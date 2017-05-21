@@ -212,9 +212,10 @@ class Plugin(indigo.PluginBase):
         #Roomba.connect()
         filename = str(deviceId)+"-config.ini"
         result = password(self, address=roombaIP, file=filename)
-        self.logger.error(unicode(result))
+        #self.logger.error(unicode(result))
         if result == True:
             valuesDict['password'] = 'OK'
+            self.logger.info(u'Password Saved. Click Ok.')
         return valuesDict
 
 
@@ -256,51 +257,52 @@ class Plugin(indigo.PluginBase):
 
         file = folderLocation + filename
 
-        if not os.path.isdir(self.folderLocation):
-            try:
-                ret = os.makedirs(self.folderLocation)
-            except:
-                self.logger.error(u"Error Creating " + unicode(self.folderLocation))
-                pass
+       # if not os.path.isdir(self.folderLocation):
+       #     try:
+        #        ret = os.makedirs(self.folderLocation)
+        #    except:
+        #        self.logger.error(u"Error Creating " + unicode(self.folderLocation))
+        #        pass
 
         if masterState != None:
-            self.logger.debug(u'Writing Master State Device:' +unicode(device.id) +":"+ unicode(file))
-            self.logger.debug(u'MasterState Name :'+ masterState['state']['reported']['name'])
-            self.logger.debug(u'MasterState Bat Pct :'+ unicode(masterState['state']['reported']['batPct']))
-            self.logger.debug(u'MasterState Bat cycle :'+ masterState['state']['reported']['cleanMissionStatus']['cycle'])
-            self.logger.debug(u'MasterState Bat phase :'+ masterState['state']['reported']['cleanMissionStatus']['phase'])
+            self.logger.debug(u'Writing Master State Device:' +unicode(device.id) +":"+unicode(masterState))
+            if masterState['state'] != None:
+                self.logger.debug(u'MasterState Name :'+ masterState['state']['reported']['name'])
+                self.logger.debug(u'MasterState Bat Pct :'+ unicode(masterState['state']['reported']['batPct']))
+                self.logger.debug(u'MasterState Bat cycle :'+ masterState['state']['reported']['cleanMissionStatus']['cycle'])
+                self.logger.debug(u'MasterState Bat phase :'+ masterState['state']['reported']['cleanMissionStatus']['phase'])
 
-            device.updateStateOnServer('BatPct', value=str(masterState['state']['reported']['batPct']))
-            device.updateStateOnServer('Cycle', value=str(masterState['state']['reported']['cleanMissionStatus']['cycle']))
-            device.updateStateOnServer('Phase', value=str(masterState['state']['reported']['cleanMissionStatus']['phase']))
-            device.updateStateOnServer('ErrorCode', value=str(masterState['state']['reported']['cleanMissionStatus']['error']))
-            device.updateStateOnServer('NotReady', value=str(masterState['state']['reported']['cleanMissionStatus']['notReady']))
+                device.updateStateOnServer('BatPct', value=str(masterState['state']['reported']['batPct']))
+                device.updateStateOnServer('Cycle', value=str(masterState['state']['reported']['cleanMissionStatus']['cycle']))
+                device.updateStateOnServer('Phase', value=str(masterState['state']['reported']['cleanMissionStatus']['phase']))
+                device.updateStateOnServer('ErrorCode', value=str(masterState['state']['reported']['cleanMissionStatus']['error']))
+                device.updateStateOnServer('NotReady', value=str(masterState['state']['reported']['cleanMissionStatus']['notReady']))
 
-            errorCode = str(masterState['state']['reported']['cleanMissionStatus']['error'])
-            try:
-                errorText = self.errorStrings[errorCode]
-            except:
-                errorText = "Undocumented Error Code (%s)" % errorCode
+                errorCode = str(masterState['state']['reported']['cleanMissionStatus']['error'])
+                try:
+                    errorText = self.errorStrings[errorCode]
+                except:
+                    errorText = "Undocumented Error Code (%s)" % errorCode
 
-            notReady = str(masterState['state']['reported']['cleanMissionStatus']['notReady'])
-            try:
-                notReadyText = self.notReadyStrings[notReady]
-            except:
-                notReadyText = "Undocumented Not Ready Value (%s)" % notReady
+                notReady = str(masterState['state']['reported']['cleanMissionStatus']['notReady'])
+                try:
+                    notReadyText = self.notReadyStrings[notReady]
+                except:
+                    notReadyText = "Undocumented Not Ready Value (%s)" % notReady
 
 
-            device.updateStateOnServer('ErrorText', value=errorText)
-            device.updateStateOnServer('NotReadyText', value=notReadyText)
+                device.updateStateOnServer('ErrorText', value=errorText)
+                device.updateStateOnServer('NotReadyText', value=notReadyText)
 
-            if errorCode == '0' and notReady == '0':
-                device.updateStateOnServer(key="deviceStatus", value="Roomba OK - "+str(masterState['state']['reported']['cleanMissionStatus']['phase']))
-                device.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
-            elif errorCode != '0':
-                device.updateStateOnServer(key="deviceStatus", value=errorText)
-                device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
-            elif notReady != '0':
-                device.updateStateOnServer(key="deviceStatus", value=notReadyText)
-                device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
+                if errorCode == '0' and notReady == '0':
+                    device.updateStateOnServer(key="deviceStatus", value="Roomba OK - "+str(masterState['state']['reported']['cleanMissionStatus']['phase']))
+                    device.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
+                elif errorCode != '0':
+                    device.updateStateOnServer(key="deviceStatus", value=errorText)
+                    device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
+                elif notReady != '0':
+                    device.updateStateOnServer(key="deviceStatus", value=notReadyText)
+                    device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
           #  self.logger.debug(unicode(masterState))
 

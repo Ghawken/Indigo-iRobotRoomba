@@ -335,7 +335,7 @@ class Roomba(object):
         self.client = None
 
         if self.address is None or blid is None or password is None:
-            self.plugin.logger.error(u'Reading Config File: %s' %file)
+            self.plugin.logger.debug(u'Reading Config File: %s' %file)
             self.read_config_file(self.file)
 
     def read_config_file(self, file):
