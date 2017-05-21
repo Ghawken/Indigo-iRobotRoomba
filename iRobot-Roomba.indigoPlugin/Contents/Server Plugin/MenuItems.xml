@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<MenuItems>
+    <SupportURL></SupportURL>
+	<MenuItem id="checkAllRoombas">
+		<Name>Update All Roomba State Info</Name>
+        <CallbackMethod>checkAllRoombas</CallbackMethod>
+	</MenuItem>
+	<MenuItem id="titleSeparator1" type="separator" />
+    <MenuItem id="checkForUpdates">
+        <Name>Check for Updates</Name>
+        <CallbackMethod>checkForUpdates</CallbackMethod>
+    </MenuItem>
+    <MenuItem id="updatePlugin">
+        <Name>Update Plugin</Name>
+        <CallbackMethod>updatePlugin</CallbackMethod>
+    </MenuItem>
+    <MenuItem id="forceUpdate">
+        <Name>Force Update</Name>
+        <CallbackMethod>forceUpdate</CallbackMethod>
+    </MenuItem>
+</MenuItems>

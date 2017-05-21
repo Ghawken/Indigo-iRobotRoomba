@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<Actions>
+    <SupportURL>http://forums.indigodomo.com/viewforum.php?f=177</SupportURL>
+    <Action id="getRoombaInfo" deviceFilter="self.roombaDevice">
+        <Name>Get Roomba Info</Name>
+        <CallbackMethod>getRoombaInfoAction</CallbackMethod>
+    </Action>
+    <Action id="getRoombaStatus" deviceFilter="self.roombaDevice">
+        <Name>Get Roomba Status</Name>
+        <CallbackMethod>getRoombaStatusAction</CallbackMethod>
+    </Action>
+    <Action id="getRoombaTime" deviceFilter="self.roombaDevice">
+        <Name>Get Roomba Day/Time</Name>
+        <CallbackMethod>getRoombaTimeAction</CallbackMethod>
+    </Action>
+    <Action id="startRoomba" deviceFilter="self.roombaDevice">
+        <Name>Start Roomba</Name>
+        <CallbackMethod>startRoombaAction</CallbackMethod>
+    </Action>
+    <Action id="stopRoomba" deviceFilter="self.roombaDevice">
+        <Name>Stop Roomba</Name>
+        <CallbackMethod>stopRoombaAction</CallbackMethod>
+    </Action>
+    <Action id="pauseRoomba" deviceFilter="self.roombaDevice">
+        <Name>Pause Roomba</Name>
+        <CallbackMethod>pauseRoombaAction</CallbackMethod>
+    </Action>
+    <Action id="resumeRoomba" deviceFilter="self.roombaDevice">
+        <Name>Resume Roomba</Name>
+        <CallbackMethod>resumeRoombaAction</CallbackMethod>
+    </Action>
+    <Action id="dockRoomba" deviceFilter="self.roombaDevice">
+        <Name>Dock Roomba</Name>
+        <CallbackMethod>dockRoombaAction</CallbackMethod>
+    </Action>
+</Actions>
