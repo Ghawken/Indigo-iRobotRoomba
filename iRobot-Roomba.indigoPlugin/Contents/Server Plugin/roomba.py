@@ -824,6 +824,7 @@ class Roomba(object):
             if self.plugin.debugTrue:
                 self.plugin.logger.debug("updated state to: %s" % (self.current_state))
             if self.plugin.continuous:
+                self.plugin.currentstate = self.current_state
                 self.plugin.updateMasterStates(self.current_state)
 
         self.publish("state", self.current_state)

@@ -54,6 +54,7 @@ class Plugin(indigo.PluginBase):
 
         self.triggers = { }
         self.masterState = None
+        self.currentstate = ""
         self.updater = GitHubPluginUpdater(self)
         self.updateFrequency = float(self.pluginPrefs.get('updateFrequency', "24")) * 60.0 * 60.0
         self.logger.debug(u"updateFrequency = " + str(self.updateFrequency))
@@ -116,7 +117,7 @@ class Plugin(indigo.PluginBase):
 
                 self.sleep(5.0)
                 if self.continuous == True and self.connected == True:
-                    self.updateMasterStates("")
+                    self.updateMasterStates(self.currentstate)
 
 
         except self.stopThread:
@@ -282,25 +283,26 @@ class Plugin(indigo.PluginBase):
         #        pass
 
         if masterState != None:
-            self.logger.debug(u'Writing Master State Device:' +unicode(device.id) +":"+unicode(masterState))
+            if self.debugTrue:
+                self.logger.debug(u'Writing Master State Device:' +unicode(device.id) +":"+unicode(masterState))
             state =""
             if 'state' in masterState:
                 if 'reported' in masterState['state']:
                     if 'name' in masterState['state']['reported']:
-                        self.logger.debug(u'MasterState Name :'+ masterState['state']['reported']['name'])
+                        #self.logger.debug(u'MasterState Name :'+ masterState['state']['reported']['name'])
                         device.updateStateOnServer('Name', value=str(masterState['state']['reported']['name']))
 
                     if 'batPct' in masterState['state']['reported']:
-                        self.logger.debug(u'MasterState Bat Pct :' + unicode(masterState['state']['reported']['batPct']))
+                        #self.logger.debug(u'MasterState Bat Pct :' + unicode(masterState['state']['reported']['batPct']))
                         device.updateStateOnServer('BatPct', value=str(masterState['state']['reported']['batPct']))
 
                     if 'cleanMissionStatus' in masterState['state']['reported']:
                         if 'cycle' in masterState['state']['reported']['cleanMissionStatus']:
-                            self.logger.debug(u'MasterState Bat cycle :'+ masterState['state']['reported']['cleanMissionStatus']['cycle'])
+                            #self.logger.debug(u'MasterState Bat cycle :'+ masterState['state']['reported']['cleanMissionStatus']['cycle'])
                             device.updateStateOnServer('Cycle',value=str(masterState['state']['reported']['cleanMissionStatus']['cycle']))
 
                         if 'phase' in masterState['state']['reported']['cleanMissionStatus']:
-                            self.logger.debug(u'MasterState Bat phase :'+ masterState['state']['reported']['cleanMissionStatus']['phase'])
+                            #self.logger.debug(u'MasterState Bat phase :'+ masterState['state']['reported']['cleanMissionStatus']['phase'])
                             device.updateStateOnServer('Phase', value=str(masterState['state']['reported']['cleanMissionStatus']['phase']))
                             state = str("Roomba Ok - ") + str(masterState['state']['reported']['cleanMissionStatus']['phase'])
                         if 'error' in masterState['state']['reported']['cleanMissionStatus']:
@@ -328,11 +330,11 @@ class Plugin(indigo.PluginBase):
 
                     if 'bin' in masterState['state']['reported']:
                         if 'full' in masterState['state']['reported']['bin']:
-                            self.logger.debug(u'MasterState Bin Full :'+ unicode(masterState['state']['reported']['bin']['full']))
+                            #self.logger.debug(u'MasterState Bin Full :'+ unicode(masterState['state']['reported']['bin']['full']))
                             if masterState['state']['reported']['bin']['full'] == 'true':
-                                device.updateStateOnServer('BinFull', value=True)
+                                device.updateStateOnServer('BinFull', value="True")
                             if masterState['state']['reported']['bin']['full'] == 'false':
-                                device.updateStateOnServer('BinFull', value=False)
+                                device.updateStateOnServer('BinFull', value="False")
 
                     if currentstate != "":
                         state = str(currentstate)
@@ -384,7 +386,8 @@ class Plugin(indigo.PluginBase):
         return
 
     def updateMasterStates(self, current_state):
-        self.logger.debug(u'updateMasterStates called.')
+        if self.debugTrue:
+            self.logger.debug(u'updateMasterStates called.')
         for dev in indigo.devices.iter("self"):
             if (dev.deviceTypeId == "roombaDevice") and self.myroomba.master_state != None:
                 self.saveMasterStateDevice(self.myroomba.master_state, dev, current_state)
@@ -404,8 +407,9 @@ class Plugin(indigo.PluginBase):
 
 
     def checkAllRoombas(self):
-        self.logger.debug(u'checkALlRoombas called. ')
-        self.logger.debug(u'self.connected equals'+unicode(self.connected)+" self.continuous equals:"+unicode(self.continuous))
+        if self.debugTrue:
+            self.logger.debug(u'checkALlRoombas called. ')
+            self.logger.debug(u'self.connected equals:'+unicode(self.connected)+"& self.continuous equals:"+unicode(self.continuous))
         for dev in indigo.devices.iter("self"):
             if self.continuous == False:
                 if (dev.deviceTypeId == "roombaDevice"):

@@ -94,7 +94,7 @@
                 <ControlPageLabel>SqFt Cleaned</ControlPageLabel>
             </State>
             <State id="BinFull">
-                <ValueType>Bool</ValueType>
+                <ValueType>String</ValueType>
                 <TriggerLabel>Bin Full</TriggerLabel>
                 <ControlPageLabel>Bin Full</ControlPageLabel>
             </State>
