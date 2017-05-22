@@ -8,7 +8,7 @@
                 <Label>Roomba IP Address:</Label>
             </Field>
             <Field id="instructions" type="label" fontSize="small" fontColor="darkgray">
-                <Label>To get Roomba into the proper mode to retrieve the password, it must be in the charging dock.  Hold down the "Home" button until Roomba plays a four note confirmation sound. Then press the Get Password button.</Label>
+                <Label>To get Roomba into the proper mode to retrieve the password, it must be in the charging dock.  Hold down the "Home" button until Roomba plays a four note confirmation sound. Then press the Get Password button.  Ignore the Timeout messages.</Label>
             </Field>
             <Field id="getRoombaPassword" type="button">
                 <Title>Get Password</Title>
@@ -16,98 +16,32 @@
             </Field>
             <Field id="password" type="textfield"  readonly="true">
                 <Label>Roomba Password:</Label>
-            </Field>            
+            </Field>
+
+
+
+
+
         </ConfigUI>
         <States>
             <State id="deviceStatus">
-                <ValueType>
-                    <List>
-                        <Option value="Unknown">Unknown</Option>
-                        <Option value="Docked">Open</Option>
-                        <Option value="Running">Closing</Option>
-                    </List>
-                </ValueType>
+                <ValueType>String</ValueType>
                 <TriggerLabel>Device Status Changed</TriggerLabel>
                 <TriggerLabelPrefix>Device Status is</TriggerLabelPrefix>
                 <ControlPageLabel>Device Status</ControlPageLabel>
                 <ControlPageLabelPrefix>Device Status is</ControlPageLabelPrefix>
             </State>
-            <State id="blid">
+            <State id="Name">
                 <ValueType>String</ValueType>
-                <TriggerLabel>blid</TriggerLabel>
-                <ControlPageLabel>blid</ControlPageLabel>
-            </State>
-            <State id="umi">
-                <ValueType>String</ValueType>
-                <TriggerLabel>umi</TriggerLabel>
-                <ControlPageLabel>umi</ControlPageLabel>
-            </State>
-            <State id="pid">
-                <ValueType>String</ValueType>
-                <TriggerLabel>pid</TriggerLabel>
-                <ControlPageLabel>pid</ControlPageLabel>
-            </State>
-            <State id="sw">
-                <ValueType>String</ValueType>
-                <TriggerLabel>sw</TriggerLabel>
-                <ControlPageLabel>sw</ControlPageLabel>
-            </State>
-            <State id="cfg">
-                <ValueType>String</ValueType>
-                <TriggerLabel>cfg</TriggerLabel>
-                <ControlPageLabel>cfg</ControlPageLabel>
-            </State>
-            <State id="boot">
-                <ValueType>String</ValueType>
-                <TriggerLabel>boot</TriggerLabel>
-                <ControlPageLabel>boot</ControlPageLabel>
-            </State>
-            <State id="main">
-                <ValueType>String</ValueType>
-                <TriggerLabel>main</TriggerLabel>
-                <ControlPageLabel>main</ControlPageLabel>
-            </State>
-            <State id="wifi">
-                <ValueType>String</ValueType>
-                <TriggerLabel>wifi</TriggerLabel>
-                <ControlPageLabel>wifi</ControlPageLabel>
-            </State>
-            <State id="nav">
-                <ValueType>String</ValueType>
-                <TriggerLabel>nav</TriggerLabel>
-                <ControlPageLabel>nav</ControlPageLabel>
-            </State>
-            <State id="ui">
-                <ValueType>String</ValueType>
-                <TriggerLabel>ui</TriggerLabel>
-                <ControlPageLabel>ui</ControlPageLabel>
-            </State>
-            <State id="audio">
-                <ValueType>String</ValueType>
-                <TriggerLabel>audio</TriggerLabel>
-                <ControlPageLabel>audio</ControlPageLabel>
-            </State>
-            <State id="bat">
-                <ValueType>String</ValueType>
-                <TriggerLabel>bat</TriggerLabel>
-                <ControlPageLabel>bat</ControlPageLabel>
-            </State>
-            <State id="Day">
-                <ValueType>String</ValueType>
-                <TriggerLabel>Day</TriggerLabel>
-                <ControlPageLabel>Day</ControlPageLabel>
+                <TriggerLabel>Name Robot</TriggerLabel>
+                <ControlPageLabel>Name Robot</ControlPageLabel>
             </State>
             <State id="Time">
                 <ValueType>String</ValueType>
                 <TriggerLabel>Time</TriggerLabel>
                 <ControlPageLabel>Time</ControlPageLabel>
             </State>
-            <State id="Flags">
-                <ValueType>String</ValueType>
-                <TriggerLabel>Flags</TriggerLabel>
-                <ControlPageLabel>Flags</ControlPageLabel>
-            </State>
-            <State id="Cycle">
+             <State id="Cycle">
                 <ValueType>String</ValueType>
                 <TriggerLabel>Cycle</TriggerLabel>
                 <ControlPageLabel>Cycle</ControlPageLabel>
@@ -117,11 +51,7 @@
                 <TriggerLabel>Phase</TriggerLabel>
                 <ControlPageLabel>Phase</ControlPageLabel>
             </State>
-            <State id="Theta">
-                <ValueType>String</ValueType>
-                <TriggerLabel>Theta</TriggerLabel>
-                <ControlPageLabel>Theta</ControlPageLabel>
-            </State>
+
             <State id="X">
                 <ValueType>String</ValueType>
                 <TriggerLabel>X</TriggerLabel>
@@ -137,16 +67,7 @@
                 <TriggerLabel>BatPct</TriggerLabel>
                 <ControlPageLabel>BatPct</ControlPageLabel>
             </State>
-            <State id="ExpireM">
-                <ValueType>String</ValueType>
-                <TriggerLabel>ExpireM</TriggerLabel>
-                <ControlPageLabel>ExpireM</ControlPageLabel>
-            </State>
-            <State id="RechrgM">
-                <ValueType>String</ValueType>
-                <TriggerLabel>RechrgM</TriggerLabel>
-                <ControlPageLabel>RechrgM</ControlPageLabel>
-            </State>
+
             <State id="ErrorCode">
                 <ValueType>String</ValueType>
                 <TriggerLabel>ErrorCode</TriggerLabel>
@@ -167,20 +88,15 @@
                 <TriggerLabel>NotReadyText</TriggerLabel>
                 <ControlPageLabel>NotReadyText</ControlPageLabel>
             </State>
-            <State id="MssnM">
-                <ValueType>String</ValueType>
-                <TriggerLabel>MssnM</TriggerLabel>
-                <ControlPageLabel>MssnM</ControlPageLabel>
-            </State>
             <State id="SqFt">
                 <ValueType>String</ValueType>
-                <TriggerLabel>SqFt</TriggerLabel>
-                <ControlPageLabel>SqFt</ControlPageLabel>
+                <TriggerLabel>SqFt Cleaned</TriggerLabel>
+                <ControlPageLabel>SqFt Cleaned</ControlPageLabel>
             </State>
-            <State id="rID">
-                <ValueType>String</ValueType>
-                <TriggerLabel>ID</TriggerLabel>
-                <ControlPageLabel>ID</ControlPageLabel>
+            <State id="BinFull">
+                <ValueType>Bool</ValueType>
+                <TriggerLabel>Bin Full</TriggerLabel>
+                <ControlPageLabel>Bin Full</ControlPageLabel>
             </State>
         </States>
         <UiDisplayStateId>deviceStatus</UiDisplayStateId>

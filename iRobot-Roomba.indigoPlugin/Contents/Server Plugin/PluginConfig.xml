@@ -18,6 +18,10 @@
     <Description>Enable/Disable</Description>
   </Field>
 
+    <Field id="continuous" type="checkbox" tooltip="Will keep connection to Roomba open.">
+            <Label>Continous connection to ONE Roomba Device only.  Do not enable if wish more than one Roomba controlled.</Label>
+            <Description>Enable/Disable</Description>
+            </Field>
 
     <Field id="logLevel" type="menu" defaultValue="20">
         <Label>Event Logging Level:</Label>

@@ -5,14 +5,6 @@
         <Name>Get Roomba Info</Name>
         <CallbackMethod>getRoombaInfoAction</CallbackMethod>
     </Action>
-    <Action id="getRoombaStatus" deviceFilter="self.roombaDevice">
-        <Name>Get Roomba Status</Name>
-        <CallbackMethod>getRoombaStatusAction</CallbackMethod>
-    </Action>
-    <Action id="getRoombaTime" deviceFilter="self.roombaDevice">
-        <Name>Get Roomba Day/Time</Name>
-        <CallbackMethod>getRoombaTimeAction</CallbackMethod>
-    </Action>
     <Action id="startRoomba" deviceFilter="self.roombaDevice">
         <Name>Start Roomba</Name>
         <CallbackMethod>startRoombaAction</CallbackMethod>

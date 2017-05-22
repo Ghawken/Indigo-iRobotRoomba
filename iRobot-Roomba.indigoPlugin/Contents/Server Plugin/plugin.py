@@ -46,7 +46,7 @@ class Plugin(indigo.PluginBase):
             self.logLevel = logging.INFO
         self.indigo_log_handler.setLevel(self.logLevel)
         self.logger.debug(u"logLevel = " + str(self.logLevel))
-        self.folderLocation = self.pluginPrefs.get('folderLocation', '')
+
         self.debugTrue = self.pluginPrefs.get('debugTrue', '')
 
     def startup(self):
@@ -59,11 +59,13 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"updateFrequency = " + str(self.updateFrequency))
         self.next_update_check = time.time()
 
+        self.continuous = self.pluginPrefs.get('continuous', False)
+
         self.statusFrequency = float(self.pluginPrefs.get('statusFrequency', "10")) * 60.0
         self.logger.debug(u"statusFrequency = " + str(self.statusFrequency))
         self.next_status_check = time.time()
         self.myroomba = None
-
+        self.connected = False
         self.errorStrings = {
             '0' : 'No Error',
             '1' : 'Place Roomba on a flat surface then press CLEAN to restart.',
@@ -96,6 +98,10 @@ class Plugin(indigo.PluginBase):
         try:
             while True:
 
+                #self.sleep(5)
+                self.checkAllRoombas()
+                self.sleep(60)
+
                 if self.updateFrequency > 0:
                     if time.time() > self.next_update_check:
                         self.updater.checkForUpdate()
@@ -104,10 +110,14 @@ class Plugin(indigo.PluginBase):
                 if self.statusFrequency > 0:
                     if time.time() > self.next_status_check:
                         self.logger.debug(u'checking all Roombas now....')
-                        self.checkAllRoombas()
+                        if self.connected == False:
+                            self.checkAllRoombas()
                         self.next_status_check = time.time() + self.statusFrequency
 
-                self.sleep(60.0)
+                self.sleep(5.0)
+                if self.continuous == True and self.connected == True:
+                    self.updateMasterStates("")
+
 
         except self.stopThread:
             pass
@@ -119,6 +129,11 @@ class Plugin(indigo.PluginBase):
         #self.getRoombaInfo(device)
         #self.getRoombaStatus(device)
         #self.getRoombaTime(device)
+
+    def deviceStopComm(self, device):
+        self.logger.debug(u"deviceStopComm called for " + device.name)
+        device.updateStateOnServer(key="deviceStatus", value="Communications Error")
+        device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
 
     def triggerStartProcessing(self, trigger):
@@ -194,6 +209,7 @@ class Plugin(indigo.PluginBase):
             self.updateFrequency = float(self.pluginPrefs.get('updateFrequency', "24")) * 60.0 * 60.0
             self.logger.debug(u"updateFrequency = " + str(self.updateFrequency))
             self.next_update_check = time.time()
+            self.debugTrue = self.pluginPrefs.get('debugTrue', '')
 
     ########################################
 
@@ -210,7 +226,7 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"getRoombaPassword called: "+unicode(deviceId))
         roombaIP = valuesDict.get('address', 0)
         #Roomba.connect()
-        filename = str(deviceId)+"-config.ini"
+        filename = str(roombaIP)+"-config.ini"
         result = password(self, address=roombaIP, file=filename)
         #self.logger.error(unicode(result))
         if result == True:
@@ -226,13 +242,14 @@ class Plugin(indigo.PluginBase):
     def connectRoomba(self,device):
         self.logger.debug(u'connecting Roomba Device: '+unicode(device.name))
         roombaIP = device.pluginProps.get('address', 0).encode('utf-8')
+
         if roombaIP == 0:
             device.updateStateOnServer(key="deviceStatus", value="Communications Error")
             device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
             self.logger.error(u"getDeviceStatus: Roomba IP address not configured.")
             return
 
-        filename = str(device.id)+"-config.ini"
+        filename = str(roombaIP)+"-config.ini"
         MAChome = os.path.expanduser("~")+"/"
         folderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
 
@@ -250,12 +267,12 @@ class Plugin(indigo.PluginBase):
             return False
         #self.logger.error(unicode(self.myroomba.master_state))
 
-    def saveMasterStateDevice(self, masterState, device):
-        filename = str(device.id)+"-masterstate.json"
-        MAChome = os.path.expanduser("~")+"/"
-        folderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
+    def saveMasterStateDevice(self, masterState, device, currentstate):
+        #filename = str(device.id)+"-masterstate.json"
+        #MAChome = os.path.expanduser("~")+"/"
+        #folderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
 
-        file = folderLocation + filename
+        #file = folderLocation + filename
 
        # if not os.path.isdir(self.folderLocation):
        #     try:
@@ -266,44 +283,72 @@ class Plugin(indigo.PluginBase):
 
         if masterState != None:
             self.logger.debug(u'Writing Master State Device:' +unicode(device.id) +":"+unicode(masterState))
-            if masterState['state'] != None:
-                self.logger.debug(u'MasterState Name :'+ masterState['state']['reported']['name'])
-                self.logger.debug(u'MasterState Bat Pct :'+ unicode(masterState['state']['reported']['batPct']))
-                self.logger.debug(u'MasterState Bat cycle :'+ masterState['state']['reported']['cleanMissionStatus']['cycle'])
-                self.logger.debug(u'MasterState Bat phase :'+ masterState['state']['reported']['cleanMissionStatus']['phase'])
+            state =""
+            if 'state' in masterState:
+                if 'reported' in masterState['state']:
+                    if 'name' in masterState['state']['reported']:
+                        self.logger.debug(u'MasterState Name :'+ masterState['state']['reported']['name'])
+                        device.updateStateOnServer('Name', value=str(masterState['state']['reported']['name']))
 
-                device.updateStateOnServer('BatPct', value=str(masterState['state']['reported']['batPct']))
-                device.updateStateOnServer('Cycle', value=str(masterState['state']['reported']['cleanMissionStatus']['cycle']))
-                device.updateStateOnServer('Phase', value=str(masterState['state']['reported']['cleanMissionStatus']['phase']))
-                device.updateStateOnServer('ErrorCode', value=str(masterState['state']['reported']['cleanMissionStatus']['error']))
-                device.updateStateOnServer('NotReady', value=str(masterState['state']['reported']['cleanMissionStatus']['notReady']))
+                    if 'batPct' in masterState['state']['reported']:
+                        self.logger.debug(u'MasterState Bat Pct :' + unicode(masterState['state']['reported']['batPct']))
+                        device.updateStateOnServer('BatPct', value=str(masterState['state']['reported']['batPct']))
 
-                errorCode = str(masterState['state']['reported']['cleanMissionStatus']['error'])
-                try:
-                    errorText = self.errorStrings[errorCode]
-                except:
-                    errorText = "Undocumented Error Code (%s)" % errorCode
+                    if 'cleanMissionStatus' in masterState['state']['reported']:
+                        if 'cycle' in masterState['state']['reported']['cleanMissionStatus']:
+                            self.logger.debug(u'MasterState Bat cycle :'+ masterState['state']['reported']['cleanMissionStatus']['cycle'])
+                            device.updateStateOnServer('Cycle',value=str(masterState['state']['reported']['cleanMissionStatus']['cycle']))
 
-                notReady = str(masterState['state']['reported']['cleanMissionStatus']['notReady'])
-                try:
-                    notReadyText = self.notReadyStrings[notReady]
-                except:
-                    notReadyText = "Undocumented Not Ready Value (%s)" % notReady
+                        if 'phase' in masterState['state']['reported']['cleanMissionStatus']:
+                            self.logger.debug(u'MasterState Bat phase :'+ masterState['state']['reported']['cleanMissionStatus']['phase'])
+                            device.updateStateOnServer('Phase', value=str(masterState['state']['reported']['cleanMissionStatus']['phase']))
+                            state = str("Roomba Ok - ") + str(masterState['state']['reported']['cleanMissionStatus']['phase'])
+                        if 'error' in masterState['state']['reported']['cleanMissionStatus']:
+                            device.updateStateOnServer('ErrorCode', value=str(masterState['state']['reported']['cleanMissionStatus']['error']))
+                            errorCode = str(masterState['state']['reported']['cleanMissionStatus']['error'])
+                            try:
+                                errorText = self.errorStrings[errorCode]
+                            except:
+                                errorText = "Undocumented Error Code (%s)" % errorCode
+                            device.updateStateOnServer('ErrorText', value=errorText)
+
+                        if 'notReady' in masterState['state']['reported']['cleanMissionStatus']:
+                            device.updateStateOnServer('NotReady', value=str(
+                                masterState['state']['reported']['cleanMissionStatus']['notReady']))
+                            notReady = str(masterState['state']['reported']['cleanMissionStatus']['notReady'])
+                            try:
+                                notReadyText = self.notReadyStrings[notReady]
+                            except:
+                                notReadyText = "Undocumented Not Ready Value (%s)" % notReady
+                            device.updateStateOnServer('NotReadyText', value=notReadyText)
+
+                        if 'sqft' in masterState['state']['reported']['cleanMissionStatus']:
+                            device.updateStateOnServer('SqFt', value=str(
+                                masterState['state']['reported']['cleanMissionStatus']['sqft']))
+
+                    if 'bin' in masterState['state']['reported']:
+                        if 'full' in masterState['state']['reported']['bin']:
+                            self.logger.debug(u'MasterState Bin Full :'+ unicode(masterState['state']['reported']['bin']['full']))
+                            if masterState['state']['reported']['bin']['full'] == 'true':
+                                device.updateStateOnServer('BinFull', value=True)
+                            if masterState['state']['reported']['bin']['full'] == 'false':
+                                device.updateStateOnServer('BinFull', value=False)
+
+                    if currentstate != "":
+                        state = str(currentstate)
+
+                    if errorCode == '0' and notReady == '0':
+                        device.updateStateOnServer(key="deviceStatus", value=unicode(state))
+                        device.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
+                    elif errorCode != '0':
+                        device.updateStateOnServer(key="deviceStatus", value=errorText)
+                        device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
+                    elif notReady != '0':
+                        device.updateStateOnServer(key="deviceStatus", value=notReadyText)
+                        device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
 
-                device.updateStateOnServer('ErrorText', value=errorText)
-                device.updateStateOnServer('NotReadyText', value=notReadyText)
-
-                if errorCode == '0' and notReady == '0':
-                    device.updateStateOnServer(key="deviceStatus", value="Roomba OK - "+str(masterState['state']['reported']['cleanMissionStatus']['phase']))
-                    device.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
-                elif errorCode != '0':
-                    device.updateStateOnServer(key="deviceStatus", value=errorText)
-                    device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
-                elif notReady != '0':
-                    device.updateStateOnServer(key="deviceStatus", value=notReadyText)
-                    device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
-
+        return
           #  self.logger.debug(unicode(masterState))
 
       #  masterjson = json.dumps(masterState)
@@ -319,7 +364,7 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u'disconnecting Roomba Device: '+unicode(device.name))
 
         if self.myroomba.master_state != None:
-            self.saveMasterStateDevice(self.myroomba.master_state, device)
+            self.saveMasterStateDevice(self.myroomba.master_state, device, "")
             self.logger.debug(unicode(self.myroomba.master_state))
 
         self.myroomba.disconnect()
@@ -328,12 +373,22 @@ class Plugin(indigo.PluginBase):
 
     def getRoombaInfo(self, device):
         self.logger.debug(u"getRoombaInfo for %s" % device.name)
+        #self.logger.debug(u'')
+        #
+        # if above true - connect to one device only (1st one found) and do so with continuous connection - constant updates...
+
         if self.connectRoomba(device):
             time.sleep(15)
-            self.disconnectRoomba(device)
+            if self.continuous == False:
+                self.disconnectRoomba(device)
         return
 
-    def updateMasterStates(self, device):
+    def updateMasterStates(self, current_state):
+        self.logger.debug(u'updateMasterStates called.')
+        for dev in indigo.devices.iter("self"):
+            if (dev.deviceTypeId == "roombaDevice") and self.myroomba.master_state != None:
+                self.saveMasterStateDevice(self.myroomba.master_state, dev, current_state)
+                self.logger.debug(u'updateMasterStates called.')
         return
 
 
@@ -349,11 +404,19 @@ class Plugin(indigo.PluginBase):
 
 
     def checkAllRoombas(self):
+        self.logger.debug(u'checkALlRoombas called. ')
+        self.logger.debug(u'self.connected equals'+unicode(self.connected)+" self.continuous equals:"+unicode(self.continuous))
         for dev in indigo.devices.iter("self"):
-            if (dev.deviceTypeId == "roombaDevice"):
-                self.logger.debug(u'getRoomba Info Running..')
-                self.getRoombaInfo(dev)
-                time.sleep(60)
+            if self.continuous == False:
+                if (dev.deviceTypeId == "roombaDevice"):
+                    self.logger.debug(u'getRoomba Info Running..')
+                    self.getRoombaInfo(dev)
+                    time.sleep(60)
+
+            if self.continuous == True and self.connected == False:
+                  if (dev.deviceTypeId == "roombaDevice"):
+                    self.logger.debug(u'Continuous ON and not connected.. ')
+                    self.getRoombaInfo(dev)
 
                 #self.getRoombaStatus(dev)
                 #self.getRoombaTime(dev)
@@ -376,8 +439,16 @@ class Plugin(indigo.PluginBase):
 
     def RoombaAction(self, pluginAction, roombaDevice, action):
         self.logger.debug(u"startRoombaAction for "+unicode(roombaDevice.name)+": Action : "+str(action))
-        self.connectRoomba(roombaDevice)
-        time.sleep(5)
-        self.myroomba.send_command(str(action))
-        time.sleep(5)
-        self.disconnectRoomba(roombaDevice)
+        if self.connected == False and self.continuous== False:
+            self.connectRoomba(roombaDevice)
+            time.sleep(5)
+            self.myroomba.send_command(str(action))
+            time.sleep(5)
+            self.disconnectRoomba(roombaDevice)
+        if self.connected == True:
+            #self.connectRoomba(roombaDevice)
+            #time.sleep(5)
+            self.myroomba.send_command(str(action))
+            time.sleep(5)
+            if self.continuous == False:
+                self.disconnectRoomba(roombaDevice)

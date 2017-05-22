@@ -129,7 +129,7 @@ class password(object):
                 self.plugin.logger.debug("Roombas at address: %s does not have the correct firmware version. Your version info is: %s" % (addr,json.dumps(parsedMsg, indent=2)))
                 continue
 
-            self.plugin.logger.debug("Make sure your robot (%s) at IP %s is on the Home Base and powered on (green lights on). Then press and hold the HOME button on your robot until it plays a series of tones (about 2 seconds). Release the button and your robot will flash WIFI light." % (parsedMsg["robotname"],addr))
+            self.plugin.logger.info("Make sure your robot (%s) at IP %s is on the Home Base and powered on (green lights on). Then press and hold the HOME button on your robot until it plays a series of tones (about 2 seconds). Release the button and your robot will flash WIFI light." % (parsedMsg["robotname"],addr))
             #raw_input("Press Enter to continue...")
 
             self.plugin.logger.debug("Received: %s"  % json.dumps(parsedMsg, indent=2))
@@ -150,8 +150,8 @@ class password(object):
             try:
                 wrappedSocket.connect((addr, 8883))
             except Exception as e:
-                self.plugin.logger.error("Connection Error %s" % e)
-                self.plugin.logger.debug('Error getting password.  Follow the instructions and try again.')
+                self.plugin.logger.debug("Connection Error %s" % e)
+                self.plugin.logger.info('Error getting password.  Follow the instructions and try again.')
                 #return False
 
             wrappedSocket.send(packet)
@@ -185,8 +185,8 @@ class password(object):
                 self.plugin.logger.debug('Error getting password, receive %d bytes. Follow the instructions and try again.' % len(data))
                 return False
             else:
-                self.plugin.logger.debug("blid is: %s" % blid)
-                self.plugin.logger.debug('Password=> %s <= Yes, all this string.' % str(data[7:]))
+                self.plugin.logger.info("blid is: %s" % blid)
+                self.plugin.logger.info('Password=> %s <= Yes, all this string.' % str(data[7:]))
 
 
                 Config = configparser.ConfigParser()
@@ -207,7 +207,8 @@ class password(object):
                 self.plugin.logger.debug(u'Using cfgfile:'+ unicode(self.file))
                 with open(self.file, 'w') as cfgfile:
                     Config.write(cfgfile)
-                    self.plugin.logger.debug(u'Saved Config File')
+                    self.plugin.logger.info(u'Saved Device Config File/Password. Click OK to continue.')
+                    #self.plugin.logger.info(u'Restart Plugin to continue.')
         return True
 
 
@@ -479,10 +480,11 @@ class Roomba(object):
         self.plugin.logger.debug("Roomba Connected %s" % self.roombaName)
         if rc == 0:
             self.roomba_connected = True
+            self.plugin.connected = True
             self.client.subscribe(self.topic)
         else:
-            self.plugin.logger.error("Roomba Connected with result code "+str(rc))
-            self.plugin.logger.error("Please make sure your blid and password are correct %s" % self.roombaName)
+            self.plugin.logger.debug("Roomba Connected with result code "+str(rc))
+            self.plugin.logger.debug("Please make sure your blid and password are correct %s" % self.roombaName)
             if self.mqttc is not None:
                self.mqttc.disconnect()
             sys.exit(1)
@@ -502,7 +504,8 @@ class Roomba(object):
         self.dict_merge(self.master_state, json_data)
 
         if self.pretty_print:
-            self.plugin.logger.debug("%-{:d}s : %s".format(self.master_indent) % (msg.topic,log_string))
+            if self.plugin.debugTrue:
+                self.plugin.logger.debug("%-{:d}s : %s".format(self.master_indent) % (msg.topic,log_string))
         else:
             if self.plugin.debugTrue:
                 self.plugin.logger.debug("Received Roomba Data %s: %s, %s" % (self.roombaName, str(msg.topic), str(msg.payload)))
@@ -513,20 +516,24 @@ class Roomba(object):
             self.decode_topics(json_data)
 
         if time.time() - self.time > self.update_seconds:   #default every 5 minutes
-            self.plugin.logger.debug("Publishing master_state %s" % self.roombaName)
+            if self.plugin.debugTrue:
+                self.plugin.logger.debug("Publishing master_state %s" % self.roombaName)
             self.decode_topics(self.master_state)    #publish all values
+            #self.plugin.checkForUpdates()
             self.time = time.time()
 
     def on_publish(self, mosq, obj, mid):
         pass
 
     def on_subscribe(self, mosq, obj, mid, granted_qos):
-        self.plugin.logger.debug("Subscribed: %s %s" % (str(mid), str(granted_qos)))
+        if self.plugin.debugTrue:
+            self.plugin.logger.debug("Subscribed: %s %s" % (str(mid), str(granted_qos)))
 
     def on_disconnect(self, mosq, obj, rc):
         self.roomba_connected = False
+        self.plugin.connected = False
         if rc != 0:
-            self.plugin.logger.error("Unexpected Disconnect From Roomba %s! - reconnecting" % self.roombaName)
+            self.plugin.logger.debug("Unexpected Disconnect From Roomba %s! - reconnecting" % self.roombaName)
         else:
             self.plugin.logger.debug("Disconnected From Roomba %s" % self.roombaName)
 
@@ -795,7 +802,7 @@ class Roomba(object):
             self.current_state = self.states["pause"]
             current_mission = None #so that we will draw map and can update recharge time
         elif self.current_state == self.states["charge"] and self.cleanMissionStatus_phase == "charge":
-            current_mission = None #so that we will draw map and can update charge status
+            current_mission == self.states['charge'] # change away from None #so that we will draw map and can update charge status
         elif (self.current_state == self.states["stop"] or self.current_state == self.states["pause"]) and self.cleanMissionStatus_phase == "hmUsrDock":
             self.current_state = self.states["cancelled"]
         elif (self.current_state == self.states["hmUsrDock"] or self.current_state == self.states["cancelled"]) and self.cleanMissionStatus_phase == "charge":
@@ -813,7 +820,11 @@ class Roomba(object):
             self.plugin.logger.debug("set current state to: %s" % (self.current_state))
 
         if self.current_state != current_mission:
-            self.plugin.logger.debug("updated state to: %s" % (self.current_state))
+
+            if self.plugin.debugTrue:
+                self.plugin.logger.debug("updated state to: %s" % (self.current_state))
+            if self.plugin.continuous:
+                self.plugin.updateMasterStates(self.current_state)
 
         self.publish("state", self.current_state)
         self.draw_map(current_mission != self.current_state)
