@@ -110,14 +110,16 @@ class Plugin(indigo.PluginBase):
 
                 if self.statusFrequency > 0:
                     if time.time() > self.next_status_check:
-                        self.logger.debug(u'checking all Roombas now....')
+                        if self.debugTrue:
+                            self.logger.debug(u'checking all Roombas now....')
                         if self.connected == False:
-                            self.checkAllRoombas()
+                            self.checkAllRoombas()   # if not using continuous connection check here - at time allowed
+                        if self.continuous == True and self.connected == True:
+                            self.updateMasterStates(self.currentstate)   # if using continuous - should already be connected just update states here
                         self.next_status_check = time.time() + self.statusFrequency
 
-                self.sleep(5.0)
-                if self.continuous == True and self.connected == True:
-                    self.updateMasterStates(self.currentstate)
+                self.sleep(60.0)
+
 
 
         except self.stopThread:
@@ -269,18 +271,8 @@ class Plugin(indigo.PluginBase):
         #self.logger.error(unicode(self.myroomba.master_state))
 
     def saveMasterStateDevice(self, masterState, device, currentstate):
-        #filename = str(device.id)+"-masterstate.json"
-        #MAChome = os.path.expanduser("~")+"/"
-        #folderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
-
-        #file = folderLocation + filename
-
-       # if not os.path.isdir(self.folderLocation):
-       #     try:
-        #        ret = os.makedirs(self.folderLocation)
-        #    except:
-        #        self.logger.error(u"Error Creating " + unicode(self.folderLocation))
-        #        pass
+        if self.debugTrue:
+            self.logger.debug(u'saveMasterStateDevice called.')
 
         if masterState != None:
             if self.debugTrue:
@@ -391,7 +383,6 @@ class Plugin(indigo.PluginBase):
         for dev in indigo.devices.iter("self"):
             if (dev.deviceTypeId == "roombaDevice") and self.myroomba.master_state != None:
                 self.saveMasterStateDevice(self.myroomba.master_state, dev, current_state)
-                self.logger.debug(u'updateMasterStates called.')
         return
 
 
