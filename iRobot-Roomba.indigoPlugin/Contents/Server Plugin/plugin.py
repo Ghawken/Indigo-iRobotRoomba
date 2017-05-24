@@ -283,6 +283,12 @@ class Plugin(indigo.PluginBase):
                     if 'name' in masterState['state']['reported']:
                         #self.logger.debug(u'MasterState Name :'+ masterState['state']['reported']['name'])
                         device.updateStateOnServer('Name', value=str(masterState['state']['reported']['name']))
+                    if 'pose' in masterState['state']['reported']:
+                        if 'point' in masterState['state']['reported']['pose']:
+                            if 'x' in masterState['state']['reported']['pose']['point']:
+                                device.updateStateOnServer('X', value=str(masterState['state']['reported']['pose']['point']['x']))
+                            if 'y' in masterState['state']['reported']['pose']['point']:
+                                device.updateStateOnServer('Y', value=str(masterState['state']['reported']['pose']['point']['y']))
 
                     if 'batPct' in masterState['state']['reported']:
                         #self.logger.debug(u'MasterState Bat Pct :' + unicode(masterState['state']['reported']['batPct']))

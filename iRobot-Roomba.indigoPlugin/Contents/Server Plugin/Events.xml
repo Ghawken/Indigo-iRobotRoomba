@@ -1,22 +1,3 @@
 <?xml version="1.0"?>
 <Events>
-    <SupportURL>http://forums.indigodomo.com/viewforum.php?f=177</SupportURL>
-    <Event id="notReady">
-        <Name>Roomba Not Ready</Name>
-        <ConfigUI>
-            <Field id="deviceID" type="menu">
-                <Label>Select Device:</Label>
-                <List class="indigo.devices" filter="self"/>
-            </Field>            
-        </ConfigUI>
-    </Event>
-    <Event id="hasError">
-        <Name>Roomba Reports Error</Name>
-        <ConfigUI>
-            <Field id="deviceID" type="menu">
-                <Label>Select Device:</Label>
-                <List class="indigo.devices" filter="self"/>
-            </Field>            
-        </ConfigUI>
-    </Event>
 </Events>
