@@ -17,11 +17,6 @@
             <Field id="password" type="textfield"  readonly="true">
                 <Label>Roomba Password:</Label>
             </Field>
-
-
-
-
-
         </ConfigUI>
         <States>
             <State id="deviceStatus">

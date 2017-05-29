@@ -443,19 +443,22 @@ class Roomba(object):
             return True
 
         except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            self.plugin.logger.error(unicode(exc_type)+ unicode(fname) +unicode( exc_tb.tb_lineno))
+            #exc_type, exc_obj, exc_tb = sys.exc_info()
+            #fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            #self.plugin.logger.error(unicode(exc_type)+ unicode(fname) +unicode( exc_tb.tb_lineno))
 
             self.plugin.logger.error("Error Here: %s " % unicode(e[0]))
-            if e[0] == 111: #errno.ECONNREFUSED
+            if e[0] == 111 or e[0] ==61 : #errno.ECONNREFUSED
                 count +=1
                 if count <= max_retries:
                     self.plugin.logger.error("Attempting new Connection# %d" % count)
-                    time.sleep(1)
+                    time.sleep(5)
                     self._connect(count, True)
         if count == max_retries:
             self.plugin.logger.error("Unable to connect %s" % unicode(self.roombaName))
+            self.plugin.logger.error("Disconnectng and Reconnecting..")
+            if self.plugin.continuous:
+                self.plugin.reconnectRoomba()
         return False
 
     def disconnect(self):

@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>PluginVersion</key>
-    <string>0.0.5</string>
+    <string>0.0.7</string>
     <key>ServerApiVersion</key>
     <string>2.0</string>
     <key>IwsApiVersion</key>
@@ -20,7 +20,7 @@
     <array>
         <dict>
             <key>CFBundleURLName</key>
-            <string>http://www.github.com/ghawken/Indigo-iRobotRoomba</string>
+            <string>http://forums.indigodomo.com/viewtopic.php?f=222&t=18426</string>
         </dict>
     </array>
 </dict>

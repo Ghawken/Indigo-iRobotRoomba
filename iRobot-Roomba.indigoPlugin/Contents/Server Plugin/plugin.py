@@ -56,14 +56,22 @@ class Plugin(indigo.PluginBase):
         self.masterState = None
         self.currentstate = ""
         self.updater = GitHubPluginUpdater(self)
+
         self.updateFrequency = float(self.pluginPrefs.get('updateFrequency', "24")) * 60.0 * 60.0
+
         self.logger.debug(u"updateFrequency = " + str(self.updateFrequency))
         self.next_update_check = time.time()
 
         self.continuous = self.pluginPrefs.get('continuous', False)
 
+        #automatically disconnect reconnect even in continuous after elapsed time - 12 hours
+        self.reconnectFreq = 12*60*60
+        self.connectTime = self.reconnectFreq +time.time()
+
         self.statusFrequency = float(self.pluginPrefs.get('statusFrequency', "10")) * 60.0
+
         self.logger.debug(u"statusFrequency = " + str(self.statusFrequency))
+
         self.next_status_check = time.time()
         self.myroomba = None
         self.connected = False
@@ -117,6 +125,12 @@ class Plugin(indigo.PluginBase):
                         if self.continuous == True and self.connected == True:
                             self.updateMasterStates(self.currentstate)   # if using continuous - should already be connected just update states here
                         self.next_status_check = time.time() + self.statusFrequency
+
+                if time.time() > self.connectTime and self.continuous == True:
+                    # Disconnect and Reconnect Roomba
+                    self.reconnectRoomba()
+                    self.connectTime = time.time() + self.reconnectFreq
+
 
                 self.sleep(60.0)
 
@@ -390,6 +404,15 @@ class Plugin(indigo.PluginBase):
             if (dev.deviceTypeId == "roombaDevice") and self.myroomba.master_state != None:
                 self.saveMasterStateDevice(self.myroomba.master_state, dev, current_state)
         return
+
+    def reconnectRoomba(self):
+        self.logger.debug("Restablish connection for Roomba Run - reconnectRoomba")
+        for dev in indigo.devices.iter("self"):
+            self.disconnectRoomba(dev)
+            time.sleep(15)
+            self.connectRoomba(dev)
+        return
+
 
 
 
