@@ -384,6 +384,12 @@ class Plugin(indigo.PluginBase):
         self.myroomba.disconnect()
         self.myroomba = None
 
+    def removeRoomba(self):
+        self.logger.debug(u'removeRoomba run')
+        self.myroomba.disconnect()
+        self.myroomba = None
+        return
+
 
     def getRoombaInfo(self, device):
         self.logger.debug(u"getRoombaInfo for %s" % device.name)

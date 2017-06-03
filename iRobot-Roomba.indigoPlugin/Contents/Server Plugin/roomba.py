@@ -447,18 +447,25 @@ class Roomba(object):
             #fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             #self.plugin.logger.error(unicode(exc_type)+ unicode(fname) +unicode( exc_tb.tb_lineno))
 
-            self.plugin.logger.error("Error Here: %s " % unicode(e[0]))
-            if e[0] == 111 or e[0] ==61 : #errno.ECONNREFUSED
-                count +=1
-                if count <= max_retries:
-                    self.plugin.logger.error("Attempting new Connection# %d" % count)
-                    time.sleep(5)
-                    self._connect(count, True)
+            self.plugin.logger.error("Connection Roomba Error: %s " % unicode(e[0]))
+            #if e[0] == 111 or e[0] ==61 : #errno.ECONNREFUSED
+            count +=1
+            if count <= max_retries:
+                self.plugin.logger.error("Attempting new Connection# %d" % count)
+                time.sleep(5)
+                self._connect(count, True)
+
         if count == max_retries:
             self.plugin.logger.error("Unable to connect %s" % unicode(self.roombaName))
-            self.plugin.logger.error("Disconnectng and Reconnecting..")
-            if self.plugin.continuous:
-                self.plugin.reconnectRoomba()
+           # self.plugin.logger.error("Disconnectng and Reconnecting..")
+            self.roomba_connected = False
+            self.plugin.connected = False
+            self.plugin.removeRoomba()
+            # delete the roomba device because trying to connect does not reestablish connection
+            # Let the time for reconnection - restablish a connection
+            #if self.plugin.continuous:
+            #    self.plugin.reconnectRoomba()
+
         return False
 
     def disconnect(self):
