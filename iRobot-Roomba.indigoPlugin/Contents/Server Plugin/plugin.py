@@ -234,14 +234,53 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"validateDeviceConfigUi called")
         errorDict = indigo.Dict()
 
+        address = valuesDict['address']
+        if address == None or address <= 0:
+            errorDict['address'] = u'IP Address can not be blank, please enter valid IP'
+            return (False, valuesDict, errorDict)
+
+        if self.checkConfigFile(valuesDict, deviceId)== False:
+            self.logger.debug(u'Config File Does Not Exist.')
+            errorDict['address'] = u'Configuration File Does Not exist - Please use Get Password button and instructions to create.'
+            return (False,valuesDict, errorDict)
+        else:
+            self.logger.debug(u'Config File Exists - using it')
+            valuesDict['password'] = 'OK.  Using Saved Config File.'
+
+
+        #Roomba.connect()
+
+
+
         return (True, valuesDict)
 
 
     ########################################
 
+    def checkConfigFile(self,valuesDict, deviceId):
+        MAChome     = os.path.expanduser("~")+"/"
+        folderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
+        roombaIP = valuesDict['address']
+        filename = str(roombaIP) + "-config.ini"
+        file = folderLocation + filename
+        self.logger.debug(u'file should equal:' + file)
+        if os.path.isfile(file):
+            return True
+
+        return False
+
+
+
+
     def getRoombaPassword(self, valuesDict, typeId, deviceId):
         self.logger.debug(u"getRoombaPassword called: "+unicode(deviceId))
+
         roombaIP = valuesDict.get('address', 0)
+
+        if roombaIP == 0 or roombaIP == '':
+            self.logger.error(u'IP Address cannot be Empty.  Please empty valid IP before using Get Password')
+            return False
+
         #Roomba.connect()
         filename = str(roombaIP)+"-config.ini"
         result = password(self, address=roombaIP, file=filename)
