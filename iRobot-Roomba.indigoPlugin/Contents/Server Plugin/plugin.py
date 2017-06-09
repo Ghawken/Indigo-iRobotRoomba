@@ -416,9 +416,10 @@ class Plugin(indigo.PluginBase):
     def disconnectRoomba(self,device):
         self.logger.debug(u'disconnecting Roomba Device: '+unicode(device.name))
 
-        if self.myroomba.master_state != None:
-            self.saveMasterStateDevice(self.myroomba.master_state, device, "")
-            self.logger.debug(unicode(self.myroomba.master_state))
+        if self.myroomba != None:
+            if self.myroomba.master_state != None:
+                self.saveMasterStateDevice(self.myroomba.master_state, device, "")
+                self.logger.debug(unicode(self.myroomba.master_state))
 
         self.myroomba.disconnect()
         self.myroomba = None
@@ -446,8 +447,9 @@ class Plugin(indigo.PluginBase):
         if self.debugTrue:
             self.logger.debug(u'updateMasterStates called.')
         for dev in indigo.devices.iter("self"):
-            if (dev.deviceTypeId == "roombaDevice") and self.myroomba.master_state != None:
-                self.saveMasterStateDevice(self.myroomba.master_state, dev, current_state)
+            if self.myroomba != None:
+                if (dev.deviceTypeId == "roombaDevice") and self.myroomba.master_state != None:
+                    self.saveMasterStateDevice(self.myroomba.master_state, dev, current_state)
         return
 
     def reconnectRoomba(self):
