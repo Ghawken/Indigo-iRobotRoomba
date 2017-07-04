@@ -459,7 +459,7 @@ class Plugin(indigo.PluginBase):
     def reconnectRoomba(self):
         self.logger.debug("Restablish connection for Roomba Run - reconnectRoomba")
         for dev in indigo.devices.iter("self"):
-            if self.roomba != None:
+            if self.myroomba != None:
                 self.disconnectRoomba(dev)
             time.sleep(15)
             self.connectRoomba(dev)
