@@ -120,9 +120,9 @@ class Plugin(indigo.PluginBase):
                     if time.time() > self.next_status_check:
                         if self.debugTrue:
                             self.logger.debug(u'checking all Roombas now....')
-                        if self.connected == False:
+                        if self.connected == False or (self.continuous == True and self.myroomba == None):
                             self.checkAllRoombas()   # if not using continuous connection check here - at time allowed
-                        if self.continuous == True and self.connected == True:
+                        if (self.continuous == True and self.connected == True) :
                             self.updateMasterStates(self.currentstate)   # if using continuous - should already be connected just update states here
                         self.next_status_check = time.time() + self.statusFrequency
 
@@ -141,7 +141,7 @@ class Plugin(indigo.PluginBase):
 
     def deviceStartComm(self, device):
         self.logger.debug(u"deviceStartComm called for " + device.name)
-
+        device.stateListOrDisplayStateIdChanged()
 
         #self.getRoombaInfo(device)
         #self.getRoombaStatus(device)
@@ -378,14 +378,18 @@ class Plugin(indigo.PluginBase):
                         if 'sqft' in masterState['state']['reported']['cleanMissionStatus']:
                             device.updateStateOnServer('SqFt', value=str(
                                 masterState['state']['reported']['cleanMissionStatus']['sqft']))
+                        if 'rechrgM' in masterState['state']['reported']['cleanMissionStatus']:
+                            device.updateStateOnServer('RechargeM', value=str(
+                                masterState['state']['reported']['cleanMissionStatus']['rechrgM']))
+
 
                     if 'bin' in masterState['state']['reported']:
                         if 'full' in masterState['state']['reported']['bin']:
                             #self.logger.debug(u'MasterState Bin Full :'+ unicode(masterState['state']['reported']['bin']['full']))
                             if masterState['state']['reported']['bin']['full'] == 'true':
-                                device.updateStateOnServer('BinFull', value="True")
+                                device.updateStateOnServer('BinFull', value=True)
                             if masterState['state']['reported']['bin']['full'] == 'false':
-                                device.updateStateOnServer('BinFull', value="False")
+                                device.updateStateOnServer('BinFull', value=False)
 
                     if currentstate != "":
                         state = str(currentstate)
@@ -455,7 +459,8 @@ class Plugin(indigo.PluginBase):
     def reconnectRoomba(self):
         self.logger.debug("Restablish connection for Roomba Run - reconnectRoomba")
         for dev in indigo.devices.iter("self"):
-            self.disconnectRoomba(dev)
+            if self.roomba != None:
+                self.disconnectRoomba(dev)
             time.sleep(15)
             self.connectRoomba(dev)
         return

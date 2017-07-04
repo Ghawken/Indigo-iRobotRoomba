@@ -460,6 +460,7 @@ class Roomba(object):
            # self.plugin.logger.error("Disconnectng and Reconnecting..")
             self.roomba_connected = False
             self.plugin.connected = False
+
             self.disconnect()
             self.plugin.removeRoomba()
             # delete the roomba device because trying to connect does not reestablish connection

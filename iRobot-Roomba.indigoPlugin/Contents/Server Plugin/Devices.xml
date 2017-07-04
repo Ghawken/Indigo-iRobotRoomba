@@ -31,11 +31,6 @@
                 <TriggerLabel>Name Robot</TriggerLabel>
                 <ControlPageLabel>Name Robot</ControlPageLabel>
             </State>
-            <State id="Time">
-                <ValueType>String</ValueType>
-                <TriggerLabel>Time</TriggerLabel>
-                <ControlPageLabel>Time</ControlPageLabel>
-            </State>
              <State id="Cycle">
                 <ValueType>String</ValueType>
                 <TriggerLabel>Cycle</TriggerLabel>
@@ -62,7 +57,11 @@
                 <TriggerLabel>BatPct</TriggerLabel>
                 <ControlPageLabel>BatPct</ControlPageLabel>
             </State>
-
+            <State id="RechargeM">
+                <ValueType>String</ValueType>
+                <TriggerLabel>RechargeM</TriggerLabel>
+                <ControlPageLabel>RechargeM</ControlPageLabel>
+            </State>
             <State id="ErrorCode">
                 <ValueType>String</ValueType>
                 <TriggerLabel>ErrorCode</TriggerLabel>
@@ -89,7 +88,7 @@
                 <ControlPageLabel>SqFt Cleaned</ControlPageLabel>
             </State>
             <State id="BinFull">
-                <ValueType>String</ValueType>
+                <ValueType>Boolean</ValueType>
                 <TriggerLabel>Bin Full</TriggerLabel>
                 <ControlPageLabel>Bin Full</ControlPageLabel>
             </State>
