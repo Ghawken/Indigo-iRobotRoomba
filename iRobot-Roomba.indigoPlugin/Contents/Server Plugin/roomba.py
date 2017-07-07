@@ -375,7 +375,7 @@ class Roomba(object):
                 self.plugin.logger.debug(u"Please install paho-mqtt '<sudo> pip install paho-mqtt' to use this library")
                 return False
 
-            self.client = mqtt.Client(client_id=self.blid, clean_session=self.clean)
+            self.client = mqtt.Client(client_id=self.blid, clean_session=self.clean, protocol=mqtt.MQTTv311)
             # Assign event callbacks
             self.client.on_message = self.on_message
             self.client.on_connect = self.on_connect
@@ -387,7 +387,21 @@ class Roomba(object):
             # self.client.on_log = self.on_log
 
             #set TLS, self.cert_name is required by paho-mqtt, even if the certificate is not used...
-            self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_TLSv1)
+            #self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_TLSv1)
+            # set TLS, self.cert_name is required by paho-mqtt, even if the certificate is not used...
+            # but v1.3 changes all this, so have to do the following:
+
+            self.plugin.logger.debug("Seting TLS")
+            try:
+                self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_TLSv1)
+            except ValueError:  # try V1.3 version
+                self.plugin.logger.debug.warn("TLS Setting failed - trying 1.3 version")
+                self.client._ssl_context = None
+                context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+                context.verify_mode = ssl.CERT_NONE
+                context.load_default_certs()
+                self.client.tls_set_context(context)
+
 
             # disables peer verification
             self.client.tls_insecure_set(True)

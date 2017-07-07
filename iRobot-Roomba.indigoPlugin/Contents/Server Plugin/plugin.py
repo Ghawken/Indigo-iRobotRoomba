@@ -128,6 +128,8 @@ class Plugin(indigo.PluginBase):
 
                 if time.time() > self.connectTime and self.continuous == True:
                     # Disconnect and Reconnect Roomba
+                    if self.debugTrue:
+                        self.logger.debug(u'Up for long enough reconecting..')
                     self.reconnectRoomba()
                     self.connectTime = time.time() + self.reconnectFreq
 
@@ -420,13 +422,13 @@ class Plugin(indigo.PluginBase):
     def disconnectRoomba(self,device):
         self.logger.debug(u'disconnecting Roomba Device: '+unicode(device.name))
 
-        if self.myroomba != None:
+        if self.myroomba != None and self.myroomba != None:
             if self.myroomba.master_state != None:
                 self.saveMasterStateDevice(self.myroomba.master_state, device, "")
                 self.logger.debug(unicode(self.myroomba.master_state))
 
-        self.myroomba.disconnect()
-        self.myroomba = None
+            self.myroomba.disconnect()
+            self.myroomba = None
 
     def removeRoomba(self):
         self.logger.debug(u'removeRoomba run')
