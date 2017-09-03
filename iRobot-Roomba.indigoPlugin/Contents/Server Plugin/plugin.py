@@ -333,6 +333,7 @@ class Plugin(indigo.PluginBase):
             if self.debugTrue:
                 self.logger.debug(u'Writing Master State Device:' +unicode(device.id) +":"+unicode(masterState))
             state =""
+            errorCode ='0'
             if 'state' in masterState:
                 if 'reported' in masterState['state']:
                     if 'name' in masterState['state']['reported']:

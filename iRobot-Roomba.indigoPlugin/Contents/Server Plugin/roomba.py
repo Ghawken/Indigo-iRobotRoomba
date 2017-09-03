@@ -472,11 +472,13 @@ class Roomba(object):
         if count == max_retries:
             self.plugin.logger.error("Unable to connect %s" % unicode(self.roombaName))
            # self.plugin.logger.error("Disconnectng and Reconnecting..")
-            self.roomba_connected = False
-            self.plugin.connected = False
+            plugin = indigo.server.getPlugin('GlennNZ.indigo.plugin.irobot')
+            plugin.restart();
+            #self.roomba_connected = False
+            #self.plugin.connected = False
 
-            self.disconnect()
-            self.plugin.removeRoomba()
+            #self.disconnect()
+            #self.plugin.removeRoomba()
             # delete the roomba device because trying to connect does not reestablish connection
             # Let the time for reconnection - restablish a connection
             #if self.plugin.continuous:
