@@ -18,4 +18,8 @@
         <Name>Force Update</Name>
         <CallbackMethod>forceUpdate</CallbackMethod>
     </MenuItem>
+        <MenuItem id="restartPlugin">
+        <Name>Restart Plugin</Name>
+        <CallbackMethod>restartPlugin</CallbackMethod>
+    </MenuItem>
 </MenuItems>

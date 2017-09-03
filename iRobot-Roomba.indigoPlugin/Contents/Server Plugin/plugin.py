@@ -102,6 +102,11 @@ class Plugin(indigo.PluginBase):
     def shutdown(self):
         indigo.server.log(u"Shutting down Roomba")
 
+    def restartPlugin(self):
+        indigo.server.log(u"restart Plugin Called.")
+        plugin = indigo.server.getPlugin('GlennNZ.indigo.plugin.irobot')
+        plugin.restart();
+
     def runConcurrentThread(self):
 
         try:
