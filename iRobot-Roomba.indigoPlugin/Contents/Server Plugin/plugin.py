@@ -56,7 +56,7 @@ class Plugin(indigo.PluginBase):
         self.masterState = None
         self.currentstate = ""
         self.updater = GitHubPluginUpdater(self)
-
+        self.KILL = False
         self.updateFrequency = float(self.pluginPrefs.get('updateFrequency', "24")) * 60.0 * 60.0
 
         self.logger.debug(u"updateFrequency = " + str(self.updateFrequency))
@@ -115,6 +115,11 @@ class Plugin(indigo.PluginBase):
                 #self.sleep(5)
                 self.checkAllRoombas()
                 self.sleep(60)
+
+                if self.KILL == True:
+                    self.logger.debug('Self.Kill is true -- restarting plugin')
+                    self.KILL = False
+                    self.restartPlugin()
 
                 if self.updateFrequency > 0:
                     if time.time() > self.next_update_check:
