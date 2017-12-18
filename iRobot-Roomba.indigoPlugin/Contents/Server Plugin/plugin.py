@@ -123,9 +123,11 @@ class Plugin(indigo.PluginBase):
 
                 if self.updateFrequency > 0:
                     if time.time() > self.next_update_check:
-                        self.updater.checkForUpdate()
-                        self.next_update_check = time.time() + self.updateFrequency
-
+                        try:
+                            self.updater.checkForUpdate()
+                            self.next_update_check = time.time() + self.updateFrequency
+                        except:
+                            self.logger.debug(u'Exception checking for update ?No Internet')
                 if self.statusFrequency > 0:
                     if time.time() > self.next_status_check:
                         if self.debugTrue:

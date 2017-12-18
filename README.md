@@ -19,7 +19,8 @@ Needs paho-mqtt python library installed.
 In terminal Window
 pip install paho-mqtt
 
-
+v.0.1.8
+Fix for no Internet connection
 
 
 V.0.0.8
