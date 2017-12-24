@@ -104,7 +104,7 @@ class Plugin(indigo.PluginBase):
 
     def restartPlugin(self):
         indigo.server.log(u"restart Plugin Called.")
-        plugin = indigo.server.getPlugin('GlennNZ.indigo.plugin.irobot')
+        plugin = indigo.server.getPlugin('com.GlennNZ.indigo.plugin.irobot')
         plugin.restart();
 
     def runConcurrentThread(self):
@@ -127,7 +127,8 @@ class Plugin(indigo.PluginBase):
                             self.updater.checkForUpdate()
                             self.next_update_check = time.time() + self.updateFrequency
                         except:
-                            self.logger.debug(u'Exception checking for update ?No Internet')
+                            self.logger.debug(u'Error checking for update - ? No Internet.  Checking again in 24 hours')
+                            self.next_update_check = self.next_update_check + 86400;
                 if self.statusFrequency > 0:
                     if time.time() > self.next_status_check:
                         if self.debugTrue:
