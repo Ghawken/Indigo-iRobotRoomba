@@ -104,7 +104,7 @@ class Plugin(indigo.PluginBase):
 
     def restartPlugin(self):
         indigo.server.log(u"restart Plugin Called.")
-        plugin = indigo.server.getPlugin('com.GlennNZ.indigo.plugin.irobot')
+        plugin = indigo.server.getPlugin('com.GlennNZ.indigoplugin.irobot')
         plugin.restart();
 
     def runConcurrentThread(self):
