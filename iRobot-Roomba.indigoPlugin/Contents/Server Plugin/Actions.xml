@@ -5,6 +5,11 @@
         <Name>Get Roomba Info</Name>
         <CallbackMethod>getRoombaInfoAction</CallbackMethod>
     </Action>
+    <Action id="toggleRoomba" deviceFilter="self.roombaDevice">
+        <Name>Toggle Roomba - Start/Dock</Name>
+        <CallbackMethod>toggleRoombaAction</CallbackMethod>
+    </Action>
+
     <Action id="startRoomba" deviceFilter="self.roombaDevice">
         <Name>Start Roomba</Name>
         <CallbackMethod>startRoombaAction</CallbackMethod>

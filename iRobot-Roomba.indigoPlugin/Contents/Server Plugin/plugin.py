@@ -513,6 +513,32 @@ class Plugin(indigo.PluginBase):
                 #self.getRoombaStatus(dev)
                 #self.getRoombaTime(dev)
 
+    def toggleRoombaAction(self, pluginAction, roombaDevice):
+        self.logger.debug(u'toggle Roomba Action Call')
+
+        Cycle = roombaDevice.states['Cycle']
+
+        self.logger.debug(u'Current State is:' + unicode(Cycle))
+
+        if Cycle =='clean':
+            self.logger.debug(u'Roomba Cycle clean changing to docking...')
+            self.RoombaAction(pluginAction, roombaDevice, 'dock')
+        if Cycle == 'charge':
+            self.logger.debug(u'Roomba changing to running...')
+            self.RoombaAction(pluginAction, roombaDevice, 'start')
+        if Cycle == 'run':
+            self.logger.debug(u'Roomba changing to docking...')
+            self.RoombaAction(pluginAction, roombaDevice, 'dock')
+        if Cycle == 'pause':
+            self.logger.debug(u'Roomba changing to running...')
+            self.RoombaAction(pluginAction, roombaDevice, 'resume')
+        if Cycle == 'hmMidMsn':
+            self.logger.debug(u'Roomba changing to running...')
+            self.RoombaAction(pluginAction, roombaDevice, 'start')
+        if Cycle == 'none':
+            self.logger.debug(u'Roomba changing to running...')
+            self.RoombaAction(pluginAction, roombaDevice, 'start')
+
 
     def startRoombaAction(self, pluginAction, roombaDevice):
         self.RoombaAction(pluginAction, roombaDevice, 'start')
