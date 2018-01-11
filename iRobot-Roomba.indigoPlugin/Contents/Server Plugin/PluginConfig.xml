@@ -19,7 +19,10 @@
   </Field>
 
     <Field id="continuous" type="checkbox" tooltip="Will keep connection to Roomba open." defaultValue="true">
-            <Label>Continous connection to ONE Roomba Device only.  Do not enable if wish more than one Roomba controlled.</Label>
+            <Label>
+                Continous connection to ONE Roomba Device only.  Do not enable if wish more than one Roomba controlled.
+                (This is the recommended setup )
+            </Label>
             <Description>Enable/Disable</Description>
             </Field>
 
