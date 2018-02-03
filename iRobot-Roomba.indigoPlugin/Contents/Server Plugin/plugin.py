@@ -40,17 +40,33 @@ class Plugin(indigo.PluginBase):
         pfmt = logging.Formatter('%(asctime)s.%(msecs)03d\t[%(levelname)8s] %(name)20s.%(funcName)-25s%(msg)s', datefmt='%Y-%m-%d %H:%M:%S')
         self.plugin_file_handler.setFormatter(pfmt)
 
+        self.logger.info(u"")
+        self.logger.info(u"{0:=^130}".format(" Initializing New Plugin Session "))
+        self.logger.info(u"{0:<30} {1}".format("Plugin name:", pluginDisplayName))
+        self.logger.info(u"{0:<30} {1}".format("Plugin version:", pluginVersion))
+        self.logger.info(u"{0:<30} {1}".format("Plugin ID:", pluginId))
+        self.logger.info(u"{0:<30} {1}".format("Indigo version:", indigo.server.version))
+        self.logger.info(u"{0:<30} {1}".format("Python version:", sys.version.replace('\n', '')))
+        self.logger.info(u"{0:<30} {1}".format("Python Directory:", sys.prefix.replace('\n', '')))
+        #self.logger.info(u"{0:<30} {1}".format("Major Problem equals: ", MajorProblem))
+        self.logger.info(u"{0:=^130}".format(""))
+
         try:
             self.logLevel = int(self.pluginPrefs[u"logLevel"])
         except:
             self.logLevel = logging.INFO
         self.indigo_log_handler.setLevel(self.logLevel)
         self.logger.debug(u"logLevel = " + str(self.logLevel))
-
         self.debugTrue = self.pluginPrefs.get('debugTrue', '')
 
+    def pluginStore(self):
+        self.logger.info(u'Opening Plugin Store.')
+        iurl = 'http://www.indigodomo.com/pluginstore/132/'
+        self.browserOpen(iurl)
+
+
     def startup(self):
-        indigo.server.log(u"Starting Roomba")
+        self.logger.info(u"Starting Roomba")
 
         self.triggers = { }
         self.masterState = None
@@ -105,7 +121,7 @@ class Plugin(indigo.PluginBase):
     def restartPlugin(self):
         indigo.server.log(u"restart Plugin Called.")
         plugin = indigo.server.getPlugin('com.GlennNZ.indigoplugin.irobot')
-        plugin.restart();
+        plugin.restart()
 
     def runConcurrentThread(self):
 
@@ -117,7 +133,7 @@ class Plugin(indigo.PluginBase):
                 self.sleep(60)
 
                 if self.KILL == True:
-                    self.logger.debug('Self.Kill is true -- restarting plugin')
+                    self.logger.debug('Self.Kill is true,  restarting plugin')
                     self.KILL = False
                     self.restartPlugin()
 
@@ -129,6 +145,7 @@ class Plugin(indigo.PluginBase):
                         except:
                             self.logger.debug(u'Error checking for update - ? No Internet.  Checking again in 24 hours')
                             self.next_update_check = self.next_update_check + 86400;
+
                 if self.statusFrequency > 0:
                     if time.time() > self.next_status_check:
                         if self.debugTrue:

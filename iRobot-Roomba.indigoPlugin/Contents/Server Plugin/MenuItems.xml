@@ -14,10 +14,15 @@
         <Name>Update Plugin</Name>
         <CallbackMethod>updatePlugin</CallbackMethod>
     </MenuItem>
+        <MenuItem id="pluginStore">
+        <Name>Go to Plugin Store</Name>
+        <CallbackMethod>pluginStore</CallbackMethod>
+    </MenuItem>
     <MenuItem id="forceUpdate">
         <Name>Force Update</Name>
         <CallbackMethod>forceUpdate</CallbackMethod>
     </MenuItem>
+    <MenuItem id="titleSeparator2" type="separator" />
         <MenuItem id="restartPlugin">
         <Name>Restart Plugin</Name>
         <CallbackMethod>restartPlugin</CallbackMethod>

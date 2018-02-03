@@ -13,7 +13,10 @@ Nick Waterton 24th April 2017: V 1.0: Initial Release
 #NOTE: MUST use Pillow Pillow 4.1.1 to avoid some horrible memory leaks in the text handling!
 
 global HAVE_MQTT
+global HAVE_SIX
 HAVE_MQTT=False
+HAVE_SIX=False
+
 try:
     import paho.mqtt.client as mqtt
     HAVE_MQTT=True
@@ -25,33 +28,43 @@ import json
 import datetime
 from collections import OrderedDict, Mapping
 import threading
+
 import logging
+
 import time
 #from logging.handlers import RotatingFileHandler
 from ast import literal_eval
 import socket
-import six
+
+try:
+    import six
+    HAVE_SIX=True
+except ImportError:
+    pass
+
 try:
     import configparser
 except:
     from six.moves import configparser
 import math
 
-global HAVE_CV2
-HAVE_CV2=False
-global HAVE_PIL
-HAVE_PIL=False
-try:
-    import cv2
-    import numpy as np
-    HAVE_CV2=True
-except ImportError:
-    print("CV or numpy module not found, falling back to PIL")
-try:
-    from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps, ImageChops
-    HAVE_PIL=True
-except ImportError:
-    print("PIL module not found, maps are disabled")
+#global HAVE_CV2
+#HAVE_CV2=False
+#global HAVE_PIL
+#HAVE_PIL=False
+
+#try:
+#    import cv2
+#    import numpy as np
+#    HAVE_CV2=True
+#except ImportError:
+#    print("CV or numpy module not found, falling back to PIL")
+
+#try:
+#    from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps, ImageChops
+#    HAVE_PIL=True
+#except ImportError:
+#    print("PIL module not found, maps are disabled")
 
 
 #----------- Start of Classes ------------
@@ -67,14 +80,24 @@ class password(object):
     VERSION = "1.0"
 
     def __init__(self, plugin, address='255.255.255.255', file="config.ini"):
+
+
         self.plugin = plugin
+
+        self.logger  = logging.getLogger('Plugin.password')
+
+
+
         self.MAChome     = os.path.expanduser("~")+"/"
         self.folderLocation = self.MAChome+"Documents/Indigo-iRobotRoomba/"
+        #self.logger = logging.getLogger('Roomba-Lib.iRobot')
         #self.folderLocation = self.plugin.folderLocation
         #self.log = logging.getLogger(__name__ + '.Roomba')
         self.address = address
         self.file = self.folderLocation + file
-        self.plugin.logger.debug(u'file should equal:' + self.file)
+
+        self.logger.info(u'File should equal:' + self.file)
+
         self.get_password()
 
     def receive_udp(self):
@@ -85,25 +108,25 @@ class password(object):
         if self.address == '255.255.255.255':
             s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.bind(("", port))  #bind all intefaces to port
-        self.plugin.logger.debug("waiting on port: %d for data" % port)
+        self.logger.debug("waiting on port: %d for data" % port)
         message = 'irobotmcs'
         s.sendto(message, (self.address, port))
         roomba_dict = {}
         while True:
             try:
                 udp_data, addr = s.recvfrom(1024)   #wait for udp data
-                #self.plugin.logger.debug('Received: Robot addr: %s Data: %s ' % (addr, udp_data))
+                #self.logger.debug('Received: Robot addr: %s Data: %s ' % (addr, udp_data))
                 if len(udp_data) > 0:
                     if udp_data != message:
                         try:
                             if self.address != addr[0]:
-                                self.plugin.logger.error("supplied address %s does not match discovered address %s, using discovered address..." % (self.address, addr[0]))
+                                self.logger.error("supplied address %s does not match discovered address %s, using discovered address..." % (self.address, addr[0]))
                             parsedMsg = json.loads(udp_data)
                             roomba_dict[addr]=parsedMsg
                         except Exception as e:
-                            self.plugin.logger.debug("json decode error: %s" % e)
+                            self.logger.debug("json decode error: %s" % e)
                             break
-                        #self.plugin.logger.debug('Robot Data: %s ' % json.dumps(parsedMsg, indent=2))
+                        #self.logger.debug('Robot Data: %s ' % json.dumps(parsedMsg, indent=2))
                 else:
                     break
             except socket.timeout:
@@ -118,22 +141,22 @@ class password(object):
         roombas = self.receive_udp()
 
         if len(roombas) == 0:
-            self.plugin.logger.debug("No Roombas found, try again...")
+            self.logger.debug("No Roombas found, try again...")
             return False
         else:
-            self.plugin.logger.debug("found %d Roombas" % len(roombas))
+            self.logger.debug("found %d Roombas" % len(roombas))
 
         for address,parsedMsg in six.iteritems(roombas):
             addr = address[0]
             if int(parsedMsg["ver"]) < 2:
-                self.plugin.logger.debug("Roombas at address: %s does not have the correct firmware version. Your version info is: %s" % (addr,json.dumps(parsedMsg, indent=2)))
+                self.logger.debug("Roombas at address: %s does not have the correct firmware version. Your version info is: %s" % (addr,json.dumps(parsedMsg, indent=2)))
                 continue
 
-            self.plugin.logger.info("Make sure your robot (%s) at IP %s is on the Home Base and powered on (green lights on). Then press and hold the HOME button on your robot until it plays a series of tones (about 2 seconds). Release the button and your robot will flash WIFI light." % (parsedMsg["robotname"],addr))
+            self.logger.info("Make sure your robot (%s) at IP %s is on the Home Base and powered on (green lights on). Then press and hold the HOME button on your robot until it plays a series of tones (about 2 seconds). Release the button and your robot will flash WIFI light." % (parsedMsg["robotname"],addr))
             #raw_input("Press Enter to continue...")
 
-            self.plugin.logger.debug("Received: %s"  % json.dumps(parsedMsg, indent=2))
-            self.plugin.logger.debug("\r\rRoomba (%s) IP address is: %s" % (parsedMsg["robotname"],addr))
+            self.logger.debug("Received: %s"  % json.dumps(parsedMsg, indent=2))
+            self.logger.debug("\r\rRoomba (%s) IP address is: %s" % (parsedMsg["robotname"],addr))
 
             hostname = parsedMsg["hostname"].split('-')
             if hostname[0] == 'Roomba':
@@ -150,8 +173,8 @@ class password(object):
             try:
                 wrappedSocket.connect((addr, 8883))
             except Exception as e:
-                self.plugin.logger.debug("Connection Error %s" % e)
-                self.plugin.logger.info('Error getting password.  Follow the instructions and try again.')
+                self.logger.debug("Connection Error %s" % e)
+                self.logger.info('Error getting password.  Follow the instructions and try again.')
                 #return False
 
             wrappedSocket.send(packet)
@@ -163,11 +186,11 @@ class password(object):
                         break
                     data_received = wrappedSocket.recv(1024)
                 except socket.error as e:
-                    self.plugin.logger.debug("Socket Error: %s" % e)
+                    self.logger.debug("Socket Error: %s" % e)
                     break
 
                 if len(data_received) == 0:
-                    self.plugin.logger.debug("socket closed")
+                    self.logger.debug("socket closed")
                     break
                 else:
                     data += data_received
@@ -179,14 +202,14 @@ class password(object):
             '''
             if len(data) > 0:
                 import binascii
-                self.plugin.logger.debug("received data: hex: %s, length: %d" % (binascii.hexlify(data), len(data)))
+                self.logger.debug("received data: hex: %s, length: %d" % (binascii.hexlify(data), len(data)))
             '''
             if len(data) <= 7:
-                self.plugin.logger.debug('Error getting password, receive %d bytes. Follow the instructions and try again.' % len(data))
+                self.logger.debug('Error getting password, receive %d bytes. Follow the instructions and try again.' % len(data))
                 return False
             else:
-                self.plugin.logger.info("blid is: %s" % blid)
-                self.plugin.logger.info('Password=> %s <= Yes, all this string.' % str(data[7:]))
+                self.logger.info("blid is: %s" % blid)
+                self.logger.info('Password=> %s <= Yes, all this string.' % str(data[7:]))
 
 
                 Config = configparser.ConfigParser()
@@ -200,15 +223,15 @@ class password(object):
                     try:
                         ret = os.makedirs(self.folderLocation)
                     except:
-                        self.plugin.logger.error(u"Error Creating " + unicode(self.folderLocation))
+                        self.logger.error(u"Error Creating " + unicode(self.folderLocation))
                         pass
 
 
-                self.plugin.logger.debug(u'Using cfgfile:'+ unicode(self.file))
+                self.logger.debug(u'Using cfgfile:'+ unicode(self.file))
                 with open(self.file, 'w') as cfgfile:
                     Config.write(cfgfile)
-                    self.plugin.logger.info(u'Saved Device Config File/Password. Click OK to continue.')
-                    #self.plugin.logger.info(u'Restart Plugin to continue.')
+                    self.logger.info(u'Saved Device Config File/Password. Click OK to continue.')
+                    #self.logger.info(u'Restart Plugin to continue.')
         return True
 
 
@@ -226,6 +249,8 @@ class Roomba(object):
     '''
 
     VERSION = "1.0"
+
+    #logger = logging.getLogger(__name__)
 
     states = {  "charge":"Charging",
                 "new":"New Mission",
@@ -272,6 +297,20 @@ class Roomba(object):
         '''
         self.plugin = plugin
         self.debug = True
+
+        self.logger  = logging.getLogger('Plugin.Roomba')
+
+        if HAVE_MQTT==False:
+            self.logger.error(u"{0:=^130}".format(""))
+            self.logger.error(u'Need to install module Mqtt for this plugin to work.  See Forum.')
+            self.logger.error(u"{0:=^130}".format(""))
+
+        if HAVE_SIX==False:
+            self.logger.error(u"{0:=^130}".format(""))
+            self.logger.error(u'Need to install module six for this plugin to work.  See Forum.')
+            self.logger.error(u"{0:=^130}".format(""))
+
+
         #self.log = logging.getLogger(__name__+'.Roomba')
         #if self.log.getEffectiveLevel() == logging.DEBUG:
          #   self.debug = True
@@ -282,9 +321,9 @@ class Roomba(object):
             self.cert_name = cert_name
         self.continuous = continuous
         if self.continuous:
-            self.plugin.logger.debug("CONTINUOUS connection")
+            self.logger.debug("CONTINUOUS connection")
         else:
-            self.plugin.logger.debug("PERIODIC connection")
+            self.logger.debug("PERIODIC connection")
         self.pretty_print = False   #set this to True to enable pretty printing of json data
         self.stop_connection = False
         self.periodic_connection_running = False
@@ -336,7 +375,7 @@ class Roomba(object):
         self.client = None
 
         if self.address is None or blid is None or password is None:
-            self.plugin.logger.debug(u'Reading Config File: %s' %file)
+            self.logger.debug(u'Reading Config File: %s' %file)
             self.read_config_file(self.file)
 
     def read_config_file(self, file):
@@ -344,24 +383,24 @@ class Roomba(object):
         Config = configparser.ConfigParser()
         try:
             Config.read(file)
-            self.plugin.logger.debug(u'Reading config file... %s' %os.path.abspath(file) )
+            self.logger.debug(u'Reading config file... %s' %os.path.abspath(file) )
         except Exception as e:
-            self.plugin.logger.error("Error reading config file %s" %e)
-            self.plugin.logger.debug("No Roomba specified, and no config file found - attempting discovery")
+            self.logger.error("Error reading config file %s" %e)
+            self.logger.debug("No Roomba specified, and no config file found - attempting discovery")
 
             #if password(self.address, file):
             #    return self.read_config_file(file)
             #else: return False
 
-        self.plugin.logger.debug("reading info from config file %s" % file)
+        self.logger.debug("reading info from config file %s" % file)
 
         addresses = Config.sections()
 
-        self.plugin.logger.debug(u'Sections %s ' %unicode(Config.sections()))
+        self.logger.debug(u'Sections %s ' %unicode(Config.sections()))
 
         if self.address is None:
             if len(addresses) > 1:
-                self.plugin.logger.error("config file has entries for %d Roombas, only configuring the first!")
+                self.logger.error("config file has entries for %d Roombas, only configuring the first!")
                 self.address = addresses[0]
 
         self.blid = Config.get(self.address, "blid")
@@ -372,7 +411,7 @@ class Roomba(object):
     def setup_client(self):
         if self.client is None:
             if not HAVE_MQTT:
-                self.plugin.logger.debug(u"Please install paho-mqtt '<sudo> pip install paho-mqtt' to use this library")
+                self.logger.debug(u"Please install paho-mqtt '<sudo> pip install paho-mqtt' to use this library")
                 return False
 
             self.client = mqtt.Client(client_id=self.blid, clean_session=self.clean, protocol=mqtt.MQTTv311)
@@ -391,11 +430,11 @@ class Roomba(object):
             # set TLS, self.cert_name is required by paho-mqtt, even if the certificate is not used...
             # but v1.3 changes all this, so have to do the following:
 
-            self.plugin.logger.debug("Seting TLS")
+            self.logger.debug("Seting TLS")
             try:
                 self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_TLSv1)
             except ValueError:  # try V1.3 version
-                self.plugin.logger.debug.warn("TLS Setting failed - trying 1.3 version")
+                self.logger.debug.warn("TLS Setting failed - trying 1.3 version")
                 self.client._ssl_context = None
                 context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
                 context.verify_mode = ssl.CERT_NONE
@@ -406,14 +445,14 @@ class Roomba(object):
             # disables peer verification
             self.client.tls_insecure_set(True)
             self.client.username_pw_set(self.blid, self.password)
-            self.plugin.logger.debug("MQTT Client Succesfully setup")
+            self.logger.debug("MQTT Client Succesfully setup")
             return True
         return False
 
     def connect(self):
         try:
             if self.address is None or self.blid is None or self.password is None:
-                self.plugin.logger.error("Invalid address, blid, or password! All these must be specified!")
+                self.logger.error("Invalid address, blid, or password! All these must be specified!")
                 #sys.exit(1)
                 return False
             if self.roomba_connected or self.periodic_connection_running: return
@@ -422,7 +461,7 @@ class Roomba(object):
                 if not self._connect():
                     if self.mqttc is not None:
                         self.mqttc.disconnect()
-                        self.plugin.logger.error("Mqttc Disconnect")
+                        self.logger.error("Mqttc Disconnect")
                         return False
             else:
                 #self.periodic_connection()
@@ -432,47 +471,47 @@ class Roomba(object):
 
             self.time = time.time()   #save connect time
         except Exception as e:
-            self.plugin.logger.error("Error Threading: %s " % unicode(e.message))
+            self.logger.error("Error Threading: %s " % unicode(e.message))
 
     def _connect(self, count=0, new_connection=False):
         max_retries = 3
 
-        self.plugin.logger.debug("Connecting: " + unicode(self.roombaName) + "  :  " +  unicode(self.address) + "  :  " +  unicode(self.password) )
+        self.logger.debug("Connecting: " + unicode(self.roombaName) + "  :  " +  unicode(self.address) + "  :  " +  unicode(self.password) )
         try:
             if self.client is None or new_connection:
-                self.plugin.logger.debug("Connecting %s" % unicode(self.roombaName))
+                self.logger.debug("Connecting %s" % unicode(self.roombaName))
                 self.setup_client()
 
-                self.plugin.logger.debug("Client Connect Running now %s" % unicode(self.roombaName))
+                self.logger.debug("Client Connect Running now %s" % unicode(self.roombaName))
 
                 self.client.connect(self.address, self.roomba_port, 60)
 
             else:
-                self.plugin.logger.debug("Attempting to Reconnect "  % unicode(self.roombaName))
+                self.logger.debug("Attempting to Reconnect "  % unicode(self.roombaName))
                 self.client.loop_stop()
                 self.client.reconnect()
 
-            self.plugin.logger.debug("Client LoopStart Running now %s" % unicode(self.roombaName))
+            self.logger.debug("Client LoopStart Running now %s" % unicode(self.roombaName))
             self.client.loop_start()
             return True
 
         except Exception as e:
             #exc_type, exc_obj, exc_tb = sys.exc_info()
             #fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            #self.plugin.logger.error(unicode(exc_type)+ unicode(fname) +unicode( exc_tb.tb_lineno))
+            #self.logger.error(unicode(exc_type)+ unicode(fname) +unicode( exc_tb.tb_lineno))
 
-            self.plugin.logger.debug("Connection Roomba Error: %s " % unicode(e[0]))
+            self.logger.debug("Connection Roomba Error: %s " % unicode(e[0]))
             #if e[0] == 111 or e[0] ==61 : #errno.ECONNREFUSED
             count +=1
             if count <= max_retries:
-                self.plugin.logger.debug("Attempting new Connection# %d" % count)
+                self.logger.debug("Attempting new Connection# %d" % count)
                 time.sleep(5)
                 self._connect(count, True)
 
         if count == max_retries:
-            self.plugin.logger.debug("Unable to connect %s" % unicode(self.roombaName))
-            self.plugin.logger.debug("Setting restart switch....")
-
+            self.logger.debug("Unable to connect %s" % unicode(self.roombaName))
+            self.logger.debug(u'This may because your Roomba has lost charge and network connection.')
+            self.logger.debug("Setting restart switch....")
             #self.plugin.restartPlugin(self)
             self.plugin.KILL = True
             #self.roomba_connected = False
@@ -506,21 +545,21 @@ class Roomba(object):
         self.periodic_connection_running = False
 
     def on_connect(self, client, userdata, flags, rc):
-        self.plugin.logger.debug("Roomba Connected %s" % self.roombaName)
+        self.logger.debug("Roomba Connected %s" % self.roombaName)
         if rc == 0:
             self.roomba_connected = True
             self.plugin.connected = True
             self.client.subscribe(self.topic)
         else:
-            self.plugin.logger.debug("Roomba Connected with result code "+str(rc))
-            self.plugin.logger.debug("Please make sure your blid and password are correct %s" % self.roombaName)
+            self.logger.debug("Roomba Connected with result code "+str(rc))
+            self.logger.debug("Please make sure your blid and password are correct %s" % self.roombaName)
             if self.mqttc is not None:
                self.mqttc.disconnect()
             sys.exit(1)
 
     def on_message(self, mosq, obj, msg):
         if self.plugin.debugTrue:
-            self.plugin.logger.debug(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))
+            self.logger.debug(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))
 
         if self.exclude != "":
             if self.exclude in msg.topic:
@@ -534,10 +573,10 @@ class Roomba(object):
 
         if self.pretty_print:
             if self.plugin.debugTrue:
-                self.plugin.logger.debug("%-{:d}s : %s".format(self.master_indent) % (msg.topic,log_string))
+                self.logger.debug("%-{:d}s : %s".format(self.master_indent) % (msg.topic,log_string))
         else:
             if self.plugin.debugTrue:
-                self.plugin.logger.debug("Received Roomba Data %s: %s, %s" % (self.roombaName, str(msg.topic), str(msg.payload)))
+                self.logger.debug("Received Roomba Data %s: %s, %s" % (self.roombaName, str(msg.topic), str(msg.payload)))
 
         if self.raw:
             self.publish(msg.topic, msg.payload)
@@ -546,7 +585,7 @@ class Roomba(object):
 
         if time.time() - self.time > self.update_seconds:   #default every 5 minutes
             if self.plugin.debugTrue:
-                self.plugin.logger.debug("Publishing master_state %s" % self.roombaName)
+                self.logger.debug("Publishing master_state %s" % self.roombaName)
             self.decode_topics(self.master_state)    #publish all values
             #self.plugin.checkForUpdates()
             self.time = time.time()
@@ -556,18 +595,18 @@ class Roomba(object):
 
     def on_subscribe(self, mosq, obj, mid, granted_qos):
         if self.plugin.debugTrue:
-            self.plugin.logger.debug("Subscribed: %s %s" % (str(mid), str(granted_qos)))
+            self.logger.debug("Subscribed: %s %s" % (str(mid), str(granted_qos)))
 
     def on_disconnect(self, mosq, obj, rc):
         self.roomba_connected = False
         self.plugin.connected = False
         if rc != 0:
-            self.plugin.logger.debug("Unexpected Disconnect From Roomba %s! - reconnecting" % self.roombaName)
+            self.logger.debug("Unexpected Disconnect From Roomba %s! - reconnecting" % self.roombaName)
         else:
-            self.plugin.logger.debug("Disconnected From Roomba %s" % self.roombaName)
+            self.logger.debug("Disconnected From Roomba %s" % self.roombaName)
 
     def on_log(self, mosq, obj, level, string):
-        self.plugin.logger.debug(unicode(string))
+        self.logger.debug(unicode(string))
 
     def set_mqtt_client(self, mqttc=None, brokerFeedback=""):
         self.mqttc = mqttc
@@ -578,29 +617,29 @@ class Roomba(object):
                 self.brokerFeedback = brokerFeedback
 
     def send_command(self, command):
-        self.plugin.logger.debug("Received COMMAND: %s" % command)
+        self.logger.debug("Received COMMAND: %s" % command)
         Command = OrderedDict()
         Command["command"] = command
         Command["time"] = self.totimestamp(datetime.datetime.now())
         Command["initiator"] = "localApp"
         myCommand = json.dumps(Command)
-        self.plugin.logger.debug("Publishing Roomba Command : %s" % myCommand)
+        self.logger.debug("Publishing Roomba Command : %s" % myCommand)
         self.client.publish("cmd", myCommand)
 
     def set_preference(self, preference, setting):
-        self.plugin.logger.debug("Received SETTING: %s, %s" % (preference, setting))
+        self.logger.debug("Received SETTING: %s, %s" % (preference, setting))
         val = False
         if setting.lower() == "true":
             val = True
         tmp = {preference: val}
         Command = {"state": tmp}
         myCommand = json.dumps(Command)
-        self.plugin.logger.debug("Publishing Roomba Setting : %s" % myCommand)
+        self.logger.debug("Publishing Roomba Setting : %s" % myCommand)
         self.client.publish("delta", myCommand)
 
     def publish(self, topic, message):
         if self.mqttc is not None and message is not None:
-            self.plugin.logger.debug("Publishing item: %s: %s" % (self.brokerFeedback+"/"+topic, message))
+            self.logger.debug("Publishing item: %s: %s" % (self.brokerFeedback+"/"+topic, message))
             self.mqttc.publish(self.brokerFeedback+"/"+topic, message)
 
     def set_options(self, raw=False, indent=0, pretty_print=False):
@@ -608,9 +647,9 @@ class Roomba(object):
         self.indent = indent
         self.pretty_print = pretty_print
         if self.raw:
-            self.plugin.logger.debug("Posting RAW data")
+            self.logger.debug("Posting RAW data")
         else:
-            self.plugin.logger.debug("Posting DECODED data")
+            self.logger.debug("Posting DECODED data")
 
     def enable_map(self, enable=False, mapSize="(800,1500,0,0,0,0)", mapPath="./", iconPath = "./",
                         home_icon_file="home.png",
@@ -635,15 +674,15 @@ class Roomba(object):
             return False
             
         if Image.PILLOW_VERSION < "4.1.1":
-            self.plugin.logger.debug("WARNING: PIL version is %s, this is not the latest! you can get bad memory leaks with old versions of PIL" % Image.PILLOW_VERSION)
-            self.plugin.logger.debug("run: 'pip install --upgrade pillow' to fix this")
+            self.logger.debug("WARNING: PIL version is %s, this is not the latest! you can get bad memory leaks with old versions of PIL" % Image.PILLOW_VERSION)
+            self.logger.debug("run: 'pip install --upgrade pillow' to fix this")
 
         self.drawmap = enable
         if self.drawmap:
-            self.plugin.logger.debug("MAP: Maps Enabled")
+            self.logger.debug("MAP: Maps Enabled")
             self.mapSize = literal_eval(mapSize)
             if len(mapSize) < 6:
-                self.plugin.logger.error("mapSize is required, and is of the form (800,1500,0,0,0,0) - (x,y size, x,y dock loc, theta1, theta2), map,roomba roatation")
+                self.logger.error("mapSize is required, and is of the form (800,1500,0,0,0,0) - (x,y size, x,y dock loc, theta1, theta2), map,roomba roatation")
                 self.drawmap = False
                 return False
             self.angle = self.mapSize[4]
@@ -846,12 +885,12 @@ class Roomba(object):
 
         if new_state is not None:
             self.current_state = self.states[new_state]
-            self.plugin.logger.debug("set current state to: %s" % (self.current_state))
+            self.logger.debug("set current state to: %s" % (self.current_state))
 
         if self.current_state != current_mission:
 
             if self.plugin.debugTrue:
-                self.plugin.logger.debug("updated state to: %s" % (self.current_state))
+                self.logger.debug("updated state to: %s" % (self.current_state))
             if self.plugin.continuous:
                 self.plugin.currentstate = self.current_state
                 self.plugin.updateMasterStates(self.current_state)
@@ -882,7 +921,7 @@ class Roomba(object):
     def make_icon(self, input="./roomba.png", output="./roomba_mod.png"):
         #utility function to make roomba icon from generic roomba icon
         if not HAVE_PIL: #drawing library loaded?
-            self.plugin.logger.error("PIL module not loaded")
+            self.logger.error("PIL module not loaded")
             return None
         try:
             roomba = Image.open(input).convert('RGBA')
@@ -893,7 +932,7 @@ class Roomba(object):
             roomba.save(output, "PNG")
             return roomba
         except Exception as e:
-            self.plugin.logger.error("ERROR: %s" % e)
+            self.logger.error("ERROR: %s" % e)
             return None
 
     def load_icon(self, filename="", icon_name=None, fnt=None, size=(32,32), base_icon=None):
@@ -908,7 +947,7 @@ class Roomba(object):
             icon = Image.open(filename).convert('RGBA').resize(size, Image.ANTIALIAS)
             icon = self.make_transparent(icon)
         except IOError as e:
-            self.plugin.logger.error("error loading %s: %s, using default icon instead" % (icon_name,e))
+            self.logger.error("error loading %s: %s, using default icon instead" % (icon_name,e))
             if base_icon is None:
                 icon = Image.new('RGBA', size, self.transparent)
             else:
@@ -958,32 +997,32 @@ class Roomba(object):
         # get base image of Roomba path
         if self.base is None:
             try:
-                self.plugin.logger.debug("MAP: openening existing line image")
+                self.logger.debug("MAP: openening existing line image")
                 self.base = Image.open(self.mapPath+'/'+self.roombaName+'lines.png').convert('RGBA')
                 if self.base.size != (self.mapSize[0], self.mapSize[1]):
                     raise IOError("Image is wrong size")
             except IOError as e:
                 self.base = Image.new('RGBA', (self.mapSize[0], self.mapSize[1]), self.transparent)
-                self.plugin.logger.error("MAP: line image problem: %s: created new image" % e)
+                self.logger.error("MAP: line image problem: %s: created new image" % e)
 
             try:
-                self.plugin.logger.debug("MAP: openening existing problems image")
+                self.logger.debug("MAP: openening existing problems image")
                 self.roomba_problem = Image.open(self.mapPath+'/'+self.roombaName+'problems.png').convert('RGBA')
                 if self.roomba_problem.size != self.base.size:
                     raise IOError("Image is wrong size")
             except IOError as e:
                 self.roomba_problem = Image.new('RGBA', self.base.size, self.transparent)
-                self.plugin.logger.error("MAP: problems image problem: %s: created new image" % e)
+                self.logger.error("MAP: problems image problem: %s: created new image" % e)
 
             try:
-                self.plugin.logger.debug("MAP: openening existing map no text image")
+                self.logger.debug("MAP: openening existing map no text image")
                 self.previous_map_no_text = None
                 self.map_no_text = Image.open(self.mapPath+'/'+self.roombaName+'map_notext.png').convert('RGBA')
                 if self.map_no_text.size != self.base.size:
                     raise IOError("Image is wrong size")
             except IOError as e:
                 self.map_no_text = None
-                self.plugin.logger.error("MAP: map no text image problem: %s: set to None" % e)
+                self.logger.error("MAP: map no text image problem: %s: set to None" % e)
 
         self.cx = self.base.size[0]  #save x and y center of image, for centering of final map image
         self.cy = self.base.size[1]
@@ -993,13 +1032,13 @@ class Roomba(object):
             try:
                 self.fnt = ImageFont.truetype('FreeMono.ttf', 40)
             except IOError as e:
-                self.plugin.logger.error("error loading font: %s, loading default font" % e)
+                self.logger.error("error loading font: %s, loading default font" % e)
                 self.fnt = ImageFont.load_default()
 
         #set dock home position
         if self.home_pos is None:
             self.home_pos = (self.mapSize[0]/2+self.mapSize[2], self.mapSize[1]/2+self.mapSize[3])
-            self.plugin.logger.debug("MAP: home_pos: (%d,%d)" % (self.home_pos[0], self.home_pos[1]))
+            self.logger.debug("MAP: home_pos: (%d,%d)" % (self.home_pos[0], self.home_pos[1]))
 
         #get icons
         if self.roomba_icon is None:
@@ -1021,7 +1060,7 @@ class Roomba(object):
         if self.bin_full_icon is None:
             self.bin_full_icon = self.load_icon(filename=self.bin_full_file, icon_name="bin full", fnt=self.fnt, size=roomba_size, base_icon=self.roomba_icon)
 
-        self.plugin.logger.debug("MAP: Initialisation complete")
+        self.logger.debug("MAP: Initialisation complete")
 
     def transparent_paste(self, base_image, icon, position):
         '''
@@ -1064,7 +1103,7 @@ class Roomba(object):
         '''
         lines = ImageDraw.Draw(image)
         if x_y != old_x_y:
-            self.plugin.logger.debug("MAP: drawing line: %s, %s" % (old_x_y, x_y))
+            self.logger.debug("MAP: drawing line: %s, %s" % (old_x_y, x_y))
             lines.line([old_x_y, x_y], fill=colour, width=self.roomba_icon.size[0]/2)
         #draw circle over roomba vacuum area to give smooth edges.
         arcbox =[x_y[0]-self.roomba_icon.size[0]/4, x_y[1]-self.roomba_icon.size[0]/4,x_y[0]+self.roomba_icon.size[0]/4,x_y[1]+self.roomba_icon.size[0]/4]
@@ -1073,7 +1112,7 @@ class Roomba(object):
     def draw_text(self, image, display_text, fnt, pos=(0,0), colour=(0,0,255,255), rotate=False):
         #draw text - (WARNING old versions of PIL have huge memory leak here!)
         if display_text is None: return
-        self.plugin.logger.debug("MAP: writing text: pos: %s, text: %s" % (pos, display_text))
+        self.logger.debug("MAP: writing text: pos: %s, text: %s" % (pos, display_text))
         if rotate:
             txt = Image.new('RGBA', (fnt.getsize(display_text)), self.transparent)
             text = ImageDraw.Draw(txt)
@@ -1107,10 +1146,10 @@ class Roomba(object):
             return
 
         if self.show_final_map == False:
-            self.plugin.logger.debug("MAP: received: new_co_ords: %s old_co_ords: %s phase: %s, state: %s" % (new_co_ords, old_co_ords, self.cleanMissionStatus_phase, self.current_state))
+            self.logger.debug("MAP: received: new_co_ords: %s old_co_ords: %s phase: %s, state: %s" % (new_co_ords, old_co_ords, self.cleanMissionStatus_phase, self.current_state))
 
         if  self.current_state == self.states["charge"]:
-            self.plugin.logger.debug("MAP: ignoring new co-ords in charge phase")
+            self.logger.debug("MAP: ignoring new co-ords in charge phase")
             new_co_ords = old_co_ords = self.zero_coords()
             self.display_text = "Charging: Battery: " + str(self.master_state["state"]["reported"]["batPct"]) + "%"
             if self.bin_full:
@@ -1120,7 +1159,7 @@ class Roomba(object):
             draw_final = True
 
         elif self.current_state == self.states["recharge"]:
-            self.plugin.logger.debug("MAP: ignoring new co-ords in recharge phase")
+            self.logger.debug("MAP: ignoring new co-ords in recharge phase")
             new_co_ords = old_co_ords = self.zero_coords()
             self.display_text = "Recharging:" + " Time: " + str(self.master_state["state"]["reported"]["cleanMissionStatus"]["rechrgM"]) + "m"
             if self.bin_full:
@@ -1128,7 +1167,7 @@ class Roomba(object):
             self.save_text_and_map_on_whitebg(self.map_no_text)
 
         elif self.current_state == self.states["pause"]:
-            self.plugin.logger.debug("MAP: ignoring new co-ords in pause phase")
+            self.logger.debug("MAP: ignoring new co-ords in pause phase")
             new_co_ords = old_co_ords
             self.display_text = "Paused: " + str(self.master_state["state"]["reported"]["cleanMissionStatus"]["mssnM"]) + "m, Bat: "+ str(self.master_state["state"]["reported"]["batPct"]) + "%"
             if self.bin_full:
@@ -1138,10 +1177,10 @@ class Roomba(object):
 
         elif self.current_state == self.states["hmPostMsn"]:
             self.display_text = "Completed: " + time.strftime("%a %b %d %H:%M:%S")
-            self.plugin.logger.debug("MAP: end of mission")
+            self.logger.debug("MAP: end of mission")
 
         elif self.current_state == self.states["dockend"]:
-            self.plugin.logger.debug("MAP: mission completed: ignoring new co-ords in docking phase")
+            self.logger.debug("MAP: mission completed: ignoring new co-ords in docking phase")
             new_co_ords = old_co_ords = self.zero_coords()
             self.draw_final_map(True)
             draw_final = True
@@ -1159,7 +1198,7 @@ class Roomba(object):
             self.roomba_problem = Image.new('RGBA', self.base.size, self.transparent) #overlay for roomba problem position
             self.show_final_map = False
             self.display_text = None
-            self.plugin.logger.debug("MAP: created new image at start of new run")
+            self.logger.debug("MAP: created new image at start of new run")
 
         elif self.current_state == self.states["stuck"]:
             self.display_text = "STUCK!: " + time.strftime("%a %b %d %H:%M:%S")
@@ -1181,17 +1220,17 @@ class Roomba(object):
                 battery_low = True
 
         else:
-            self.plugin.logger.error("MAP: no special handling for state: %s" % self.current_state)
+            self.logger.error("MAP: no special handling for state: %s" % self.current_state)
 
         if self.base is None:
-            self.plugin.logger.error("MAP: no image, exiting...")
+            self.logger.error("MAP: no image, exiting...")
             return
 
         if self.display_text is None:
             self.display_text = self.current_state
 
         if self.show_final_map: #just display final map - not live
-            self.plugin.logger.debug("MAP: not updating map - Roomba not running")
+            self.logger.debug("MAP: not updating map - Roomba not running")
             return
 
         if self.debug:
@@ -1201,7 +1240,7 @@ class Roomba(object):
         old_x_y, x_y, theta = self.offset_coordinates(old_co_ords, new_co_ords)
         roomba_pos = self.get_roomba_pos(x_y)
 
-        self.plugin.logger.debug("MAP: old x,y: %s new x,y: %s theta: %s roomba pos: %s" % (old_x_y, x_y, theta, roomba_pos))
+        self.logger.debug("MAP: old x,y: %s new x,y: %s theta: %s roomba pos: %s" % (old_x_y, x_y, theta, roomba_pos))
 
         #draw lines
         self.draw_vacuum_lines(self.base, old_x_y, x_y, theta)
@@ -1210,18 +1249,18 @@ class Roomba(object):
         roomba_sprite = Image.new('RGBA', self.base.size, self.transparent)
 
         #draw roomba
-        self.plugin.logger.debug("MAP: drawing roomba: pos: %s, theta: %s" % (roomba_pos, theta))
+        self.logger.debug("MAP: drawing roomba: pos: %s, theta: %s" % (roomba_pos, theta))
         if stuck:
-            self.plugin.logger.debug("MAP: Drawing stuck Roomba")
+            self.logger.debug("MAP: Drawing stuck Roomba")
             self.roomba_problem.paste(self.roomba_error_icon,roomba_pos)
         if cancelled:
-            self.plugin.logger.debug("MAP: Drawing cancelled Roomba")
+            self.logger.debug("MAP: Drawing cancelled Roomba")
             self.roomba_problem.paste(self.roomba_cancelled_icon,roomba_pos)
         if bin_full:
-            self.plugin.logger.debug("MAP: Drawing full bin")
+            self.logger.debug("MAP: Drawing full bin")
             self.roomba_problem.paste(self.bin_full_icon,roomba_pos)
         if battery_low:
-            self.plugin.logger.debug("MAP: Drawing low battery Roomba")
+            self.logger.debug("MAP: Drawing low battery Roomba")
             self.roomba_problem.paste(self.roomba_battery_icon,roomba_pos)
 
         roomba_sprite = self.transparent_paste(roomba_sprite, self.roomba_icon.rotate(theta, expand=False), roomba_pos)
@@ -1244,7 +1283,7 @@ class Roomba(object):
         out = Image.alpha_composite(out, self.roomba_problem)
         if draw_final and self.auto_rotate:
             #translate image to center it if auto_rotate is on
-            self.plugin.logger.debug("MAP: calculation of center: (%d,%d), translating final map to center it, x:%d, y:%d deg: %.2f" % (self.cx,self.cy,self.cx-out.size[0]/2,self.cy-out.size[1]/2,self.angle))
+            self.logger.debug("MAP: calculation of center: (%d,%d), translating final map to center it, x:%d, y:%d deg: %.2f" % (self.cx,self.cy,self.cx-out.size[0]/2,self.cy-out.size[1]/2,self.angle))
             out = out.transform(out.size, Image.AFFINE, (1, 0, self.cx-out.size[0]/2, 0, 1, self.cy-out.size[1]/2))
         out_rotated = out.rotate(180+self.angle, expand=True).resize(self.base.size)    #map is upside down, so rotate 180 degrees, and size to fit
         #save composite image
@@ -1325,14 +1364,14 @@ class Roomba(object):
             sc = M[0, 0]
             scaleRecovered = math.sqrt(ss * ss + sc * sc)
             thetaRecovered = math.atan2(ss, sc) * 180 / math.pi
-            self.plugin.logger.debug("MAP: Calculated scale difference: %.2f, Calculated rotation difference: %.2f" % (scaleRecovered, thetaRecovered))
+            self.logger.debug("MAP: Calculated scale difference: %.2f, Calculated rotation difference: %.2f" % (scaleRecovered, thetaRecovered))
 
             #deskew image
             im_out = cv2.warpPerspective(skewed_image, np.linalg.inv(M), (orig_image.shape[1], orig_image.shape[0]))
             return im_out
 
         else:
-            self.plugin.logger.error("MAP: Not  enough  matches are found   -   %d/%d" % (len(good), MIN_MATCH_COUNT))
+            self.logger.error("MAP: Not  enough  matches are found   -   %d/%d" % (len(good), MIN_MATCH_COUNT))
             matchesMask = None
             return skewed_image
 
@@ -1340,23 +1379,23 @@ class Roomba(object):
         '''
         draw room outline
         '''
-        self.plugin.logger.debug("MAP: checking room outline")
+        self.logger.debug("MAP: checking room outline")
         if HAVE_CV2:
             if self.room_outline_contour is None or overwrite:
                 try:
                     self.room_outline_contour = np.load(self.mapPath+'/'+self.roombaName+'room.npy')
                 except IOError as e:
-                    self.plugin.logger.error("Unable to load room outline: %s, setting to 0" % e)
+                    self.logger.error("Unable to load room outline: %s, setting to 0" % e)
                     self.room_outline_contour = np.array([(0,0),(0,0),(0,0),(0,0)], dtype=np.int)
 
                 try:
-                    self.plugin.logger.debug("MAP: openening existing room outline image")
+                    self.logger.debug("MAP: openening existing room outline image")
                     self.room_outline = Image.open(self.mapPath+'/'+self.roombaName+'room.png').convert('RGBA')
                     if self.room_outline.size != self.base.size:
                         raise IOError("Image is wrong size")
                 except IOError as e:
                     self.room_outline = Image.new('RGBA', self.base.size, self.transparent)
-                    self.plugin.logger.error("MAP: room outline image problem: %s: set to None" % e)
+                    self.logger.error("MAP: room outline image problem: %s: set to None" % e)
 
             room_outline_area = cv2.contourArea(self.room_outline_contour)
             #edgedata = cv2.add(np.array(self.base.convert('L'), dtype=np.uint8), np.array(self.room_outline.convert('L'), dtype=np.uint8))
@@ -1367,13 +1406,13 @@ class Roomba(object):
             max_area = cv2.contourArea(contours[0])
             # experimental shape matching
             match = cv2.matchShapes(self.room_outline_contour,contours[0],cv2.cv.CV_CONTOURS_MATCH_I1,0.0)
-            self.plugin.logger.debug("MAP: perimeter/outline match is: %.4f" % match)
+            self.logger.debug("MAP: perimeter/outline match is: %.4f" % match)
             #if match is less than 0.35 - shapes are similar (but if it's 0 - then they are the same shape..) try auto rotating map to fit.
             if match < 0.35 and match > 0:
                 #self.match_outlines(self.room_outline, self.base)
                 pass
             if max_area > room_outline_area:
-                self.plugin.logger.debug("MAP: found new outline perimiter")
+                self.logger.debug("MAP: found new outline perimiter")
                 self.room_outline_contour = contours[0]
                 perimeter = cv2.arcLength(self.room_outline_contour,True)
                 outline = Image.new('RGBA',self.base.size,self.transparent)
@@ -1395,9 +1434,9 @@ class Roomba(object):
                 np.save(self.mapPath+'/'+self.roombaName+'room.npy', self.room_outline_contour) #save room outline contour as numpy array
             if self.auto_rotate:
                 self.get_image_parameters(image=self.room_outline, contour=self.room_outline_contour, final=overwrite)  #update outline centre
-                self.plugin.logger.debug("MAP: calculation of center: (%d,%d), translating room outline to center it, x:%d, y:%d deg: %.2f" % (self.cx,self.cy,self.cx-self.base.size[0]/2,self.cy-self.base.size[1]/2,self.angle))
+                self.logger.debug("MAP: calculation of center: (%d,%d), translating room outline to center it, x:%d, y:%d deg: %.2f" % (self.cx,self.cy,self.cx-self.base.size[0]/2,self.cy-self.base.size[1]/2,self.angle))
                 self.room_outline = self.room_outline.transform(self.base.size, Image.AFFINE, (1, 0, self.cx-self.base.size[0]/2, 0, 1, self.cy-self.base.size[1]/2)) # center room outline, same as map.
-            self.plugin.logger.debug("MAP: Wrote new room outline files")
+            self.logger.debug("MAP: Wrote new room outline files")
 
     def PIL_get_image_parameters(self, image=None, start=90, end = 0, step=-1, recursion=0):
         '''
@@ -1431,7 +1470,7 @@ class Roomba(object):
 
         x_y, angle = self.PIL_get_image_parameters(image, (angle+1)*10, (angle-1)*10, -10, recursion + 1)
 
-        #self.plugin.logger.debug("MAP: PIL: image center: x:%d, y:%d, angle %.2f" % (x_y[0], x_y[1], angle))
+        #self.logger.debug("MAP: PIL: image center: x:%d, y:%d, angle %.2f" % (x_y[0], x_y[1], angle))
         return x_y, angle
 
     def get_image_parameters(self, image=None, contour=None, final=False):
@@ -1460,7 +1499,7 @@ class Roomba(object):
             self.cx = x_y[0]
             self.cy = x_y[1]
             self.angle = angle
-        self.plugin.logger.debug("MAP: image center: x:%d, y:%d, angle %.2f" % (x_y[0], x_y[1], angle))
+        self.logger.debug("MAP: image center: x:%d, y:%d, angle %.2f" % (x_y[0], x_y[1], angle))
 
     def angle_between(self, p1, p2):
         '''
@@ -1511,7 +1550,7 @@ class Roomba(object):
             try:
                 contours.remove(max_contour)    #remove max contour from list
             except ValueError:
-                self.plugin.logger.error("MAP: unable to remove contour")
+                self.logger.error("MAP: unable to remove contour")
                 pass
 
             mask = np.full(edgedata.shape, 255, dtype=np.uint8) #white
@@ -1539,7 +1578,7 @@ class Roomba(object):
         merge = Image.alpha_composite(merge,base)
         merge = Image.alpha_composite(merge,edges)
         if overwrite:
-            self.plugin.logger.debug("MAP: Drawing final map")
+            self.logger.debug("MAP: Drawing final map")
             self.last_completed_time = time.time()
             self.base=merge
 
@@ -1637,9 +1676,9 @@ if __name__ == '__main__':
               l.addHandler(streamHandler)
         except IOError as e:
             if e[0] == 13: #errno Permission denied
-                self.plugin.logger.debug("Error: %s: You probably don't have permission to write to the log file/directory - try sudo" % e)
+                self.logger.debug("Error: %s: You probably don't have permission to write to the log file/directory - try sudo" % e)
             else:
-                self.plugin.logger.debug("Log Error: %s" % e)
+                self.logger.debug("Log Error: %s" % e)
             sys.exit(1)
 
 
