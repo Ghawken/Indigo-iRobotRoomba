@@ -73,6 +73,7 @@ class Plugin(indigo.PluginBase):
         self.currentstate = ""
         self.updater = GitHubPluginUpdater(self)
         self.KILL = False
+        self.restarted = 0
         self.updateFrequency = float(self.pluginPrefs.get('updateFrequency', "24")) * 60.0 * 60.0
 
         self.logger.debug(u"updateFrequency = " + str(self.updateFrequency))
@@ -135,6 +136,7 @@ class Plugin(indigo.PluginBase):
                 if self.KILL == True:
                     self.logger.debug('Self.Kill is true,  restarting plugin')
                     self.KILL = False
+                    self.restarted = 1
                     self.restartPlugin()
 
                 if self.updateFrequency > 0:
@@ -159,14 +161,12 @@ class Plugin(indigo.PluginBase):
                 if time.time() > self.connectTime and self.continuous == True:
                     # Disconnect and Reconnect Roomba
                     if self.debugTrue:
-                        self.logger.debug(u'Up for long enough reconecting..')
+                        self.logger.debug(u'Up for long enough reconnecting..')
                     self.reconnectRoomba()
                     self.connectTime = time.time() + self.reconnectFreq
 
 
                 self.sleep(60.0)
-
-
 
         except self.stopThread:
             pass
@@ -478,8 +478,6 @@ class Plugin(indigo.PluginBase):
             time.sleep(15)
             if self.continuous == False:
                 self.disconnectRoomba(device)
-
-
         return
 
     def updateMasterStates(self, current_state):

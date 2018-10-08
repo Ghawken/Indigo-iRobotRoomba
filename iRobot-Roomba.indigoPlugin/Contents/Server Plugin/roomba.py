@@ -22,6 +22,7 @@ try:
     HAVE_MQTT=True
 except ImportError:
     print("paho mqtt client not found")
+
 import sys, os
 import ssl
 import json
@@ -159,7 +160,7 @@ class password(object):
             self.logger.debug("\r\rRoomba (%s) IP address is: %s" % (parsedMsg["robotname"],addr))
 
             hostname = parsedMsg["hostname"].split('-')
-            if hostname[0] == 'Roomba':
+            if hostname[0] == 'Roomba' or hostname[0]== 'iRobot':
                 blid = hostname[1]
 
             packet = 'f005efcc3b2900'.decode("hex") #this is 0xf0 (mqtt reserved) 0x05(data length) 0xefcc3b2900 (data)
@@ -509,9 +510,10 @@ class Roomba(object):
                 self._connect(count, True)
 
         if count == max_retries:
-            self.logger.debug("Unable to connect %s" % unicode(self.roombaName))
-            self.logger.debug(u'This may because your Roomba has lost charge and network connection.')
-            self.logger.debug("Setting restart switch....")
+            self.logger.info(u"Unable to connect to %s" % unicode(self.roombaName))
+            self.logger.info(u'This may because your Roomba has lost charge and network connection.')
+            self.logger.info(u'Restarting Plugin in effort to resolve...')
+            self.logger.debug(u"Setting restart switch....")
             #self.plugin.restartPlugin(self)
             self.plugin.KILL = True
             #self.roomba_connected = False
