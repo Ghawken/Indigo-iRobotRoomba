@@ -210,13 +210,18 @@ class password(object):
                 return False
             else:
                 self.logger.info("blid is: %s" % blid)
-                self.logger.info('Password=> %s <= Yes, all this string.' % str(data[7:]))
 
+                # strip null character from end of string
+                # from EricMcM and for iRobot i7 Roomba
+                passwordroomba = str(data[7:]).partition(b'\0')[0]
+                self.logger.info('Password=> %s <= Yes, all this string.' % str(passwordroomba))
+
+                
 
                 Config = configparser.ConfigParser()
                 Config.add_section(addr)
                 Config.set(addr,'blid',blid)
-                Config.set(addr,'password',str(data[7:]))
+                Config.set(addr,'password',str(passwordroomba))
                 Config.set(addr,'data',parsedMsg)
                 #write config file
 
