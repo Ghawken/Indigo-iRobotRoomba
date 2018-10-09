@@ -216,7 +216,7 @@ class password(object):
                 passwordroomba = str(data[7:]).partition(b'\0')[0]
                 self.logger.info('Password=> %s <= Yes, all this string.' % str(passwordroomba))
 
-                
+
 
                 Config = configparser.ConfigParser()
                 Config.add_section(addr)
