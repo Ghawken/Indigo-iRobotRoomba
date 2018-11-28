@@ -177,9 +177,12 @@ class password(object):
                 self.logger.debug("Connection Error %s" % e)
                 self.logger.info('Error getting password.  Follow the instructions and try again.')
                 #return False
-
-            wrappedSocket.send(packet)
-            data = ''
+            try:
+                wrappedSocket.send(packet)
+            except:
+                self.logger.error(u'Error in send Packet.  ? Timeout')
+                return False
+            data = b''
             data_len = 35
             while True:
                 try:
@@ -200,11 +203,13 @@ class password(object):
 
             #close socket
             wrappedSocket.close()
-            '''
-            if len(data) > 0:
-                import binascii
-                self.logger.debug("received data: hex: %s, length: %d" % (binascii.hexlify(data), len(data)))
-            '''
+            try:
+                if len(data) > 0:
+                    import binascii
+                    self.logger.debug("received data: hex: %s, length: %d" % (binascii.hexlify(data), len(data)))
+            except:
+                pass
+            
             if len(data) <= 7:
                 self.logger.debug('Error getting password, receive %d bytes. Follow the instructions and try again.' % len(data))
                 return False
@@ -220,9 +225,9 @@ class password(object):
 
                 Config = configparser.ConfigParser()
                 Config.add_section(addr)
-                Config.set(addr,'blid',blid)
+                Config.set(addr,'blid',str(blid))
                 Config.set(addr,'password',str(passwordroomba))
-                Config.set(addr,'data',parsedMsg)
+                Config.set(addr,'data',str(parsedMsg))
                 #write config file
 
                 if not os.path.isdir(self.folderLocation):
