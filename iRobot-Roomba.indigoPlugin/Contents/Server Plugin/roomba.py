@@ -142,22 +142,22 @@ class password(object):
         roombas = self.receive_udp()
 
         if len(roombas) == 0:
-            self.logger.debug("No Roombas found, try again...")
+            self.logger.info("No Roombas found, try again...")
             return False
         else:
-            self.logger.debug("found %d Roombas" % len(roombas))
+            self.logger.info("found %d Roombas" % len(roombas))
 
         for address,parsedMsg in six.iteritems(roombas):
             addr = address[0]
             if int(parsedMsg["ver"]) < 2:
-                self.logger.debug("Roombas at address: %s does not have the correct firmware version. Your version info is: %s" % (addr,json.dumps(parsedMsg, indent=2)))
+                self.logger.info("Roombas at address: %s does not have the correct firmware version. Your version info is: %s" % (addr,json.dumps(parsedMsg, indent=2)))
                 continue
 
             self.logger.info("Make sure your robot (%s) at IP %s is on the Home Base and powered on (green lights on). Then press and hold the HOME button on your robot until it plays a series of tones (about 2 seconds). Release the button and your robot will flash WIFI light." % (parsedMsg["robotname"],addr))
             #raw_input("Press Enter to continue...")
 
-            self.logger.debug("Received: %s"  % json.dumps(parsedMsg, indent=2))
-            self.logger.debug("\r\rRoomba (%s) IP address is: %s" % (parsedMsg["robotname"],addr))
+            self.logger.info("Received: %s"  % json.dumps(parsedMsg, indent=2))
+            self.logger.info("\r\rRoomba (%s) IP address is: %s" % (parsedMsg["robotname"],addr))
 
             hostname = parsedMsg["hostname"].split('-')
             if hostname[0] == 'Roomba' or hostname[0]== 'iRobot':
@@ -203,15 +203,16 @@ class password(object):
 
             #close socket
             wrappedSocket.close()
+
             try:
                 if len(data) > 0:
                     import binascii
                     self.logger.debug("received data: hex: %s, length: %d" % (binascii.hexlify(data), len(data)))
             except:
                 pass
-            
+
             if len(data) <= 7:
-                self.logger.debug('Error getting password, receive %d bytes. Follow the instructions and try again.' % len(data))
+                self.logger.info('Error getting password, receive %d bytes. Follow the instructions and try again.' % len(data))
                 return False
             else:
                 self.logger.info("blid is: %s" % blid)
