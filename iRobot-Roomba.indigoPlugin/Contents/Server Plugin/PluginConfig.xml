@@ -5,13 +5,13 @@
         <Label>Update device status frequency (minutes):</Label>
     </Field>
     <Field id="sep1" type="separator"/>
-    <Field id="updateFrequency" type="textfield" defaultValue="24">
+    <Field id="updateFrequency" type="textfield" defaultValue="24" hidden="true">
         <Label>Check for plugin update frequency (hours):</Label>
     </Field>
-    <Field id="updateNote" type="label" fontSize="small" fontColor="darkgray">
+    <Field id="updateNote" type="label" fontSize="small" fontColor="darkgray" hidden="true">
         <Label>The plugin will not check for updates if the frequency is set to zero.</Label>
     </Field>
-    <Field id="sep2" type="separator"/>
+    <Field id="sep2" type="separator" hidden="true"/>
 
   <Field id="debugTrue" type="checkbox" tooltip="Will save debug info to log.">
     <Label>Display Roomba Communication and save to log (vebose!)</Label>

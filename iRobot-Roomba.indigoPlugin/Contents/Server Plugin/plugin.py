@@ -139,15 +139,6 @@ class Plugin(indigo.PluginBase):
                     self.restarted = 1
                     self.restartPlugin()
 
-                if self.updateFrequency > 0:
-                    if time.time() > self.next_update_check:
-                        try:
-                            self.updater.checkForUpdate()
-                            self.next_update_check = time.time() + self.updateFrequency
-                        except:
-                            self.logger.debug(u'Error checking for update - ? No Internet.  Checking again in 24 hours')
-                            self.next_update_check = self.next_update_check + 86400;
-
                 if self.statusFrequency > 0:
                     if time.time() > self.next_status_check:
                         if self.debugTrue:
@@ -419,10 +410,11 @@ class Plugin(indigo.PluginBase):
                     if 'bin' in masterState['state']['reported']:
                         if 'full' in masterState['state']['reported']['bin']:
                             #self.logger.debug(u'MasterState Bin Full :'+ unicode(masterState['state']['reported']['bin']['full']))
-                            if masterState['state']['reported']['bin']['full'] == 'true':
+                            if masterState['state']['reported']['bin']['full'] == True:
                                 device.updateStateOnServer('BinFull', value=True)
-                            if masterState['state']['reported']['bin']['full'] == 'false':
+                            if masterState['state']['reported']['bin']['full'] == False:
                                 device.updateStateOnServer('BinFull', value=False)
+
 
                     if currentstate != "":
                         state = str(currentstate)
