@@ -179,11 +179,13 @@ class password(object):
                 #return False
             try:
                 wrappedSocket.send(packet)
-            except:
-                self.logger.error(u'Error in send Packet.  ? Timeout')
+            except Exception as e:
+                self.logger.error(u'Error in send Packet.  ? Timeout. Exception:'+unicode(e))
                 return False
+
             data = b''
             data_len = 35
+
             while True:
                 try:
                     if len(data) >= data_len+2: #NOTE data is 0xf0 (mqtt RESERVED) length (0x23 = 35), 0xefcc3b2900 (magic packet), 0xXXXX... (30 bytes of password). so 7 bytes, followed by 30 bytes of password (total of 37)
