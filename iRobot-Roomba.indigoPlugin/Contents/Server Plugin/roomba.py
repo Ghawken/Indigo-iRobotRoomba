@@ -464,10 +464,15 @@ class Roomba(object):
             # set TLS, self.cert_name is required by paho-mqtt, even if the certificate is not used...
             # but v1.3 changes all this, so have to do the following:
 
-            self.logger.debug("Seting TLS")
+            self.logger.debug("Setting TLS")
+
+
+
             try:
-                self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_TLSv1)
-            except ValueError:  # try V1.3 version
+                self.logger.debug('DEBUG VERSION:  Using Protocol SSLv23')
+
+                self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_SSLv23)
+            except (ValueError):  # try V1.3 version
                 self.logger.debug.warn("TLS Setting failed - trying 1.3 version")
                 self.client._ssl_context = None
                 context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
