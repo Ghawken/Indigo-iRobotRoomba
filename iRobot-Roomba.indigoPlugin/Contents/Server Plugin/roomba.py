@@ -80,15 +80,10 @@ class password(object):
 
     VERSION = "1.0"
 
-    def __init__(self, plugin, address='255.255.255.255', file="config.ini"):
-
+    def __init__(self, plugin, address, file="config.ini"):
 
         self.plugin = plugin
-
         self.logger  = logging.getLogger('Plugin.password')
-
-
-
         self.MAChome     = os.path.expanduser("~")+"/"
         self.folderLocation = self.MAChome+"Documents/Indigo-iRobotRoomba/"
         #self.logger = logging.getLogger('Roomba-Lib.iRobot')
@@ -99,7 +94,7 @@ class password(object):
 
         self.logger.info(u'File should equal:' + self.file)
 
-        self.get_password()
+        self.get_password(address)
 
     def receive_udp(self):
         #set up UDP socket to receive data from robot
@@ -135,11 +130,13 @@ class password(object):
         s.close()
         return roomba_dict
 
-    def get_password(self):
+    def get_password(self, ipaddress):
         import struct
         #get roomba info
         blid=None
         roombas = self.receive_udp()
+
+        self.logger.debug('Looking for Roomba with IP Address:'+unicode(ipaddress))
 
         if len(roombas) == 0:
             self.logger.info("No Roombas found, try again...")
@@ -149,9 +146,15 @@ class password(object):
 
         for address,parsedMsg in six.iteritems(roombas):
             addr = address[0]
+
+            if addr != ipaddress:
+                self.logger.info('Roomba at IP address:'+unicode(addr)+' skipped.')
+                continue
+
             if int(parsedMsg["ver"]) < 2:
                 self.logger.info("Roombas at address: %s does not have the correct firmware version. Your version info is: %s" % (addr,json.dumps(parsedMsg, indent=2)))
                 continue
+
 
             self.logger.info("Make sure your robot (%s) at IP %s is on the Home Base and powered on (green lights on). Then press and hold the HOME button on your robot until it plays a series of tones (about 2 seconds). Release the button and your robot will flash WIFI light." % (parsedMsg["robotname"],addr))
             #raw_input("Press Enter to continue...")
@@ -163,45 +166,60 @@ class password(object):
             if hostname[0] == 'Roomba' or hostname[0]== 'iRobot':
                 blid = hostname[1]
 
-            packet = 'f005efcc3b2900'.decode("hex") #this is 0xf0 (mqtt reserved) 0x05(data length) 0xefcc3b2900 (data)
+            if hasattr(str, 'decode'):
+                # this is 0xf0 (mqtt reserved) 0x05(data length)
+                # 0xefcc3b2900 (data)
+                packet = 'f005efcc3b2900'.decode("hex")
+            else:
+                # this is 0xf0 (mqtt reserved) 0x05(data length)
+                # 0xefcc3b2900 (data)
+                packet = bytes.fromhex('f005efcc3b2900')
+
+            #packet = 'f005efcc3b2900'.decode("hex") #this is 0xf0 (mqtt reserved) 0x05(data length) 0xefcc3b2900 (data)
             #send socket
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(8)
+            sock.settimeout(10)
 
             #ssl wrap
-            wrappedSocket = ssl.wrap_socket(sock, ssl_version=ssl.PROTOCOL_TLSv1)
+            if 'soho' in parsedMsg['sw']:
+                self.logger.debug('Using BETA TEST SSL settings given Soho found in SW')
+                wrappedSocket= ssl.wrap_socket(sock,ssl_version=ssl.PROTOCOL_SSLv23)
+            else:
+                self.logger.debug('Standard SSL using TLSv1')
+                wrappedSocket = ssl.wrap_socket(sock, ssl_version=ssl.PROTOCOL_TLSv1)
+
             #connect and send packet
             try:
                 wrappedSocket.connect((addr, 8883))
             except Exception as e:
                 self.logger.debug("Connection Error %s" % e)
                 self.logger.info('Error getting password.  Follow the instructions and try again.')
-                #return False
+                return False
             try:
                 wrappedSocket.send(packet)
-            except Exception as e:
-                self.logger.error(u'Error in send Packet.  ? Timeout. Exception:'+unicode(e))
-                return False
+                data = b''
+                data_len = 35
 
-            data = b''
-            data_len = 35
-
-            while True:
-                try:
-                    if len(data) >= data_len+2: #NOTE data is 0xf0 (mqtt RESERVED) length (0x23 = 35), 0xefcc3b2900 (magic packet), 0xXXXX... (30 bytes of password). so 7 bytes, followed by 30 bytes of password (total of 37)
+                while True:
+                    try:
+                        if len(data) >= data_len+2: #NOTE data is 0xf0 (mqtt RESERVED) length (0x23 = 35), 0xefcc3b2900 (magic packet), 0xXXXX... (30 bytes of password). so 7 bytes, followed by 30 bytes of password (total of 37)
+                            break
+                        data_received = wrappedSocket.recv(1024)
+                        #self.logger.error('datareceived:'+unicode(data_received))
+                    except socket.error as e:
+                        self.logger.debug("Socket Error: %s" % e)
                         break
-                    data_received = wrappedSocket.recv(1024)
-                except socket.error as e:
-                    self.logger.debug("Socket Error: %s" % e)
-                    break
 
-                if len(data_received) == 0:
-                    self.logger.debug("socket closed")
-                    break
-                else:
-                    data += data_received
-                    if len(data) >= 2:
-                        data_len = struct.unpack("B", data[1:2])[0]
+                    if len(data_received) == 0:
+                        self.logger.debug("socket closed")
+                        break
+                    else:
+                        data += data_received
+                        if len(data) >= 2:
+                            data_len = struct.unpack("B", data[1:2])[0]
+            except Exception as e:
+                self.logger.error(u'Error in send Packet.  Exception:' + unicode(e))
+                return False
 
             #close socket
             wrappedSocket.close()
@@ -246,6 +264,8 @@ class password(object):
                     Config.write(cfgfile)
                     self.logger.info(u'Saved Device Config File/Password. Click OK to continue.')
                     #self.logger.info(u'Restart Plugin to continue.')
+
+
         return True
 
 
