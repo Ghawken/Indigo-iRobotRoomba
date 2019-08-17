@@ -78,9 +78,9 @@ class password(object):
     Results are written to a config file, default ".\config.ini"
     '''
 
-    VERSION = "1.0"
+    VERSION = "1.1"
 
-    def __init__(self, plugin, address, file="config.ini"):
+    def __init__(self, plugin, address, file="config.ini",forceSSL=None):
 
         self.plugin = plugin
         self.logger  = logging.getLogger('Plugin.password')
@@ -91,7 +91,7 @@ class password(object):
         #self.log = logging.getLogger(__name__ + '.Roomba')
         self.address = address
         self.file = self.folderLocation + file
-
+        self.forceSSL = forceSSL
         self.logger.info(u'File should equal:' + self.file)
 
         self.get_password(address)
@@ -155,6 +155,8 @@ class password(object):
                 self.logger.info("Roombas at address: %s does not have the correct firmware version. Your version info is: %s" % (addr,json.dumps(parsedMsg, indent=2)))
                 continue
 
+            if parsedMsg['sw']:
+                self.plugin.softwareVersion = parsedMsg['sw']
 
             self.logger.info("Make sure your robot (%s) at IP %s is on the Home Base and powered on (green lights on). Then press and hold the HOME button on your robot until it plays a series of tones (about 2 seconds). Release the button and your robot will flash WIFI light." % (parsedMsg["robotname"],addr))
             #raw_input("Press Enter to continue...")
@@ -181,8 +183,8 @@ class password(object):
             sock.settimeout(10)
 
             #ssl wrap
-            if 'soho' in parsedMsg['sw']:
-                self.logger.debug('Using BETA TEST SSL settings given Soho found in SW')
+            if 'soho' in parsedMsg['sw'] or self.forceSSL:
+                self.logger.debug('Using SSLv23 TLS settings given S9 iRoomba or Option selected')
                 wrappedSocket= ssl.wrap_socket(sock,ssl_version=ssl.PROTOCOL_SSLv23)
             else:
                 self.logger.debug('Standard SSL using TLSv1')
@@ -242,8 +244,6 @@ class password(object):
                 passwordroomba = str(data[7:]).partition(b'\0')[0]
                 self.logger.info('Password=> %s <= Yes, all this string.' % str(passwordroomba))
 
-
-
                 Config = configparser.ConfigParser()
                 Config.add_section(addr)
                 Config.set(addr,'blid',str(blid))
@@ -271,7 +271,7 @@ class password(object):
 
 class Roomba(object):
     '''
-    This is a Class for Roomba 900 series WiFi connected Vacuum cleaners
+    This is a Class for Roomba 900/i7 and S9 series WiFi connected Vacuum cleaners
     Requires firmware version 2.0 and above (not V1.0). Tested with Roomba 980
     username (blid) and password are required, and can be found using the password() class above (or can be auto discovered)
     Most of the underlying info was obtained from here:
@@ -282,7 +282,7 @@ class Roomba(object):
     designated mqtt client topic.
     '''
 
-    VERSION = "1.0"
+    VERSION = "1.1"
 
     #logger = logging.getLogger(__name__)
 
@@ -320,7 +320,7 @@ class Roomba(object):
         18: "Roomba cannot return to the Home Base or starting position."
     }
 
-    def __init__(self, plugin, address=None, blid=None, password=None, topic="#", continuous=True, clean=False, cert_name="", roombaName="", file="/config.ini"):
+    def __init__(self, plugin, address=None, blid=None, password=None, topic="#", continuous=True, clean=False, cert_name="", roombaName="", file="/config.ini", softwareversion=None, forceSSL=False):
         '''
         address is the IP address of the Roomba, the continuous flag
         enables a continuous mqtt connection, if this is set to False, the client connects and disconnects every 'delay' seconds
@@ -366,7 +366,9 @@ class Roomba(object):
         self.blid = blid
         self.password = password
         self.roombaName = roombaName
-
+        self.softwareversion = softwareversion
+        self.forceSSL = forceSSL
+        #self.logger.error('software Version:'+self.softwareversion)
         #self.MACuserName = pwd.getpwuid(os.getuid())[0]
 
         self.MAChome     = os.path.expanduser("~")+"/"
@@ -376,7 +378,7 @@ class Roomba(object):
         self.file = self.folderLocation + file
         self.topic = topic
         self.mqttc = None
-        self.exclude = ""
+        self.exclude = "wifistat"
         self.delay = 1
         self.roomba_connected = False
         self.indent = 0
@@ -440,6 +442,7 @@ class Roomba(object):
         self.blid = Config.get(self.address, "blid")
         self.password = Config.get(self.address, "password")
         self.roombaName = literal_eval(Config.get(self.address, "data"))["robotname"]
+
         return True
 
     def setup_client(self):
@@ -464,22 +467,21 @@ class Roomba(object):
             # set TLS, self.cert_name is required by paho-mqtt, even if the certificate is not used...
             # but v1.3 changes all this, so have to do the following:
 
-            self.logger.debug("Setting TLS")
-
-
-
+            self.logger.debug("Selecting the best SSL TLS Settings")
             try:
-                self.logger.debug('DEBUG VERSION:  Using Protocol SSLv23')
-
-                self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_SSLv23)
+                if 'soho' in self.softwareversion or self.forceSSL:
+                    self.logger.debug('s9 iRoomba VERSION:  Using Protocol SSLv23')
+                    self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_SSLv23)
+                else:
+                    self.logger.debug('Standard iRoomba VERSION:  Using Protocol TLSv1')
+                    self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_TLSv1)
             except (ValueError):  # try V1.3 version
-                self.logger.debug.warn("TLS Setting failed - trying 1.3 version")
+                self.logger.debug("TLS Setting failed - trying 1.3 version")
                 self.client._ssl_context = None
                 context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
                 context.verify_mode = ssl.CERT_NONE
                 context.load_default_certs()
                 self.client.tls_set_context(context)
-
 
             # disables peer verification
             self.client.tls_insecure_set(True)
@@ -598,12 +600,15 @@ class Roomba(object):
             sys.exit(1)
 
     def on_message(self, mosq, obj, msg):
-        if self.plugin.debugTrue:
-            self.logger.debug(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))
 
         if self.exclude != "":
             if self.exclude in msg.topic:
+                #self.logger.debug('Skipping this topic....')
                 return
+
+        if self.plugin.debugTrue:
+            self.logger.debug(
+                'on_message: msg.topic:' + msg.topic + " msg.qos:" + str(msg.qos) + " payload:" + str(msg.payload))
 
         if self.indent == 0:
             self.master_indent = max(self.master_indent, len(msg.topic))
@@ -611,12 +616,12 @@ class Roomba(object):
         log_string, json_data = self.decode_payload(msg.topic,msg.payload)
         self.dict_merge(self.master_state, json_data)
 
-        if self.pretty_print:
-            if self.plugin.debugTrue:
-                self.logger.debug("%-{:d}s : %s".format(self.master_indent) % (msg.topic,log_string))
-        else:
-            if self.plugin.debugTrue:
-                self.logger.debug("Received Roomba Data %s: %s, %s" % (self.roombaName, str(msg.topic), str(msg.payload)))
+        #if self.pretty_print:
+        #    if self.plugin.debugTrue:
+        #        self.logger.debug("%-{:d}s : %s".format(self.master_indent) % (msg.topic,log_string))
+        #else:
+        #    if self.plugin.debugTrue:
+        #        self.logger.debug("Received Roomba Data %s: %s, %s" % (self.roombaName, str(msg.topic), str(msg.payload)))
 
         if self.raw:
             self.publish(msg.topic, msg.payload)

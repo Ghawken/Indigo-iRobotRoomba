@@ -9,6 +9,14 @@ Currently - have it functioning well and it enables a continuous connection to o
 The benefit of continuous connection is status is updated immediately - so can trigger events to occur which happen within a few seconds; Status is immediately updated.
 The library I am using also supports mapping/drawing a map of cleaning - which I would imagine would look good on a control page.  (I haven't worked through those aspects as yet - but have it on a todo list)
 
+Supports:
+
+iRoomba 900 series
+
+iRoomba i7/i7+
+
+iRoomba s9/S9+
+
 ***Installation:***
 
 Indigo 7 Only

@@ -297,8 +297,10 @@ class Plugin(indigo.PluginBase):
 
     def getRoombaPassword(self, valuesDict, typeId, deviceId):
         self.logger.debug(u"getRoombaPassword called: "+unicode(deviceId))
-
+        device = indigo.devices[deviceId]
+        device.updateStateOnServer('softwareVer', value='Unknown')
         roombaIP = valuesDict.get('address', 0)
+        forceSSL = valuesDict.get('forceSSL',False)
 
         if roombaIP == 0 or roombaIP == '':
             self.logger.error(u'IP Address cannot be Empty.  Please empty valid IP before using Get Password')
@@ -306,8 +308,12 @@ class Plugin(indigo.PluginBase):
 
         #Roomba.connect()
         filename = str(roombaIP)+"-config.ini"
-        result = password(self, address=roombaIP, file=filename)
+        self.softwareVersion = ''
+        result = password(self, address=roombaIP, file=filename, forceSSL=forceSSL  )
         #self.logger.error(unicode(result))
+        if self.softwareVersion != '':
+            self.logger.debug('Software Version of Roomba Found:'+unicode(self.softwareVersion))
+            device.updateStateOnServer('softwareVer', value=self.softwareVersion)
         if result == True:
             valuesDict['password'] = 'OK'
             self.logger.info(u'Password Saved. Click Ok.')
@@ -321,6 +327,9 @@ class Plugin(indigo.PluginBase):
     def connectRoomba(self,device):
         self.logger.debug(u'connecting Roomba Device: '+unicode(device.name))
         roombaIP = device.pluginProps.get('address', 0).encode('utf-8')
+        softwareVersion = device.states['softwareVer']
+        forceSSL = device.pluginProps.get('forceSSL',False)
+
 
         if roombaIP == 0:
             device.updateStateOnServer(key="deviceStatus", value="Communications Error")
@@ -336,7 +345,7 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u'Using config file: ' + file)
         if os.path.isfile(file):
 
-            self.myroomba = Roomba( self, address=roombaIP, file=filename)
+            self.myroomba = Roomba( self, address=roombaIP, file=filename, softwareversion=softwareVersion, forceSSL=forceSSL)
             self.myroomba.set_options(raw=False, indent=0, pretty_print=False)
             self.myroomba.connect()
 
@@ -360,6 +369,7 @@ class Plugin(indigo.PluginBase):
                     if 'name' in masterState['state']['reported']:
                         #self.logger.debug(u'MasterState Name :'+ masterState['state']['reported']['name'])
                         device.updateStateOnServer('Name', value=str(masterState['state']['reported']['name']))
+
                     if 'pose' in masterState['state']['reported']:
                         if 'point' in masterState['state']['reported']['pose']:
                             if 'x' in masterState['state']['reported']['pose']['point']:
