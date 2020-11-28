@@ -26,7 +26,8 @@
             <Description>Enable/Disable</Description>
             </Field>
             <Field id="SSLinfo" type="label" fontSize="small" fontColor="darkgray">
-                <Label>This is an advanced SSL setting to force the plugin to use SSLv23 in its Password and MQTT communication.  This appears to be needed for new S9/S9+ Roomba, which the plugin should correctly detect and enable. If you are having connection issues, make sure there is no other connection eg. App ongoing, and depending on OSX version and Roomba version can try this setting.</Label>
+                <Label>Force SSLv23 settings. This is now needed for new firmware for both i7 and i9.  It is quite likely newer firmware for other Roombas will require this in the future. If you have any connection/or get Password issues also try with this checkbox enabled
+                </Label>
 
             </Field>
             <Field id="space21126" type="separator" hidden="true"/>

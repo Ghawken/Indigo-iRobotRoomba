@@ -183,12 +183,12 @@ class password(object):
             sock.settimeout(10)
 
             #ssl wrap
-            if 'soho' in parsedMsg['sw'] or self.forceSSL:
+            if 'soho' in parsedMsg['sw'] or self.forceSSL or 'lewis+3.0.11+lewis' in parsedMsg['sw']:  ## soho = i9, lewis+etc = i7 new firmware force SSLv23
                 self.logger.debug('Using SSLv23 TLS settings given S9 iRoomba or Option selected')
                 wrappedSocket= ssl.wrap_socket(sock,ssl_version=ssl.PROTOCOL_SSLv23)
             else:
                 self.logger.debug('Standard SSL using TLSv1')
-                wrappedSocket = ssl.wrap_socket(sock, ssl_version=ssl.PROTOCOL_TLSv1)
+                wrappedSocket = ssl.wrap_socket(sock, ssl_version=ssl.PROTOCOL_TLS)
 
             #connect and send packet
             try:
@@ -469,11 +469,11 @@ class Roomba(object):
 
             self.logger.debug("Selecting the best SSL TLS Settings")
             try:
-                if 'soho' in self.softwareversion or self.forceSSL:
+                if 'soho' in self.softwareversion or self.forceSSL or 'lewis+3.0.11+lewis' in self.softwareversion:
                     self.logger.debug('s9 iRoomba VERSION:  Using Protocol SSLv23')
                     self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_SSLv23)
                 else:
-                    self.logger.debug('Standard iRoomba VERSION:  Using Protocol TLSv1')
+                    self.logger.debug('Standard iRoomba VERSION:  Using Protocol TLS.  Change v0.51')
                     self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_TLSv1)
             except (ValueError):  # try V1.3 version
                 self.logger.debug("TLS Setting failed - trying 1.3 version")

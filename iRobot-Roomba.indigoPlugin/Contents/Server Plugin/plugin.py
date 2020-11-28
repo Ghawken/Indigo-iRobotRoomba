@@ -16,6 +16,7 @@ import time
 import requests
 import json
 import logging
+import OpenSSL
 from base64 import b64encode
 from roomba import Roomba
 from roomba import password
@@ -575,6 +576,8 @@ class Plugin(indigo.PluginBase):
         self.RoombaAction(pluginAction, roombaDevice, 'dock')
 
     def RoombaAction(self, pluginAction, roombaDevice, action):
+
+
         self.logger.debug(u"startRoombaAction for "+unicode(roombaDevice.name)+": Action : "+str(action))
         # Add a try except loop to catch nicely any errors.
         try:
