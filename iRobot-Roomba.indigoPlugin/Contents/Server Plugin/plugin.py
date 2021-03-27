@@ -93,6 +93,9 @@ class Plugin(indigo.PluginBase):
         self.next_status_check = time.time()
         self.myroomba = None
         self.connected = False
+
+        self.connectedtoName = "none"
+
         self.errorStrings = {
             '0' : 'No Error',
             '1' : 'Place Roomba on a flat surface then press CLEAN to restart.',
@@ -330,26 +333,20 @@ class Plugin(indigo.PluginBase):
         roombaIP = device.pluginProps.get('address', 0).encode('utf-8')
         softwareVersion = device.states['softwareVer']
         forceSSL = device.pluginProps.get('forceSSL',False)
-
-
         if roombaIP == 0:
             device.updateStateOnServer(key="deviceStatus", value="Communications Error")
             device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
             self.logger.error(u"getDeviceStatus: Roomba IP address not configured.")
             return
-
         filename = str(roombaIP)+"-config.ini"
         MAChome = os.path.expanduser("~")+"/"
         folderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
-
         file = folderLocation + filename
         self.logger.debug(u'Using config file: ' + file)
         if os.path.isfile(file):
-
             self.myroomba = Roomba( self, address=roombaIP, file=filename, softwareversion=softwareVersion, forceSSL=forceSSL)
             self.myroomba.set_options(raw=False, indent=0, pretty_print=False)
             self.myroomba.connect()
-
             return True
         else:
             self.logger.error(u'Config file for device does not exist - check Device settings')
@@ -460,7 +457,6 @@ class Plugin(indigo.PluginBase):
             if self.myroomba.master_state != None:
                 self.saveMasterStateDevice(self.myroomba.master_state, device, "")
                 self.logger.debug(unicode(self.myroomba.master_state))
-
             self.myroomba.disconnect()
             self.myroomba = None
 
@@ -575,12 +571,18 @@ class Plugin(indigo.PluginBase):
     def dockRoombaAction(self, pluginAction, roombaDevice):
         self.RoombaAction(pluginAction, roombaDevice, 'dock')
 
-    def RoombaAction(self, pluginAction, roombaDevice, action):
+    def evacRoombaAction(self, pluginAction, roombaDevice):
+        self.RoombaAction(pluginAction, roombaDevice, 'evac')
 
+    def RoombaAction(self, pluginAction, roombaDevice, action):
 
         self.logger.debug(u"startRoombaAction for "+unicode(roombaDevice.name)+": Action : "+str(action))
         # Add a try except loop to catch nicely any errors.
         try:
+            iroombaName = roombaDevice.states['Name']
+            self.logger.debug("Roomba Name:"+unicode(iroombaName))
+            self.logger.debug("Connected Roomba Name:"+unicode(self.connectedtoName))
+
             if self.connected == False and self.continuous== False:
                 connected = False
                 connected = self.connectRoomba(roombaDevice)
@@ -592,21 +594,39 @@ class Plugin(indigo.PluginBase):
                     if connected == False:
                         self.logger.info(u'Failed Connected to Roomba within 5 seconds.  Ending attempt.')
                         return
-
                 self.myroomba.send_command(str(action))
                 time.sleep(5)
                 self.disconnectRoomba(roombaDevice)
                 time.sleep(5)
                 return
 
-            if self.connected == True:
+            if self.connected == True:  ## may be the wrong iroomba that you are already connected to...
+                if self.connectedtoName != iroombaName:   ## wrong iroomba connected
+                    self.disconnectRoomba(roombaDevice)
+                    connected = False
+                    connected = self.connectRoomba(roombaDevice)
+                    time.sleep(5)
+                    # Add a connection check - the main library has added a base exception which might be useful to also use.
+                    if connected == False:
+                        self.logger.info(u'Failed Connected to Roomba within 5 seconds, waiting another 5.')
+                        time.sleep(5)
+                        if connected == False:
+                            self.logger.info(u'Failed Connected to Roomba within 5 seconds.  Ending attempt.')
+                            return
+                    self.myroomba.send_command(str(action))
+                    time.sleep(5)
+                    if self.continuous == False:
+                        self.disconnectRoomba(roombaDevice)
+                    return
+                else:  ## already connected to correct device.. don't disconnect, make most of it
+
                 #self.connectRoomba(roombaDevice)
                 #time.sleep(5)
-                self.myroomba.send_command(str(action))
-                time.sleep(5)
-                if self.continuous == False:
-                    self.disconnectRoomba(roombaDevice)
+                    self.myroomba.send_command(str(action))
+                    time.sleep(5)
+                    if self.continuous == False:
+                        self.disconnectRoomba(roombaDevice)
                 return
 
         except Exception as e:
-            self.logger.debug(u'Error within RoombaAction:'+unicode(e))
+            self.logger.debug(u'Caught Error within RoombaAction:'+unicode(e))

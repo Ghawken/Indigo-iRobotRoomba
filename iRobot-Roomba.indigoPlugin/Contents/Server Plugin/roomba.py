@@ -504,11 +504,11 @@ class Roomba(object):
                         self.mqttc.disconnect()
                         self.logger.error("Mqttc Disconnect")
                         return False
-            else:
+           # else:
                 #self.periodic_connection()
-                self._thread = threading.Thread(target=self.periodic_connection)
-                self._thread.daemon = True
-                self._thread.start()
+                #self._thread = threading.Thread(target=self.periodic_connection)
+                #self._thread.daemon = True
+                #self._thread.start()
 
             self.time = time.time()   #save connect time
         except Exception as e:
@@ -591,9 +591,10 @@ class Roomba(object):
         if rc == 0:
             self.roomba_connected = True
             self.plugin.connected = True
+            self.plugin.connectedtoName = self.roombaName
             self.client.subscribe(self.topic)
         else:
-            self.logger.debug("Roomba Connected with result code "+str(rc))
+            self.logger.debug("Roomba failed Connection with result code "+str(rc))
             self.logger.debug("Please make sure your blid and password are correct %s" % self.roombaName)
             if self.mqttc is not None:
                self.mqttc.disconnect()
@@ -645,6 +646,7 @@ class Roomba(object):
     def on_disconnect(self, mosq, obj, rc):
         self.roomba_connected = False
         self.plugin.connected = False
+        self.plugin.connectedtoName = "none"
         if rc != 0:
             self.logger.debug("Unexpected Disconnect From Roomba %s! - reconnecting" % self.roombaName)
         else:

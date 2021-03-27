@@ -30,5 +30,8 @@
         <Name>Dock Roomba</Name>
         <CallbackMethod>dockRoombaAction</CallbackMethod>
     </Action>
-
+    <Action id="evacRoomba" deviceFilter="self.roombaDevice">
+        <Name>Evac Roomba</Name>
+        <CallbackMethod>evacRoombaAction</CallbackMethod>
+    </Action>
 </Actions>
