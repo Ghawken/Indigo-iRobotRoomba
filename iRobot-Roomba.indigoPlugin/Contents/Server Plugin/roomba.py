@@ -286,38 +286,103 @@ class Roomba(object):
 
     #logger = logging.getLogger(__name__)
 
-    states = {  "charge":"Charging",
-                "new":"New Mission",
-                "run":"Running",
-                "resume":"Running",
-                "hmMidMsn":"Recharging",
-                "recharge":"Recharging",
-                "stuck":"Stuck",
-                "hmUsrDock":"User Docking",
-                "dock":"Docking",
-                "dockend":"Docking - End Mission",
-                "cancelled":"Cancelled",
-                "stop":"Stopped",
-                "pause":"Paused",
-                "hmPostMsn":"End Mission",
-                "":None}
+    states = {"charge": "Charging",
+              "new": "New Mission",
+              "run": "Running",
+              "resume": "Running",
+              "hmMidMsn": "Recharging",
+              "recharge": "Recharging",
+              "stuck": "Stuck",
+              "hmUsrDock": "User Docking",
+              "dock": "Docking",
+              "dockend": "Docking - End Mission",
+              "cancelled": "Cancelled",
+              "stop": "Stopped",
+              "pause": "Paused",
+              "hmPostMsn": "End Mission",
+              "": None}
 
     # From http://homesupport.irobot.com/app/answers/detail/a_id/9024/~/roomba-900-error-messages
     _ErrorMessages = {
-        0 : "None",
-        1 : "Roomba is stuck with its left or right wheel hanging down.",
-        2 : "The debris extractors can't turn.",
-        5 : "The left or right wheel is stuck.",
-        6 : "The cliff sensors are dirty, it is hanging over a drop, or it is stuck on a dark surface.",
-        8 : "The fan is stuck or its filter is clogged.",
-        9 : "The bumper is stuck, or the bumper sensor is dirty.",
-        10: "The left or right wheel is not moving.",
-        11: "Roomba has an internal error.",
-        14: "The bin has a bad connection to the robot.",
-        15: "Roomba has an internal error.",
-        16: "Roomba has started while moving or at an angle, or was bumped while running.",
-        17: "The cleaning job is incomplete.",
-        18: "Roomba cannot return to the Home Base or starting position."
+        0: "None",
+        1: "Left wheel off floor",
+        2: "Main brushes stuck",
+        3: "Right wheel off floor",
+        4: "Left wheel stuck",
+        5: "Right wheel stuck",
+        6: "Stuck near a cliff",
+        7: "Left wheel error",
+        8: "Bin error",
+        9: "Bumper stuck",
+        10: "Right wheel error",
+        11: "Bin error",
+        12: "Cliff sensor issue",
+        13: "Both wheels off floor",
+        14: "Bin missing",
+        15: "Reboot required",
+        16: "Bumped unexpectedly",
+        17: "Path blocked",
+        18: "Docking issue",
+        19: "Undocking issue",
+        20: "Docking issue",
+        21: "Navigation problem",
+        22: "Navigation problem",
+        23: "Battery issue",
+        24: "Navigation problem",
+        25: "Reboot required",
+        26: "Vacuum problem",
+        27: "Vacuum problem",
+        29: "Software update needed",
+        30: "Vacuum problem",
+        31: "Reboot required",
+        32: "Smart map problem",
+        33: "Path blocked",
+        34: "Reboot required",
+        35: "Unrecognised cleaning pad",
+        36: "Bin full",
+        37: "Tank needed refilling",
+        38: "Vacuum problem",
+        39: "Reboot required",
+        40: "Navigation problem",
+        41: "Timed out",
+        42: "Localization problem",
+        43: "Navigation problem",
+        44: "Pump issue",
+        45: "Lid open",
+        46: "Low battery",
+        47: "Reboot required",
+        48: "Path blocked",
+        52: "Pad required attention",
+        53: "Software update required",
+        65: "Hardware problem detected",
+        66: "Low memory",
+        68: "Hardware problem detected",
+        73: "Pad type changed",
+        74: "Max area reached",
+        75: "Navigation problem",
+        76: "Hardware problem detected",
+        88: "Back-up refused",
+        89: "Mission runtime too long",
+        101: "Battery isn't connected",
+        102: "Charging error",
+        103: "Charging error",
+        104: "No charge current",
+        105: "Charging current too low",
+        106: "Battery too warm",
+        107: "Battery temperature incorrect",
+        108: "Battery communication failure",
+        109: "Battery error",
+        110: "Battery cell imbalance",
+        111: "Battery communication failure",
+        112: "Invalid charging load",
+        114: "Internal battery failure",
+        115: "Cell failure during charging",
+        116: "Charging error of Home Base",
+        118: "Battery communication failure",
+        119: "Charging timeout",
+        120: "Battery not initialized",
+        122: "Charging system error",
+        123: "Battery not initialized",
     }
 
     def __init__(self, plugin, address=None, blid=None, password=None, topic="#", continuous=True, clean=False, cert_name="", roombaName="", file="/config.ini", softwareversion=None, forceSSL=False):
@@ -590,7 +655,7 @@ class Roomba(object):
         self.logger.debug("Roomba Connected %s" % self.roombaName)
         if rc == 0:
             self.roomba_connected = True
-            self.plugin.connected = True
+            #self.plugin.connected = True
             self.plugin.connectedtoName = self.roombaName
             self.client.subscribe(self.topic)
         else:
@@ -601,41 +666,42 @@ class Roomba(object):
             sys.exit(1)
 
     def on_message(self, mosq, obj, msg):
+        try:
+            if self.exclude != "":
+                if self.exclude in msg.topic:
+                    #self.logger.debug('Skipping this topic....')
+                    return
 
-        if self.exclude != "":
-            if self.exclude in msg.topic:
-                #self.logger.debug('Skipping this topic....')
-                return
-
-        if self.plugin.debugTrue:
-            self.logger.debug(
-                'on_message: msg.topic:' + msg.topic + " msg.qos:" + str(msg.qos) + " payload:" + str(msg.payload))
-
-        if self.indent == 0:
-            self.master_indent = max(self.master_indent, len(msg.topic))
-
-        log_string, json_data = self.decode_payload(msg.topic,msg.payload)
-        self.dict_merge(self.master_state, json_data)
-
-        #if self.pretty_print:
-        #    if self.plugin.debugTrue:
-        #        self.logger.debug("%-{:d}s : %s".format(self.master_indent) % (msg.topic,log_string))
-        #else:
-        #    if self.plugin.debugTrue:
-        #        self.logger.debug("Received Roomba Data %s: %s, %s" % (self.roombaName, str(msg.topic), str(msg.payload)))
-
-        if self.raw:
-            self.publish(msg.topic, msg.payload)
-        else:
-            self.decode_topics(json_data)
-
-        if time.time() - self.time > self.update_seconds:   #default every 5 minutes
             if self.plugin.debugTrue:
-                self.logger.debug("Publishing master_state %s" % self.roombaName)
-            self.decode_topics(self.master_state)    #publish all values
-            #self.plugin.checkForUpdates()
-            self.time = time.time()
+                self.logger.debug(
+                    'on_message: msg.topic:' + msg.topic + " msg.qos:" + str(msg.qos) + " payload:" + str(msg.payload))
 
+            if self.indent == 0:
+                self.master_indent = max(self.master_indent, len(msg.topic))
+
+            log_string, json_data = self.decode_payload(msg.topic,msg.payload)
+            self.dict_merge(self.master_state, json_data)
+
+            #if self.pretty_print:
+            #    if self.plugin.debugTrue:
+            #        self.logger.debug("%-{:d}s : %s".format(self.master_indent) % (msg.topic,log_string))
+            #else:
+            #    if self.plugin.debugTrue:
+            #        self.logger.debug("Received Roomba Data %s: %s, %s" % (self.roombaName, str(msg.topic), str(msg.payload)))
+
+            if self.raw:
+                self.publish(msg.topic, msg.payload)
+            else:
+                self.decode_topics(json_data)
+
+            if time.time() - self.time > self.update_seconds:   #default every 5 minutes
+                if self.plugin.debugTrue:
+                    self.logger.debug("Publishing master_state %s" % self.roombaName)
+                self.decode_topics(self.master_state)    #publish all values
+                #self.plugin.checkForUpdates()
+                self.time = time.time()
+        except:
+            self.logger.exception("Exception Caught On Message")
     def on_publish(self, mosq, obj, mid):
         pass
 
@@ -645,8 +711,8 @@ class Roomba(object):
 
     def on_disconnect(self, mosq, obj, rc):
         self.roomba_connected = False
-        self.plugin.connected = False
-        self.plugin.connectedtoName = "none"
+        #self.plugin.connected = False
+        #self.plugin.connectedtoName = "none"
         if rc != 0:
             self.logger.debug("Unexpected Disconnect From Roomba %s! - reconnecting" % self.roombaName)
         else:
@@ -935,12 +1001,11 @@ class Roomba(object):
             self.logger.debug("set current state to: %s" % (self.current_state))
 
         if self.current_state != current_mission:
-
             if self.plugin.debugTrue:
                 self.logger.debug("updated state to: %s" % (self.current_state))
             if self.plugin.continuous:
-                self.plugin.currentstate = self.current_state
-                self.plugin.updateMasterStates(self.current_state)
+                #self.plugin.currentstate = self.current_state
+                self.plugin.updateMasterStates()
 
         self.publish("state", self.current_state)
         self.draw_map(current_mission != self.current_state)

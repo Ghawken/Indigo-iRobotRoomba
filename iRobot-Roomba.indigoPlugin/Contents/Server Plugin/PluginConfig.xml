@@ -1,10 +1,17 @@
 <?xml version="1.0"?>
 <PluginConfig>
-    <SupportURL></SupportURL>
-    <Field id="statusFrequency" type="textfield" defaultValue="10">
+    <SupportURL>https://forums.indigodomo.com/viewforum.php?f=265</SupportURL>
+      <Field id="infoLabel0" type="label" fontSize='large' fontColor="black">
+    <Label>iRoomba Robot Line Indigo Plugin</Label>
+  </Field>
+  <Field id="space0" type="label" fontColor="black" >
+    <Label>Developed by: GlennNZ</Label>
+  </Field>
+  <Field id="sep7" type="separator"/>
+
+    <Field id="statusFrequency" type="textfield" defaultValue="1" hidden="true">
         <Label>Update device status frequency (minutes):</Label>
     </Field>
-    <Field id="sep1" type="separator"/>
     <Field id="updateFrequency" type="textfield" defaultValue="24" hidden="true">
         <Label>Check for plugin update frequency (hours):</Label>
     </Field>
@@ -18,7 +25,7 @@
     <Description>Enable/Disable</Description>
   </Field>
 
-    <Field id="continuous" type="checkbox" tooltip="Will keep connection to Roomba open." defaultValue="true">
+    <Field id="continuous" type="checkbox" tooltip="Will keep connection to Roomba open." defaultValue="true" hidden="true">
             <Label>
                 Continous connection to ONE Roomba Device only.  Do not enable if wish more than one Roomba controlled.
                 (This is the recommended setup )
