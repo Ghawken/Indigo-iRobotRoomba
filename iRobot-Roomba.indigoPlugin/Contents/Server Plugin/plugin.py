@@ -90,7 +90,7 @@ class Plugin(indigo.PluginBase):
         self.connectTime = self.reconnectFreq +time.time()
 
       #  self.statusFrequency = float(self.pluginPrefs.get('statusFrequency', "10")) * 60.0
-        self.statusFrequency = 60 * 10
+        self.statusFrequency = 60
         self.logger.debug(u"statusFrequency = " + str(self.statusFrequency))
         self.next_status_check = time.time()
        # self.myroomba = None
@@ -147,14 +147,14 @@ class Plugin(indigo.PluginBase):
                 if time.time() > self.next_status_check:
                     if self.debugTrue:
                         self.logger.debug(u'Updating Master States....')
-                    #self.checkAllRoombas()   # if not using continuous connection check here - at time allowed
                     self.updateMasterStates()   # if using continuous - should already be connected just update states here
-                    self.next_status_check = time.time() + self.statusFrequency
+                    self.next_status_check = time.time() +60  ## 1 minute later update states
 
                 if time.time() > self.checkConnection:
                     if self.debugTrue:
                         self.logger.debug(u'checking all Roombas are still connected now....')
                     self.checkAllRoombas()
+                    self.checkConnection = time.time()+ 60 *60 # 60 minutes later
 
                 if time.time() > self.connectTime:
                     # Disconnect and Reconnect Roomba
