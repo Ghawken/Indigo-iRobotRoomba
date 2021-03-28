@@ -90,9 +90,8 @@ class Plugin(indigo.PluginBase):
         self.connectTime = self.reconnectFreq +time.time()
 
       #  self.statusFrequency = float(self.pluginPrefs.get('statusFrequency', "10")) * 60.0
-        self.statusFrequency = 60
+        self.statusFrequency = 60 * 10
         self.logger.debug(u"statusFrequency = " + str(self.statusFrequency))
-
         self.next_status_check = time.time()
        # self.myroomba = None
         #self.connected = False
@@ -332,20 +331,26 @@ class Plugin(indigo.PluginBase):
         #self.getRoombaInfo(roombaDevice)
 
     def connectRoomba(self,device):
-        self.logger.debug("connectRoomba Called self.roomba_list = "+unicode(self.roomba_list))
+        if self.debugTrue:
+            self.logger.debug("connectRoomba Called self.roomba_list = "+unicode(self.roomba_list))
 
         if any(roomba.roombaName == device.states['Name'] for roomba in self.roomba_list):
-            self.logger.debug("connectRoomba Msg: iRoomba Name Already Exists in roomba_list:")
+
+            if self.debugTrue:
+                self.logger.debug("connectRoomba Msg: iRoomba Name Already Exists in roomba_list:")
             for myroomba in self.roomba_list:
                 if myroomba.roombaName == device.states['Name']:
                     if myroomba.roomba_connected == False:
-                        self.logger.debug("Reconnecting myroomba already exists in self.roomba_list")
+                        if self.debugTrue:
+                            self.logger.debug("Reconnecting myroomba already exists in self.roomba_list")
                         myroomba.connect()
                     else:
-                        self.logger.debug("connectRoomba:  Already in roomba_list and already connected returning")
+                        if self.debugTrue:
+                            self.logger.debug("connectRoomba:  Already in roomba_list and already connected returning")
                         return True
         else:  ## no matching Roomba in roomba_list
-            self.logger.debug(u'connecting Roomba Device: '+unicode(device.name))
+            if self.debugTrue:
+                self.logger.debug(u'connecting Roomba Device: '+unicode(device.name))
             roombaIP = device.pluginProps.get('address', 0).encode('utf-8')
             softwareVersion = device.states['softwareVer']
             forceSSL = device.pluginProps.get('forceSSL',False)
@@ -358,7 +363,8 @@ class Plugin(indigo.PluginBase):
             MAChome = os.path.expanduser("~")+"/"
             folderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
             file = folderLocation + filename
-            self.logger.debug(u'Using config file: ' + file)
+            if self.debugTrue:
+                self.logger.debug(u'Using config file: ' + file)
             if os.path.isfile(file):
                 myroomba = Roomba( self, address=roombaIP, file=filename, softwareversion=softwareVersion, forceSSL=forceSSL)
                 myroomba.set_options(raw=False, indent=0, pretty_print=False)
@@ -483,7 +489,8 @@ class Plugin(indigo.PluginBase):
         #self.myroomba = None
 
     def getRoombaInfo(self, device):
-        self.logger.debug(u"getRoombaInfo for %s" % device.name)
+        if self.debugTrue:
+            self.logger.debug(u"getRoombaInfo for %s" % device.name)
         #self.logger.debug(u'')
         #
         # if above true - connect to one device only (1st one found) and do so with continuous connection - constant updates...
@@ -538,7 +545,8 @@ class Plugin(indigo.PluginBase):
             #self.logger.debug(u'self.connected equals:'+unicode(self.connected)+"& self.continuous equals:"+unicode(self.continuous))
         for dev in indigo.devices.iter("self"):
             if (dev.deviceTypeId == "roombaDevice"):
-                self.logger.debug(u'getRoomba Info Running..')
+                if self.debugTrue:
+                    self.logger.debug(u'getRoomba Info Running..')
                 self.getRoombaInfo(dev)
                 time.sleep(1)
                 #self.getRoombaStatus(dev)
