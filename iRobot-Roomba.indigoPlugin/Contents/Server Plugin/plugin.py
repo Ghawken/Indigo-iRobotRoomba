@@ -65,15 +65,13 @@ class Plugin(indigo.PluginBase):
         iurl = 'http://www.indigodomo.com/pluginstore/132/'
         self.browserOpen(iurl)
 
-
     def startup(self):
         self.logger.info(u"Starting Roomba")
-
         self.triggers = { }
         self.masterState = None
         self.currentstate = ""
         self.updater = GitHubPluginUpdater(self)
-        self.KILL = False
+        self.KILLcount = 0
         self.restarted = 0
         self.updateFrequency = float(self.pluginPrefs.get('updateFrequency', "24")) * 60.0 * 60.0
 
@@ -133,16 +131,11 @@ class Plugin(indigo.PluginBase):
 
     def runConcurrentThread(self):
         self.next_status_check = time.time()
+        self.checkiRoombaConnectedtime = time.time() + 60*60
         self.checkAllRoombas()
         self.checkConnection = time.time()+ 60*60
         try:
             while True:
-
-                if self.KILL == True:
-                    self.logger.debug('Self.Kill is true,  restarting plugin')
-                    self.KILL = False
-                    self.restarted = 1
-                    self.restartPlugin()
 
                 if time.time() > self.next_status_check:
                     if self.debugTrue:
@@ -155,6 +148,12 @@ class Plugin(indigo.PluginBase):
                         self.logger.debug(u'checking all Roombas are still connected now....')
                     self.checkAllRoombas()
                     self.checkConnection = time.time()+ 60 *60 # 60 minutes later
+
+                if time.time() > self.checkiRoombaConnectedtime:
+                    if self.debugTrue:
+                        self.logger.debug(u'checking any Roombas still connected now....')
+                    self.checkanyConnected()  ## and restart if more than 4 checks nothing connected -- 3-4 hours
+                    self.checkiRoombaConnectedtime = time.time()+ 60 *60 #
 
                 if time.time() > self.connectTime:
                     # Disconnect and Reconnect Roomba
@@ -538,6 +537,28 @@ class Plugin(indigo.PluginBase):
 
         self.updateMasterStates()
 
+    def checkanyConnected(self):
+        if self.debugTrue:
+            self.logger.debug(u'checkanyConnected called. ')
+        anyConnected = False
+        for myroomba in self.roomba_list:
+            if myroomba.roomba_connected == True:
+                anyConnected = True
+                if self.debugTrue:
+                    self.logger.debug(u'Found connected myroomba.  Returning True ')
+
+        if anyConnected == False:
+            self.KILLcount = self.KILLcount +1
+            self.logger.debug(u"No connected iRoombas found now for "+unicode(self.KILLcount)+" times...")
+        else:
+            self.KILLcount = 0
+
+        if self.KILLcount > 4:
+            self.logger.debug(u"No connected iRoomabs found for 5 checks... restarting Plugin to reset MQTT connection")
+            self.logger.debug(u"Occasionally after days of continuous connection, error somewhere requiring restart")
+            self.restartPlugin()
+
+        return anyConnected
 
     def checkAllRoombas(self):
         if self.debugTrue:

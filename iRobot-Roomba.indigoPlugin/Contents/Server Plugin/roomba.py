@@ -617,10 +617,10 @@ class Roomba(object):
         if count == max_retries:
             self.logger.info(u"Unable to connect to %s" % unicode(self.roombaName))
             self.logger.info(u'This may because your Roomba has lost charge and network connection.')
-            self.logger.info(u'Restarting Plugin in effort to resolve...')
-            self.logger.debug(u"Setting restart switch....")
+            #self.logger.info(u'Restarting Plugin in effort to resolve...')
+            #self.logger.debug(u"Setting restart switch....")
             #self.plugin.restartPlugin(self)
-            self.plugin.KILL = True
+            #self.plugin.KILL = True
             #self.roomba_connected = False
             #self.plugin.connected = False
 
