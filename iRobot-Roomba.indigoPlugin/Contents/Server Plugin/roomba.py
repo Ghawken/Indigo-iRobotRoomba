@@ -577,7 +577,7 @@ class Roomba(object):
 
             self.time = time.time()   #save connect time
         except Exception as e:
-            self.logger.error("Error Threading: %s " % unicode(e.message))
+            self.logger.error("Error Connect: %s " % unicode(e.message))
 
     def _connect(self, count=0, new_connection=False):
         max_retries = 3
@@ -649,18 +649,20 @@ class Roomba(object):
         self.periodic_connection_running = False
 
     def on_connect(self, client, userdata, flags, rc):
-        self.logger.debug("Roomba Connected %s" % self.roombaName)
-        if rc == 0:
-            self.roomba_connected = True
-            #self.plugin.connected = True
-            self.plugin.connectedtoName = self.roombaName
-            self.client.subscribe(self.topic)
-        else:
-            self.logger.debug("Roomba failed Connection with result code "+str(rc))
-            self.logger.debug("Please make sure your blid and password are correct %s" % self.roombaName)
-            if self.mqttc is not None:
-               self.mqttc.disconnect()
-            sys.exit(1)
+        try:
+            self.logger.debug("Roomba Connected %s" % self.roombaName)
+            if rc == 0:
+                self.roomba_connected = True
+                #self.plugin.connected = True
+                self.plugin.connectedtoName = self.roombaName
+                self.client.subscribe(self.topic)
+            else:
+                self.logger.debug("Roomba failed Connection with result code "+str(rc))
+                self.logger.debug("Please make sure your blid and password are correct %s" % self.roombaName)
+                if self.mqttc is not None:
+                   self.mqttc.disconnect()
+        except:
+            self.logger.exception("Caught Exception in on_connect")
 
     def on_message(self, mosq, obj, msg):
         try:

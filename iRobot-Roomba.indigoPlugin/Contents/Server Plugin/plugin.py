@@ -334,12 +334,12 @@ class Plugin(indigo.PluginBase):
         if self.debugOther:
             self.logger.debug("connectRoomba Called self.roomba_list = "+unicode(self.roomba_list))
 
-        if any(roomba.roombaName == device.states['Name'] for roomba in self.roomba_list):
+        if any(str(roomba.roombaName) == str(device.states['Name']) for roomba in self.roomba_list):
 
             if self.debugOther:
                 self.logger.debug("connectRoomba Msg: iRoomba Name Already Exists in roomba_list:")
             for myroomba in self.roomba_list:
-                if myroomba.roombaName == device.states['Name']:
+                if str(myroomba.roombaName) == str(device.states['Name']):
                     if myroomba.roomba_connected == False:
                         if self.debugOther:
                             self.logger.debug("Reconnecting myroomba already exists in self.roomba_list")
@@ -480,7 +480,7 @@ class Plugin(indigo.PluginBase):
     def disconnectRoomba(self,device):
         self.logger.debug(u'disconnecting Roomba Device: '+unicode(device.name))
         for myroomba in self.roomba_list:
-            if myroomba.roombaName == device.states['Name']:
+            if str(myroomba.roombaName) == str(device.states['Name']):
                 self.logger.debug("disconnectRoomba Matching iroomba found")
                 if myroomba.master_state != None:
                     self.saveMasterStateDevice(myroomba.master_state, device, "")
@@ -505,7 +505,7 @@ class Plugin(indigo.PluginBase):
             self.logger.debug(u'updateMasterStates called.')
         for dev in indigo.devices.iter("self"):
             for myroomba in self.roomba_list:
-                if myroomba.roombaName == dev.states['Name']:
+                if str(myroomba.roombaName) == str(dev.states['Name']):
                     if (dev.deviceTypeId == "roombaDevice") and myroomba.master_state != None:
                         self.saveMasterStateDevice(myroomba.master_state, dev, myroomba.current_state)
         return
@@ -620,17 +620,17 @@ class Plugin(indigo.PluginBase):
         self.RoombaAction(pluginAction, roombaDevice, 'evac')
 
     def RoombaAction(self, pluginAction, roombaDevice, action):
-
         self.logger.debug(u"startRoombaAction for "+unicode(roombaDevice.name)+": Action : "+str(action))
         # Add a try except loop to catch nicely any errors.
         try:
-            iroombaName = roombaDevice.states['Name']
+            iroombaName = str(roombaDevice.states['Name'])
             self.logger.debug("Roomba Name:"+unicode(iroombaName))
             #self.logger.debug("Connected Roomba Name:"+unicode(self.connectedtoName))
 
             for myroomba in self.roomba_list:
-                if myroomba.roombaName == iroombaName:
+                if str(myroomba.roombaName) == str(iroombaName):
                     if myroomba.roomba_connected == False:
+                        self.logger.debug(u"Not connected to iRoomba:"+unicode(iroombaName)+u" -- Should be --- Attempting to reconnect.")
                         connected = False
                         connected = self.connectRoomba(roombaDevice)
                         time.sleep(5)
