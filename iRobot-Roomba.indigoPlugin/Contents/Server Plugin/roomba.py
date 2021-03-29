@@ -587,11 +587,8 @@ class Roomba(object):
             if self.client is None or new_connection:
                 self.logger.debug("Connecting %s" % unicode(self.roombaName))
                 self.setup_client()
-
                 self.logger.debug("Client Connect Running now %s" % unicode(self.roombaName))
-
                 self.client.connect(self.address, self.roomba_port, 60)
-
             else:
                 self.logger.debug("Attempting to Reconnect "  % unicode(self.roombaName))
                 self.client.loop_stop()

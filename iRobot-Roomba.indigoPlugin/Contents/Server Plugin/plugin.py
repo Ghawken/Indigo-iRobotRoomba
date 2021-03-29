@@ -59,6 +59,7 @@ class Plugin(indigo.PluginBase):
         self.indigo_log_handler.setLevel(self.logLevel)
         self.logger.debug(u"logLevel = " + str(self.logLevel))
         self.debugTrue = self.pluginPrefs.get('debugTrue', '')
+        self.debugOther = self.pluginPrefs.get('debugOther', True)
 
     def pluginStore(self):
         self.logger.info(u'Opening Plugin Store.')
@@ -255,7 +256,7 @@ class Plugin(indigo.PluginBase):
             self.logger.debug(u"updateFrequency = " + str(self.updateFrequency))
             self.next_update_check = time.time()
             self.debugTrue = self.pluginPrefs.get('debugTrue', '')
-
+            self.debugOther = self.pluginPrefs.get('debugOther', True)
     ########################################
 
     def validateDeviceConfigUi(self, valuesDict, typeId, deviceId):
@@ -330,25 +331,26 @@ class Plugin(indigo.PluginBase):
         #self.getRoombaInfo(roombaDevice)
 
     def connectRoomba(self,device):
-        if self.debugTrue:
+        if self.debugOther:
             self.logger.debug("connectRoomba Called self.roomba_list = "+unicode(self.roomba_list))
 
         if any(roomba.roombaName == device.states['Name'] for roomba in self.roomba_list):
 
-            if self.debugTrue:
+            if self.debugOther:
                 self.logger.debug("connectRoomba Msg: iRoomba Name Already Exists in roomba_list:")
             for myroomba in self.roomba_list:
                 if myroomba.roombaName == device.states['Name']:
                     if myroomba.roomba_connected == False:
-                        if self.debugTrue:
+                        if self.debugOther:
                             self.logger.debug("Reconnecting myroomba already exists in self.roomba_list")
                         myroomba.connect()
+                        time.sleep(2)
                     else:
-                        if self.debugTrue:
+                        if self.debugOther:
                             self.logger.debug("connectRoomba:  Already in roomba_list and already connected returning")
                         return True
         else:  ## no matching Roomba in roomba_list
-            if self.debugTrue:
+            if self.debugOther:
                 self.logger.debug(u'connecting Roomba Device: '+unicode(device.name))
             roombaIP = device.pluginProps.get('address', 0).encode('utf-8')
             softwareVersion = device.states['softwareVer']
@@ -362,7 +364,7 @@ class Plugin(indigo.PluginBase):
             MAChome = os.path.expanduser("~")+"/"
             folderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
             file = folderLocation + filename
-            if self.debugTrue:
+            if self.debugOther:
                 self.logger.debug(u'Using config file: ' + file)
             if os.path.isfile(file):
                 myroomba = Roomba( self, address=roombaIP, file=filename, softwareversion=softwareVersion, forceSSL=forceSSL)
@@ -380,11 +382,11 @@ class Plugin(indigo.PluginBase):
         #self.logger.error(unicode(self.myroomba.master_state))
 
     def saveMasterStateDevice(self, masterState, device, currentstate):
-        if self.debugTrue:
+        if self.debugOther:
             self.logger.debug(u'saveMasterStateDevice called.')
 
         if masterState != None:
-            if self.debugTrue:
+            if self.debugOther:
                 self.logger.debug(u'Writing Master State Device:' +unicode(device.id) +":"+unicode(masterState))
             state =""
             errorCode ='0'
@@ -538,13 +540,13 @@ class Plugin(indigo.PluginBase):
         self.updateMasterStates()
 
     def checkanyConnected(self):
-        if self.debugTrue:
+        if self.debugOther:
             self.logger.debug(u'checkanyConnected called. ')
         anyConnected = False
         for myroomba in self.roomba_list:
             if myroomba.roomba_connected == True:
                 anyConnected = True
-                if self.debugTrue:
+                if self.debugOther:
                     self.logger.debug(u'Found connected myroomba.  Returning True ')
 
         if anyConnected == False:
@@ -561,12 +563,12 @@ class Plugin(indigo.PluginBase):
         return anyConnected
 
     def checkAllRoombas(self):
-        if self.debugTrue:
+        if self.debugOther:
             self.logger.debug(u'checkALlRoombas called. ')
             #self.logger.debug(u'self.connected equals:'+unicode(self.connected)+"& self.continuous equals:"+unicode(self.continuous))
         for dev in indigo.devices.iter("self"):
             if (dev.deviceTypeId == "roombaDevice"):
-                if self.debugTrue:
+                if self.debugOther:
                     self.logger.debug(u'getRoomba Info Running..')
                 self.getRoombaInfo(dev)
                 time.sleep(1)
