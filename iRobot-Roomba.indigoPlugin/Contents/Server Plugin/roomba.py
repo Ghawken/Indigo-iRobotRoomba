@@ -998,7 +998,11 @@ class Roomba(object):
             self.current_state = self.states["charge"]
 
         else:
-            self.current_state = self.states[self.cleanMissionStatus_phase]
+            try:
+                self.current_state = self.states[self.cleanMissionStatus_phase]
+            except:
+                self.logger.error(u"Unknown State Reported: "+unicode(self.cleanMissionStatus_phase))
+                self.current_state = "Unknown"
 
         if new_state is not None:
             self.current_state = self.states[new_state]
