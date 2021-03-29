@@ -297,8 +297,11 @@ class Roomba(object):
               "dock": "Docking",
               "dockend": "Docking - End Mission",
               "cancelled": "Cancelled",
+              "completed": "Mission Completed",
               "stop": "Stopped",
               "pause": "Paused",
+              "evac": "Emptying",
+              "chargingerror": "Base Unplugged",
               "hmPostMsn": "End Mission",
               "": None}
 
@@ -654,13 +657,15 @@ class Roomba(object):
             if rc == 0:
                 self.roomba_connected = True
                 #self.plugin.connected = True
-                self.plugin.connectedtoName = self.roombaName
+                #self.plugin.connectedtoName = self.roombaName
                 self.client.subscribe(self.topic)
             else:
                 self.logger.debug("Roomba failed Connection with result code "+str(rc))
                 self.logger.debug("Please make sure your blid and password are correct %s" % self.roombaName)
                 if self.mqttc is not None:
                    self.mqttc.disconnect()
+                if self.client is not None:
+                   self.client.disconnect()
         except:
             self.logger.exception("Caught Exception in on_connect")
 

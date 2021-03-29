@@ -95,7 +95,7 @@ class Plugin(indigo.PluginBase):
        # self.myroomba = None
         #self.connected = False
 
-        self.connectedtoName = "none"
+        #self.connectedtoName = "none"
         self.roomba_list = []
 
         self.errorStrings = {
@@ -170,6 +170,8 @@ class Plugin(indigo.PluginBase):
 
     def deviceStartComm(self, device):
         self.logger.debug(u"deviceStartComm called for " + device.name)
+        if self.debugOther:
+            self.logger.debug(unicode(device))
         device.stateListOrDisplayStateIdChanged()
 
         #self.getRoombaInfo(device)
@@ -335,7 +337,6 @@ class Plugin(indigo.PluginBase):
             self.logger.debug("connectRoomba Called self.roomba_list = "+unicode(self.roomba_list))
 
         if any(str(roomba.roombaName) == str(device.states['Name']) for roomba in self.roomba_list):
-
             if self.debugOther:
                 self.logger.debug("connectRoomba Msg: iRoomba Name Already Exists in roomba_list:")
             for myroomba in self.roomba_list:
@@ -371,7 +372,7 @@ class Plugin(indigo.PluginBase):
                 myroomba.set_options(raw=False, indent=0, pretty_print=False)
                 myroomba.connect()
 
-                if myroomba not in self.roomba_list:  ## not convinced this will work correctly; don't checked above anyhow...
+                if myroomba not in self.roomba_list:  ## not convinced this will work correctly; is checked above anyhow...
                     self.logger.debug("Adding myroomba to self.roomba_list..")
                     self.roomba_list.append(myroomba)
                     self.logger.debug("self.roomba_list:"+unicode(self.roomba_list))
@@ -646,7 +647,7 @@ class Plugin(indigo.PluginBase):
                         self.logger.debug("Sending Command to myroomba:"+unicode(myroomba.roombaName)+" and action:"+str(action))
                         myroomba.send_command(str(action))
 
-                return
+            return
 
             # if self.connected == True:  ## may be the wrong iroomba that you are already connected to...
             #     if self.connectedtoName != iroombaName:   ## wrong iroomba connected
