@@ -117,6 +117,10 @@ class Plugin(indigo.PluginBase):
 
         self.notReadyStrings = {
             '0' : 'Ready',
+            '1': 'Near a cliff',
+            '2': 'Both wheels dropped',
+            '3': 'Left wheel dropped',
+            '4': 'Right wheel dropped',
             '7' : 'Bin Missing',
             '15': 'Battery Low',
             '16': 'Bin Full',
@@ -278,6 +282,13 @@ class Plugin(indigo.PluginBase):
             self.logger.debug(u'Config File Exists - using it')
             valuesDict['password'] = 'OK.  Using Saved Config File.'
 
+        iroombaName = valuesDict['roombaName']
+        if iroombaName == None or iroombaName == "":
+            self.logger.debug("No name set, no changing")
+        else:
+            dev = indigo.devices[deviceId]
+            dev.updateStateOnServer("Name",iroombaName)
+            self.logger.debug("Updated iRoomba Robot Name")
 
         #Roomba.connect()
 

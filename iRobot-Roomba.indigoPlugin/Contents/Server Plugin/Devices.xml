@@ -17,6 +17,12 @@
             <Field id="password" type="textfield"  readonly="true">
                 <Label>Roomba Password:</Label>
             </Field>
+            <Field id="roombaName" type="textfield"  >
+                <Label>Roomba Name:</Label>
+            </Field>
+            <Field id="labelforname" type="label" fontSize="small" fontColor="darkgray">
+                <Label>Set this to the name of your iRoomba (same as in the App) Update here if happen to change name!</Label>
+            </Field>
             <Field id="sep4" type="separator"/>
             <Field id="space10" type="label" alignText="right">
                 <Label>Advanced SSL Options:</Label>
