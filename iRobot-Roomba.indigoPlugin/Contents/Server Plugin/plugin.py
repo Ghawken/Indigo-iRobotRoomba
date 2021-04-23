@@ -184,6 +184,7 @@ class Plugin(indigo.PluginBase):
 
     def deviceStopComm(self, device):
         self.logger.debug(u"deviceStopComm called for " + device.name)
+        #self.disconnectRoomba(device)
         device.updateStateOnServer(key="deviceStatus", value="Communications Error")
         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
@@ -320,11 +321,9 @@ class Plugin(indigo.PluginBase):
         device.updateStateOnServer('softwareVer', value='Unknown')
         roombaIP = valuesDict.get('address', 0)
         forceSSL = valuesDict.get('forceSSL',False)
-
         if roombaIP == 0 or roombaIP == '':
             self.logger.error(u'IP Address cannot be Empty.  Please empty valid IP before using Get Password')
             return False
-
         #Roomba.connect()
         filename = str(roombaIP)+"-config.ini"
         self.softwareVersion = ''
@@ -346,6 +345,10 @@ class Plugin(indigo.PluginBase):
     def connectRoomba(self,device):
         if self.debugOther:
             self.logger.debug("connectRoomba Called self.roomba_list = "+unicode(self.roomba_list))
+
+        deviceroombaName = str(device.states['Name'])
+        if self.debugOther:
+            self.logger.debug("Device Name  = "+unicode(deviceroombaName))
 
         if any(str(roomba.roombaName) == str(device.states['Name']) for roomba in self.roomba_list):
             if self.debugOther:
@@ -379,7 +382,7 @@ class Plugin(indigo.PluginBase):
             if self.debugOther:
                 self.logger.debug(u'Using config file: ' + file)
             if os.path.isfile(file):
-                myroomba = Roomba( self, address=roombaIP, file=filename, softwareversion=softwareVersion, forceSSL=forceSSL)
+                myroomba = Roomba( self, address=roombaIP, file=filename, softwareversion=softwareVersion, forceSSL=forceSSL, roombaName=deviceroombaName)
                 myroomba.set_options(raw=False, indent=0, pretty_print=False)
                 myroomba.connect()
 
@@ -419,6 +422,12 @@ class Plugin(indigo.PluginBase):
                     if 'batPct' in masterState['state']['reported']:
                         #self.logger.debug(u'MasterState Bat Pct :' + unicode(masterState['state']['reported']['batPct']))
                         device.updateStateOnServer('BatPct', value=str(masterState['state']['reported']['batPct']))
+
+                    if 'name' in masterState['state']['reported']:
+                        #self.logger.error(u'MasterState state/reported :' + unicode(masterState['state']['reported']) )
+                        if device.states['Name'] != str(masterState['state']['reported']['name']):
+                            device.updateStateOnServer('Name', value=str(masterState['state']['reported']['name']))
+                            self.logger.error(u"Updated Name")
 
                     if 'cleanMissionStatus' in masterState['state']['reported']:
                         if 'cycle' in masterState['state']['reported']['cleanMissionStatus']:
@@ -497,8 +506,8 @@ class Plugin(indigo.PluginBase):
                 if myroomba.master_state != None:
                     self.saveMasterStateDevice(myroomba.master_state, device, "")
                     self.logger.debug(unicode(myroomba.master_state))
-            myroomba.disconnect()
-            self.roomba_list.remove(myroomba)
+                myroomba.disconnect()
+                self.roomba_list.remove(myroomba)
         #self.myroomba = None
 
     def getRoombaInfo(self, device):

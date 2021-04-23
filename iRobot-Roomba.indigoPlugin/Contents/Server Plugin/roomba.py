@@ -93,8 +93,8 @@ class password(object):
         self.file = self.folderLocation + file
         self.forceSSL = forceSSL
         self.logger.info(u'File should equal:' + self.file)
-
         self.get_password(address)
+
 
     def receive_udp(self):
         #set up UDP socket to receive data from robot
@@ -388,7 +388,7 @@ class Roomba(object):
         123: "Battery not initialized",
     }
 
-    def __init__(self, plugin, address=None, blid=None, password=None, topic="#", continuous=True, clean=False, cert_name="", roombaName="", file="/config.ini", softwareversion=None, forceSSL=False):
+    def __init__(self, plugin, address=None, blid=None, password=None, topic="#", continuous=True, clean=False, cert_name="", roombaName="", file="/config.ini", softwareversion=None, forceSSL=False ):
         '''
         address is the IP address of the Roomba, the continuous flag
         enables a continuous mqtt connection, if this is set to False, the client connects and disconnects every 'delay' seconds
@@ -509,7 +509,9 @@ class Roomba(object):
 
         self.blid = Config.get(self.address, "blid")
         self.password = Config.get(self.address, "password")
-        self.roombaName = literal_eval(Config.get(self.address, "data"))["robotname"]
+        if self.roombaName == "":
+            self.logger.debug(u"No device Name for iRoomba using config File")
+            self.roombaName = literal_eval(Config.get(self.address, "data"))["robotname"]
 
         return True
 

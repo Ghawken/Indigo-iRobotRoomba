@@ -328,6 +328,7 @@ class Roomba(object):
                 self.address = addresses[0]
         self.blid = Config.get(self.address, "blid"),
         self.password = Config.get(self.address, "password")
+
         #self.roombaName = literal_eval(Config.get(self.address, "data"))["robotname"]
         return True
 
