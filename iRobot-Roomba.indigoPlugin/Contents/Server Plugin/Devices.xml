@@ -27,7 +27,7 @@
             <Field id="space10" type="label" alignText="right">
                 <Label>Advanced SSL Options:</Label>
             </Field>
-            <Field id="forceSSL" type="checkbox" tooltip='Force use of SSLv23' hidden="false" default="False">
+            <Field id="forceSSL" type="checkbox" tooltip='Force use of SSLv23' hidden="false" default="True">
                 <Label>Force Use of SSLv23</Label>
             <Description>Enable/Disable</Description>
             </Field>
@@ -58,6 +58,11 @@
                 <ValueType>String</ValueType>
                 <TriggerLabel>MAC address</TriggerLabel>
                 <ControlPageLabel>MAC address</ControlPageLabel>
+            </State>
+            <State id="IP">
+                <ValueType>String</ValueType>
+                <TriggerLabel>IP address</TriggerLabel>
+                <ControlPageLabel>IP address</ControlPageLabel>
             </State>
              <State id="Cycle">
                 <ValueType>String</ValueType>

@@ -10,4 +10,8 @@
         <Name>Restart Plugin</Name>
         <CallbackMethod>restartPlugin</CallbackMethod>
     </MenuItem>
+    	<MenuItem id="logAllRoombas">
+		<Name>Debug Log All Roomba State Info</Name>
+        <CallbackMethod>logAllRoombas</CallbackMethod>
+	</MenuItem>
 </MenuItems>

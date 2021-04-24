@@ -178,7 +178,8 @@ class Plugin(indigo.PluginBase):
         if self.debugOther:
             self.logger.debug(unicode(device))
         device.stateListOrDisplayStateIdChanged()
-
+        device.updateStateOnServer(key="IP",value=str(device.pluginProps['address']))
+        self.checkAllRoombas()
         time.sleep(1)
         #self.getRoombaInfo(device)
         #self.getRoombaStatus(device)
@@ -186,7 +187,7 @@ class Plugin(indigo.PluginBase):
 
     def deviceStopComm(self, device):
         self.logger.debug(u"deviceStopComm called for " + device.name)
-        #self.disconnectRoomba(device)
+        self.disconnectRoomba(device)
         device.updateStateOnServer(key="deviceStatus", value="Communications Error")
         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
@@ -272,15 +273,12 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(
             u'     (' + unicode(valuesDict) + u', ' + unicode(userCancelled) + ', ' + unicode(typeId) + u', ' + unicode(
                 devId) + u')')
-        if not userCancelled:
-            self.checkAllRoombas()
-        return
+
 
 
     def validateDeviceConfigUi(self, valuesDict, typeId, deviceId):
         self.logger.debug(u"validateDeviceConfigUi called")
         errorDict = indigo.Dict()
-
         address = valuesDict['address']
         if address == None or address <= 0:
             errorDict['address'] = u'IP Address can not be blank, please enter valid IP'
@@ -295,6 +293,7 @@ class Plugin(indigo.PluginBase):
             valuesDict['password'] = 'OK.  Using Saved Config File.'
 
         iroombaName = valuesDict['roombaName']
+        ipaddress = valuesDict['address']
         dev = indigo.devices[deviceId]
         if iroombaName == None or iroombaName == "":
             self.logger.debug("No name set in Config, using Device State")
@@ -302,6 +301,9 @@ class Plugin(indigo.PluginBase):
         else:
             dev.updateStateOnServer("Name",iroombaName)
             self.logger.debug("Updated iRoomba Robot Name")
+
+        dev.updateStateOnServer("IP",ipaddress)
+
 
         #Roomba.connect()
         return (True, valuesDict)
@@ -360,9 +362,8 @@ class Plugin(indigo.PluginBase):
                 self.logger.info(u'Password Saved. Click Ok.')
                 self.passwordReturned = "reset"
                 valuesDict['refreshCallbackMethod'] = None
-                self.checkAllRoombas()
-                time.sleep(1)
-                self.updateMasterStates()
+                #time.sleep(1)
+                #self.updateMasterStates()
             elif self.passwordReturned == "Failed":
                 valuesDict['refreshCallbackMethod'] = None
             return valuesDict
@@ -395,6 +396,15 @@ class Plugin(indigo.PluginBase):
             self.logger.debug("Caught Exception:"+unicode(e))
             return False
 
+    def logAllRoombas(self):
+        self.logger.debug(u"{0:=^130}".format(""))
+        self.logger.debug(u'log All Roomba Info Menu Item Called:')
+        self.logger.debug(u"{0:=^130}".format(""))
+        for myroomba in self.roomba_list:
+            self.logger.debug(u"{0:=^130}".format(""))
+            for property, value in vars(myroomba).items():
+                self.logger.debug(unicode(property) + ":" + unicode(value))
+
 
     def getRoombaInfoAction(self, pluginAction, roombaDevice):
         self.logger.debug(u"getRoombaInfoAction for %s" % roombaDevice.name)
@@ -408,11 +418,11 @@ class Plugin(indigo.PluginBase):
         if self.debugOther:
             self.logger.debug("Device Name  = "+unicode(deviceroombaName))
 
-        if any(str(roomba.roombaName) == str(device.states['Name']) for roomba in self.roomba_list):
+        if any(str(roomba.address) == str(device.states['IP']) for roomba in self.roomba_list):
             if self.debugOther:
-                self.logger.debug("connectRoomba Msg: iRoomba Name Already Exists in roomba_list:")
+                self.logger.debug("connectRoomba Msg: iRoomba IP Already Exists in roomba_list:")
             for myroomba in self.roomba_list:
-                if str(myroomba.roombaName) == str(device.states['Name']):
+                if str(myroomba.address) == str(device.states['IP']):
                     if myroomba.roomba_connected == False:
                         if self.debugOther:
                             self.logger.debug("Reconnecting myroomba already exists in self.roomba_list")
@@ -426,6 +436,7 @@ class Plugin(indigo.PluginBase):
             if self.debugOther:
                 self.logger.debug(u'connecting Roomba Device: '+unicode(device.name))
             roombaIP = device.pluginProps.get('address', 0).encode('utf-8')
+
             softwareVersion = device.states['softwareVer']
             forceSSL = device.pluginProps.get('forceSSL',False)
             if roombaIP == 0:
@@ -559,13 +570,14 @@ class Plugin(indigo.PluginBase):
     def disconnectRoomba(self,device):
         self.logger.debug(u'disconnecting Roomba Device: '+unicode(device.name))
         for myroomba in self.roomba_list:
-            if str(myroomba.roombaName) == str(device.states['Name']):
+            if str(myroomba.address) == str(device.states['IP']):
                 self.logger.debug("disconnectRoomba Matching iroomba found")
                 if myroomba.master_state != None:
                     self.saveMasterStateDevice(myroomba.master_state, device, "")
                     self.logger.debug(unicode(myroomba.master_state))
                 myroomba.disconnect()
                 self.roomba_list.remove(myroomba)
+                self.logger.debug("Self.Roomba_list:"+unicode(self.roomba_list))
         #self.myroomba = None
 
     def getRoombaInfo(self, device):
@@ -584,7 +596,7 @@ class Plugin(indigo.PluginBase):
             self.logger.debug(u'updateMasterStates called.')
         for dev in indigo.devices.iter("self"):
             for myroomba in self.roomba_list:
-                if str(myroomba.roombaName) == str(dev.states['Name']):
+                if str(myroomba.address) == str(dev.states['IP']):
                     if (dev.deviceTypeId == "roombaDevice") and myroomba.master_state != None:
                         self.saveMasterStateDevice(myroomba.master_state, dev, myroomba.current_state)
         return
@@ -647,10 +659,11 @@ class Plugin(indigo.PluginBase):
             #self.logger.debug(u'self.connected equals:'+unicode(self.connected)+"& self.continuous equals:"+unicode(self.continuous))
         for dev in indigo.devices.iter("self"):
             if (dev.deviceTypeId == "roombaDevice"):
-                if self.debugOther:
-                    self.logger.debug(u'getRoomba Info Running..')
-                self.getRoombaInfo(dev)
-                time.sleep(1)
+                if dev.enabled:
+                    if self.debugOther:
+                        self.logger.debug(u'getRoomba Info Running..')
+                    self.getRoombaInfo(dev)
+                    time.sleep(1)
                 #self.getRoombaStatus(dev)
                 #self.getRoombaTime(dev)
 
@@ -703,13 +716,15 @@ class Plugin(indigo.PluginBase):
         # Add a try except loop to catch nicely any errors.
         try:
             iroombaName = str(roombaDevice.states['Name'])
+            iroombaIP = str(roombaDevice.states['IP'])
             self.logger.debug("Roomba Name:"+unicode(iroombaName))
+            self.logger.debug("Roomba IP:" + unicode(iroombaIP))
             #self.logger.debug("Connected Roomba Name:"+unicode(self.connectedtoName))
 
             for myroomba in self.roomba_list:
-                if str(myroomba.roombaName) == str(iroombaName):
+                if str(myroomba.address) == str(iroombaIP):
                     if myroomba.roomba_connected == False:
-                        self.logger.debug(u"Not connected to iRoomba:"+unicode(iroombaName)+u" -- Should be --- Attempting to reconnect.")
+                        self.logger.debug(u"Not connected to iRoomba:"+unicode(iroombaName)+" & IP:"+unicode(iroombaIP)+u" -- Should be --- Attempting to reconnect.")
                         connected = False
                         connected = self.connectRoomba(roombaDevice)
                         time.sleep(5)
