@@ -21,6 +21,7 @@ from base64 import b64encode
 from roomba import Roomba
 from roomba import password
 #import paho.mqtt.client as mqtt
+import threading
 
 #from requests.auth import HTTPBasicAuth
 #from requests.utils import quote
@@ -75,7 +76,7 @@ class Plugin(indigo.PluginBase):
         self.KILLcount = 0
         self.restarted = 0
         self.updateFrequency = float(self.pluginPrefs.get('updateFrequency', "24")) * 60.0 * 60.0
-
+        self.passwordReturned = "not set yet"
         self.logger.debug(u"updateFrequency = " + str(self.updateFrequency))
         self.next_update_check = time.time()
 
@@ -178,6 +179,7 @@ class Plugin(indigo.PluginBase):
             self.logger.debug(unicode(device))
         device.stateListOrDisplayStateIdChanged()
 
+        time.sleep(1)
         #self.getRoombaInfo(device)
         #self.getRoombaStatus(device)
         #self.getRoombaTime(device)
@@ -265,6 +267,15 @@ class Plugin(indigo.PluginBase):
             self.debugTrue = self.pluginPrefs.get('debugTrue', '')
             self.debugOther = self.pluginPrefs.get('debugOther', True)
     ########################################
+    def closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):
+        self.logger.debug(u'closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):')
+        self.logger.debug(
+            u'     (' + unicode(valuesDict) + u', ' + unicode(userCancelled) + ', ' + unicode(typeId) + u', ' + unicode(
+                devId) + u')')
+        if not userCancelled:
+            self.checkAllRoombas()
+        return
+
 
     def validateDeviceConfigUi(self, valuesDict, typeId, deviceId):
         self.logger.debug(u"validateDeviceConfigUi called")
@@ -284,17 +295,15 @@ class Plugin(indigo.PluginBase):
             valuesDict['password'] = 'OK.  Using Saved Config File.'
 
         iroombaName = valuesDict['roombaName']
+        dev = indigo.devices[deviceId]
         if iroombaName == None or iroombaName == "":
-            self.logger.debug("No name set, no changing")
+            self.logger.debug("No name set in Config, using Device State")
+            valuesDict['roombaName']= dev.states['Name']
         else:
-            dev = indigo.devices[deviceId]
             dev.updateStateOnServer("Name",iroombaName)
             self.logger.debug("Updated iRoomba Robot Name")
 
         #Roomba.connect()
-
-
-
         return (True, valuesDict)
 
 
@@ -312,11 +321,9 @@ class Plugin(indigo.PluginBase):
 
         return False
 
-
-
-
     def getRoombaPassword(self, valuesDict, typeId, deviceId):
         self.logger.debug(u"getRoombaPassword called: "+unicode(deviceId))
+        valuesDict['refreshCallbackMethod'] = 'refreshThreadData'
         device = indigo.devices[deviceId]
         device.updateStateOnServer('softwareVer', value='Unknown')
         roombaIP = valuesDict.get('address', 0)
@@ -327,15 +334,66 @@ class Plugin(indigo.PluginBase):
         #Roomba.connect()
         filename = str(roombaIP)+"-config.ini"
         self.softwareVersion = ''
-        result = password(self, address=roombaIP, file=filename, forceSSL=forceSSL  )
-        #self.logger.error(unicode(result))
-        if self.softwareVersion != '':
-            self.logger.debug('Software Version of Roomba Found:'+unicode(self.softwareVersion))
-            device.updateStateOnServer('softwareVer', value=self.softwareVersion)
-        if result == True:
-            valuesDict['password'] = 'OK'
-            self.logger.info(u'Password Saved. Click Ok.')
+
+        # result = password(self, address=roombaIP, file=filename, forceSSL=forceSSL  )
+        # #self.logger.error(unicode(result))
+        # if self.softwareVersion != '':
+        #     self.logger.debug('Software Version of Roomba Found:'+unicode(self.softwareVersion))
+        #     device.updateStateOnServer('softwareVer', value=self.softwareVersion)
+        # if result == True:
+        #     valuesDict['password'] = 'OK'
+        #     self.logger.info(u'Password Saved. Click Ok.')
+
+        ## Lets thread it...
+        getPasswordThread = threading.Thread(target=self.threadgetPassword,args=[roombaIP, filename, forceSSL, device, self.softwareVersion])
+        getPasswordThread.setDaemon(True)
+        getPasswordThread.start()
         return valuesDict
+
+    def refreshThreadData(self, valuesDict, typeId, deviceId):
+        try:
+            self.logger.debug(u"prefsRefreshCallback called")
+            #self.logger.debug(u"valuesDict: {}".format(valuesDict))
+            self.logger.debug(u'Checking Number of Active Threads:' + unicode(threading.activeCount() ) )
+            if self.passwordReturned=="OK":
+                valuesDict['password'] = 'OK'
+                self.logger.info(u'Password Saved. Click Ok.')
+                self.passwordReturned = "reset"
+                valuesDict['refreshCallbackMethod'] = None
+                self.checkAllRoombas()
+                time.sleep(1)
+                self.updateMasterStates()
+            elif self.passwordReturned == "Failed":
+                valuesDict['refreshCallbackMethod'] = None
+            return valuesDict
+
+        except Exception as ex:
+            self.logger.debug("Caught Exception refreshThreadData:"+unicode(ex))
+
+
+    def threadgetPassword(self, roombaIP,filename,forceSSL, device, softwareversion):
+        try:
+            self.passwordReturned = "reset"
+            self.logger.debug(u'Thread:Get Password called.' + u' & Number of Active Threads:' + unicode(threading.activeCount() ) )
+            result = password(self, address=roombaIP, file=filename, forceSSL=forceSSL)
+            self.logger.debug("PaswordReturned:"+unicode(self.passwordReturned))
+            for property, value in vars(result).items():
+                self.logger.debug(unicode(property) + ":" + unicode( value))
+                if property=="iRoombaMAC":
+                    if value:
+                        device.updateStateOnServer('MAC', value=str(value))
+                if property == "iRoombaName":
+                    if value:
+                        device.updateStateOnServer('Name', value=str(value))
+                if property == 'iRoombaSWver':
+                    if value:
+                        self.logger.debug('Software Version of Roomba Found:' + unicode(value))
+                        device.updateStateOnServer('softwareVer', value=str(value))
+            #self.logger.debug("Returning Result:"+unicode(result))
+            return result
+        except Exception as e:
+            self.logger.debug("Caught Exception:"+unicode(e))
+            return False
 
 
     def getRoombaInfoAction(self, pluginAction, roombaDevice):

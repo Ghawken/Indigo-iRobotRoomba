@@ -84,6 +84,9 @@ class password(object):
 
         self.plugin = plugin
         self.logger  = logging.getLogger('Plugin.password')
+        self.iRoombaName = ""
+        self.iRoombaMAC = ""
+        self.iRoombaSWver =""
         self.MAChome     = os.path.expanduser("~")+"/"
         self.folderLocation = self.MAChome+"Documents/Indigo-iRobotRoomba/"
         #self.logger = logging.getLogger('Roomba-Lib.iRobot')
@@ -100,7 +103,7 @@ class password(object):
         #set up UDP socket to receive data from robot
         port = 5678
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.settimeout(8)
+        s.settimeout(10)
         if self.address == '255.255.255.255':
             s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.bind(("", port))  #bind all intefaces to port
@@ -140,6 +143,7 @@ class password(object):
 
         if len(roombas) == 0:
             self.logger.info("No Roombas found, try again...")
+            self.plugin.passwordReturned = "Failed"
             return False
         else:
             self.logger.info("found %d Roombas" % len(roombas))
@@ -157,12 +161,16 @@ class password(object):
 
             if parsedMsg['sw']:
                 self.plugin.softwareVersion = parsedMsg['sw']
-
+                self.iRoombaSWver = str(parsedMsg['sw'])
             self.logger.info("Make sure your robot (%s) at IP %s is on the Home Base and powered on (green lights on). Then press and hold the HOME button on your robot until it plays a series of tones (about 2 seconds). Release the button and your robot will flash WIFI light." % (parsedMsg["robotname"],addr))
             #raw_input("Press Enter to continue...")
 
             self.logger.info("Received: %s"  % json.dumps(parsedMsg, indent=2))
             self.logger.info("\r\rRoomba (%s) IP address is: %s" % (parsedMsg["robotname"],addr))
+            if parsedMsg['robotname'] != None:
+                self.iRoombaName = str(parsedMsg["robotname"])
+            if parsedMsg['mac'] != None:
+                self.iRoombaMAC = str(parsedMsg["mac"])
 
             hostname = parsedMsg["hostname"].split('-')
             if hostname[0] == 'Roomba' or hostname[0]== 'iRobot':
@@ -196,6 +204,7 @@ class password(object):
             except Exception as e:
                 self.logger.debug("Connection Error %s" % e)
                 self.logger.info('Error getting password.  Follow the instructions and try again.')
+                self.plugin.passwordReturned = "Failed"
                 return False
             try:
                 wrappedSocket.send(packet)
@@ -221,6 +230,7 @@ class password(object):
                             data_len = struct.unpack("B", data[1:2])[0]
             except Exception as e:
                 self.logger.error(u'Error in send Packet.  Exception:' + unicode(e))
+                self.plugin.passwordReturned = "Failed"
                 return False
 
             #close socket
@@ -235,6 +245,7 @@ class password(object):
 
             if len(data) <= 7:
                 self.logger.info('Error getting password, receive %d bytes. Follow the instructions and try again.' % len(data))
+                self.plugin.passwordReturned = "Failed"
                 return False
             else:
                 self.logger.info("blid is: %s" % blid)
@@ -265,7 +276,7 @@ class password(object):
                     self.logger.info(u'Saved Device Config File/Password. Click OK to continue.')
                     #self.logger.info(u'Restart Plugin to continue.')
 
-
+        self.plugin.passwordReturned = "OK"
         return True
 
 

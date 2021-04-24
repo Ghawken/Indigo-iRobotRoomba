@@ -54,6 +54,11 @@
                 <TriggerLabel>Name Robot</TriggerLabel>
                 <ControlPageLabel>Name Robot</ControlPageLabel>
             </State>
+            <State id="MAC">
+                <ValueType>String</ValueType>
+                <TriggerLabel>MAC address</TriggerLabel>
+                <ControlPageLabel>MAC address</ControlPageLabel>
+            </State>
              <State id="Cycle">
                 <ValueType>String</ValueType>
                 <TriggerLabel>Cycle</TriggerLabel>
