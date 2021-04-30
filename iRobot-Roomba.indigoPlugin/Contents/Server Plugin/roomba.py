@@ -397,6 +397,7 @@ class Roomba(object):
         120: "Battery not initialized",
         122: "Charging system error",
         123: "Battery not initialized",
+        224 : "Smart Map Problem"
     }
 
     def __init__(self, plugin, address=None, blid=None, password=None, topic="#", continuous=True, clean=False, cert_name="", roombaName="", file="/config.ini", softwareversion=None, forceSSL=False ):
@@ -719,6 +720,7 @@ class Roomba(object):
                 self.time = time.time()
         except:
             self.logger.exception("Exception Caught On Message")
+
     def on_publish(self, mosq, obj, mid):
         pass
 
@@ -754,6 +756,21 @@ class Roomba(object):
         Command["initiator"] = "localApp"
         myCommand = json.dumps(Command)
         self.logger.debug("Publishing Roomba Command : %s" % myCommand)
+        self.client.publish("cmd", myCommand)
+
+    def send_command_special(self, command):
+        self.logger.debug("Received Special COMMAND: %s" % command)
+        sentCommand = json.loads(command)
+        Command = OrderedDict()
+        Command["command"] = sentCommand["command"]
+        sentCommand.pop("command",None)  # remove command
+        Command["time"] = self.totimestamp(datetime.datetime.now())
+        Command["initiator"] = "localApp"
+        ## add all the rest regardless of what they are
+        Command.update(sentCommand)
+
+        myCommand = json.dumps(Command)
+        self.logger.debug("Publishing Roomba Special Command : %s" % myCommand)
         self.client.publish("cmd", myCommand)
 
     def set_preference(self, preference, setting):
@@ -917,7 +934,7 @@ class Roomba(object):
                     try:
                         self.error_message = self._ErrorMessages[v]
                     except KeyError as e:
-                        log.warn("Error looking up Roomba error message %s" % e)
+                        self.logger.info("Error looking up Roomba error message %s" % e)
                         self.error_message = "Unknown Error number: %d" % v
                     self.publish("error_message", self.error_message)
                 if k == "cleanMissionStatus_phase":

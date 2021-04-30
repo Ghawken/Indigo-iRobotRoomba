@@ -9,6 +9,23 @@
         <Name>Toggle Roomba - Start/Dock</Name>
         <CallbackMethod>toggleRoombaAction</CallbackMethod>
     </Action>
+    <Action id="lastCommandRoomba" deviceFilter="self.roombaDevice">
+        <Name>Save Last Command Run</Name>
+        <ConfigUI>
+                <Field id="roombatoUse" type="menu" deviceFilter="self.roombaDevice">
+                    <List class="indigo.devices" filter="com.GlennNZ.indigoplugin.irobot.roombaDevice"/>
+                </Field>
+                <Field id="instructions" type="label" fontSize="small" fontColor="darkgray">
+                <Label>Press the button below to load the last command sent.  Details in log for review.</Label>
+            </Field>
+            <Field id="lastCommand" type="button" >
+                <Title>Get Last Command</Title>
+                <CallbackMethod>getLastCommand</CallbackMethod>
+            </Field>
+            <Field id="commandToSend" type="textfield" hidden="true"></Field>
+            </ConfigUI>
+        <CallbackMethod>lastCommandRoombaAction</CallbackMethod>
+    </Action>
 
     <Action id="startRoomba" deviceFilter="self.roombaDevice">
         <Name>Start Roomba</Name>

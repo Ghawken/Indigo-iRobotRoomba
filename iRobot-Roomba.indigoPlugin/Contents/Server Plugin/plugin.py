@@ -252,7 +252,6 @@ class Plugin(indigo.PluginBase):
 
         return (True, valuesDict)
 
-
     def closedPrefsConfigUi(self, valuesDict, userCancelled):
         if not userCancelled:
             try:
@@ -273,6 +272,7 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(
             u'     (' + unicode(valuesDict) + u', ' + unicode(userCancelled) + ', ' + unicode(typeId) + u', ' + unicode(
                 devId) + u')')
+
 
 
 
@@ -471,7 +471,7 @@ class Plugin(indigo.PluginBase):
 
         if masterState != None:
             if self.debugOther:
-                self.logger.debug(u'Writing Master State Device:' +unicode(device.id) +":"+unicode(masterState))
+                self.logger.debug(u'Writing Master State Device:' +unicode(device.id) +":"+unicode(json.dumps(masterState)))
             state =""
             errorCode ='0'
             notReady = '0'
@@ -675,12 +675,16 @@ class Plugin(indigo.PluginBase):
 
         if Cycle =='clean':
             self.logger.debug(u'Roomba Cycle clean changing to docking...')
+            self.RoombaAction(pluginAction, roombaDevice, 'pause')
+            self.sleep(1)
             self.RoombaAction(pluginAction, roombaDevice, 'dock')
         if Cycle == 'charge':
             self.logger.debug(u'Roomba changing to running...')
             self.RoombaAction(pluginAction, roombaDevice, 'start')
         if Cycle == 'run':
             self.logger.debug(u'Roomba changing to docking...')
+            self.RoombaAction(pluginAction, roombaDevice, 'pause')
+            self.sleep(1)
             self.RoombaAction(pluginAction, roombaDevice, 'dock')
         if Cycle == 'pause':
             self.logger.debug(u'Roomba changing to running...')
@@ -706,10 +710,99 @@ class Plugin(indigo.PluginBase):
         self.RoombaAction(pluginAction, roombaDevice, 'resume')
 
     def dockRoombaAction(self, pluginAction, roombaDevice):
+        self.RoombaAction(pluginAction, roombaDevice, 'pause')
+        self.sleep(1)
         self.RoombaAction(pluginAction, roombaDevice, 'dock')
 
     def evacRoombaAction(self, pluginAction, roombaDevice):
         self.RoombaAction(pluginAction, roombaDevice, 'evac')
+
+    def getLastCommand(self, valuesDict, typeId, deviceId):
+        self.logger.debug(u"getLastCommand called: "+unicode(deviceId))
+        self.logger.debug(u"getLastCommand valuesDict: " + unicode(valuesDict))
+        self.logger.debug(u"getLastCommand typeId: " + unicode(typeId))
+        try:
+            roombaDeviceID = int(valuesDict.get("roombatoUse",0))
+            if roombaDeviceID == 0:
+                self.logger.info("Please select a roomba to use")
+                return
+            roombaDevice = indigo.devices[roombaDeviceID]
+            iroombaName = str(roombaDevice.states['Name'])
+            iroombaIP = str(roombaDevice.states['IP'])
+            self.logger.debug("Roomba Name:" + unicode(iroombaName))
+            self.logger.debug("Roomba IP:" + unicode(iroombaIP))
+            lastcommand = ""
+            for myroomba in self.roomba_list:
+                if str(myroomba.address) == str(iroombaIP):
+                    if "state" in myroomba.master_state:
+                        if "reported" in myroomba.master_state["state"]:
+                            if "lastCommand" in myroomba.master_state["state"]["reported"]:
+                                self.logger.debug(json.dumps(myroomba.master_state["state"]["reported"]["lastCommand"]))
+                                lastcommand = myroomba.master_state["state"]["reported"]["lastCommand"]
+                                #lastcommand ='thisisasteing'
+                                self.logger.info("Saving this Command:")
+                                self.logger.info(unicode(json.dumps(lastcommand)))
+                                valuesDict['commandToSend']=json.dumps(lastcommand)
+                                self.logger.debug(unicode(valuesDict))
+                                return valuesDict
+                            else:
+                                self.logger.info("No Last Command found please try again")
+                                return
+
+        except Exception as ex:
+            self.logger.exception("Exception ")
+
+
+    def lastCommandRoombaAction(self, pluginAction, roombaDevice):
+        self.logger.debug("lastcommandRoombaAction")
+        self.logger.debug("pluginAction "+unicode(pluginAction))
+
+        action = []
+        commandtosend = ""
+        if "commandToSend" in pluginAction.props:
+            commandtosend = pluginAction.props.get("commandToSend")
+            self.logger.debug(unicode(commandtosend))
+
+        action = json.loads(commandtosend)
+
+        ## remove initiator and current time - add these back in iroomba
+        if "initiator" in action:
+            action.pop("initiator", None)
+        if "time" in action:
+            action.pop("time", None)
+
+        self.logger.debug(action)
+
+        try:
+            iroombaName = str(roombaDevice.states['Name'])
+            iroombaIP = str(roombaDevice.states['IP'])
+            self.logger.debug("Roomba Name:"+unicode(iroombaName))
+            self.logger.debug("Roomba IP:" + unicode(iroombaIP))
+            #self.logger.debug("Connected Roomba Name:"+unicode(self.connectedtoName))
+
+            for myroomba in self.roomba_list:
+                if str(myroomba.address) == str(iroombaIP):
+                    if myroomba.roomba_connected == False:
+                        self.logger.debug(u"Not connected to iRoomba:"+unicode(iroombaName)+" & IP:"+unicode(iroombaIP)+u" -- Should be --- Attempting to reconnect.")
+                        connected = False
+                        connected = self.connectRoomba(roombaDevice)
+                        time.sleep(5)
+                        # Add a connection check - the main library has added a base exception which might be useful to also use.
+                        if connected == False:
+                            self.logger.info(u'Failed Connected to Roomba within 5 seconds, waiting another 5.')
+                            time.sleep(5)
+                            if connected == False:
+                                self.logger.info(u'Failed Connected to Roomba within 5 seconds.  Ending attempt.')
+                                return
+                        myroomba.send_command_special(json.dumps(action))
+                    else:
+                        self.logger.debug("Sending Command to myroomba:"+unicode(myroomba.roombaName)+" and action:"+str(json.dumps(action)))
+                        myroomba.send_command_special(json.dumps(action))
+
+            return
+
+        except Exception as e:
+            self.logger.exception(u'Caught Error within RoombaAction:'+unicode(e))
 
     def RoombaAction(self, pluginAction, roombaDevice, action):
         self.logger.debug(u"startRoombaAction for "+unicode(roombaDevice.name)+": Action : "+str(action))
