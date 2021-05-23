@@ -235,9 +235,9 @@ class Plugin(indigo.PluginBase):
             folder = indigo.variables.folders.getId('iRoombaDevices')
 
         if name not in indigo.variables:
-            NewVar = indigo.variable.create(name, value=value, folder=folder)
+            NewVar = indigo.variable.create(name, value=str(value), folder=folder)
         else:
-            indigo.variable.updateValue(name, value)
+            indigo.variable.updateValue(name, str(value))
         return
 
     def triggerStartProcessing(self, trigger):
