@@ -182,19 +182,20 @@ class Plugin(indigo.PluginBase):
         device.stateListOrDisplayStateIdChanged()   # update  from device.xml info if changed
 
         device.updateStateOnServer(key="IP",value=str(device.pluginProps['address']))
-        device.updateStateOnServer(key="onOffState", value=False, uiValue="Starting Device")
+
         if device.states['IP'] != "":
             self.updateVar(device.states['IP'], str("Starting Device"))
 
         #device.type = indigo.kDevicerelay
-        device.subType = indigo.kRelayDeviceSubType.Switch
+        # readd this later
+        #device.subType = indigo.kRelayDeviceSubType.Switch
 
-        device.replaceOnServer()
+        #device.replaceOnServer()
         #self.logger.error(unicode(device))
 
-        props = device.pluginProps
-        if hasattr(device, 'onState')==False:  ## if custom
-            self.logger.error("onState on in Props converted device..")
+        #props = device.pluginProps
+        if hasattr(device, 'onState')== False:  ## if custom
+            self.logger.debug("onState Not in Props converting device..")
             device = indigo.device.changeDeviceTypeId(device, device.deviceTypeId)
             device.replaceOnServer()
 
@@ -206,7 +207,7 @@ class Plugin(indigo.PluginBase):
         props["AllowOnStateChange"] = True
         props["SupportsStatusRequest"] = False
         device.replacePluginPropsOnServer(props)
-
+        device.updateStateOnServer(key="onOffState", value=False, uiValue="Starting Device")
 
 
         self.checkAllRoombas()
