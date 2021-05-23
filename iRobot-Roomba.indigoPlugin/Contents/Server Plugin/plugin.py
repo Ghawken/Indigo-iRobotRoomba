@@ -127,6 +127,7 @@ class Plugin(indigo.PluginBase):
             '16': 'Bin Full',
         }
 
+
     def shutdown(self):
         indigo.server.log(u"Shutting down Roomba")
 
@@ -175,10 +176,39 @@ class Plugin(indigo.PluginBase):
 
     def deviceStartComm(self, device):
         self.logger.debug(u"deviceStartComm called for " + device.name)
-        if self.debugOther:
-            self.logger.debug(unicode(device))
-        device.stateListOrDisplayStateIdChanged()
+        #if self.debugOther:
+         #   self.logger.debug(unicode(device))
+
+        device.stateListOrDisplayStateIdChanged()   # update  from device.xml info if changed
+
         device.updateStateOnServer(key="IP",value=str(device.pluginProps['address']))
+        device.updateStateOnServer(key="onOffState", value=False, uiValue="Starting Device")
+        if device.states['IP'] != "":
+            self.updateVar(device.states['IP'], str("Starting Device"))
+
+        #device.type = indigo.kDevicerelay
+        device.subType = indigo.kRelayDeviceSubType.Switch
+
+        device.replaceOnServer()
+        #self.logger.error(unicode(device))
+
+        props = device.pluginProps
+        if hasattr(device, 'onState')==False:  ## if custom
+            self.logger.error("onState on in Props converted device..")
+            device = indigo.device.changeDeviceTypeId(device, device.deviceTypeId)
+            device.replaceOnServer()
+
+        device = indigo.devices[device.id]
+        props = device.pluginProps
+        props["SupportsSensorValue"] = True
+        props["SupportsOnState"] = True
+        props["AllowSensorValueChange"] = False
+        props["AllowOnStateChange"] = True
+        props["SupportsStatusRequest"] = False
+        device.replacePluginPropsOnServer(props)
+
+
+
         self.checkAllRoombas()
         time.sleep(1)
         #self.getRoombaInfo(device)
@@ -189,8 +219,25 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"deviceStopComm called for " + device.name)
         self.disconnectRoomba(device)
         device.updateStateOnServer(key="deviceStatus", value="Communications Error")
+        self.updateVar(device.states['IP'], str("Device Stopped"))
+        device.updateStateOnServer(key="onOffState", value=False, uiValue="Communications Error")
         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
+    def updateVar(self, name, value):
+        self.logger.debug(u'updatevar run.')
+        name = "iRoomba-"+name
+        if not ('iRoombaDevices' in indigo.variables.folders):
+            # create folder
+            folderId = indigo.variables.folder.create('iRoombaDevices')
+            folder = folderId.id
+        else:
+            folder = indigo.variables.folders.getId('iRoombaDevices')
+
+        if name not in indigo.variables:
+            NewVar = indigo.variable.create(name, value=value, folder=folder)
+        else:
+            indigo.variable.updateValue(name, value)
+        return
 
     def triggerStartProcessing(self, trigger):
         self.logger.debug("Adding Trigger %s (%d) - %s" % (trigger.name, trigger.id, trigger.pluginTypeId))
@@ -201,6 +248,27 @@ class Plugin(indigo.PluginBase):
         self.logger.debug("Removing Trigger %s (%d)" % (trigger.name, trigger.id))
         assert trigger.id in self.triggers
         del self.triggers[trigger.id]
+
+    def actionControlDevice(self, action, device):
+        self.logger.debug("actionControlDevice Called: action:"+unicode(action)+" for device :"+unicode(device.name))
+        if device.deviceTypeId == "roombaDevice":
+            currentOnState = device.states['onOffState']
+            command = action.deviceAction
+            if command == indigo.kDeviceAction.TurnOn:
+                self.logger.debug("Turning On iRoomba Device: Sending Start Command")
+                self.startRoombaAction("notUsed",device)
+                ##### TURN OFF #####
+            elif command == indigo.kDeviceAction.TurnOff:
+                self.logger.debug("Turning Off/Docking iRoomba Device: Sending Dock Command")
+                self.dockRoombaAction("notUsed",device)
+                ##### TOGGLE #####
+            elif command == indigo.kDeviceAction.Toggle:
+                self.logger.debug("Toggling iRoomba Device")
+                self.toggleRoombaAction("Notused",device)
+            else:
+                self.logger.debug("Unsupport Command sent:  Command Sent:"+unicode(command))
+                return
+
 
     def triggerCheck(self, device):
 
@@ -441,6 +509,8 @@ class Plugin(indigo.PluginBase):
             forceSSL = device.pluginProps.get('forceSSL',False)
             if roombaIP == 0:
                 device.updateStateOnServer(key="deviceStatus", value="Communications Error")
+                self.updateVar(device.states['IP'], str("IP-Address Error"))
+                device.updateStateOnServer(key="onOffState", value=False, uiValue="Communications Error")
                 device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
                 self.logger.error(u"getDeviceStatus: Roomba IP address not configured.")
                 return
@@ -548,12 +618,18 @@ class Plugin(indigo.PluginBase):
 
                     if errorCode == '0' and notReady == '0':
                         device.updateStateOnServer(key="deviceStatus", value=unicode(state))
+                        self.updateVar(device.states['IP'], str(state))
+                        device.updateStateOnServer(key="onOffState", value=True, uiValue=unicode(state))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
                     elif errorCode != '0':
                         device.updateStateOnServer(key="deviceStatus", value=errorText)
+                        self.updateVar(device.states['IP'], str(errorText))
+                        device.updateStateOnServer(key="onOffState", value=False, uiValue=unicode(errorText))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
                     elif notReady != '0':
                         device.updateStateOnServer(key="deviceStatus", value=notReadyText)
+                        self.updateVar(device.states['IP'], str(notReadyText))
+                        device.updateStateOnServer(key="onOffState", value=False, uiValue=unicode(notReadyText))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
 

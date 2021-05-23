@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <Devices>
-    <Device type="custom" id="roombaDevice">
+    <Device type="relay" id="roombaDevice" >
         <Name>Roomba Cleaner</Name>
         <ConfigUI>
             <SupportURL></SupportURL>
+
             <Field id="address" type="textfield">
                 <Label>Roomba IP Address:</Label>
             </Field>
@@ -34,11 +35,8 @@
             <Field id="SSLinfo" type="label" fontSize="small" fontColor="darkgray">
                 <Label>Force SSLv23 settings. This is now needed for new firmware for both i7 and i9.  It is quite likely newer firmware for other Roombas will require this in the future. If you have any connection/or get Password issues also try with this checkbox enabled
                 </Label>
-
             </Field>
-            <Field id="space21126" type="separator" hidden="true"/>
-
-
+    <Field id="space21126bb" type="separator" hidden="false"/>
 
         </ConfigUI>
         <States>
@@ -125,7 +123,6 @@
                 <TriggerLabel>Software Version</TriggerLabel>
                 <ControlPageLabel>Software Version</ControlPageLabel>
             </State>
-
             <State id="BinFull">
                 <ValueType>Boolean</ValueType>
                 <TriggerLabel>Bin Full</TriggerLabel>
