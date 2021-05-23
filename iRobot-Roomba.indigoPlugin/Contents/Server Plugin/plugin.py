@@ -184,7 +184,7 @@ class Plugin(indigo.PluginBase):
         device.updateStateOnServer(key="IP",value=str(device.pluginProps['address']))
 
         if device.states['IP'] != "":
-            self.updateVar(device.states['IP'], str("Starting Device"))
+            self.updateVar(device.states['IP'], True)
 
         #device.type = indigo.kDevicerelay
         # readd this later
@@ -220,7 +220,7 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"deviceStopComm called for " + device.name)
         self.disconnectRoomba(device)
         device.updateStateOnServer(key="deviceStatus", value="Communications Error")
-        self.updateVar(device.states['IP'], str("Device Stopped"))
+        self.updateVar(device.states['IP'], False)
         device.updateStateOnServer(key="onOffState", value=False, uiValue="Communications Error")
         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
@@ -510,7 +510,7 @@ class Plugin(indigo.PluginBase):
             forceSSL = device.pluginProps.get('forceSSL',False)
             if roombaIP == 0:
                 device.updateStateOnServer(key="deviceStatus", value="Communications Error")
-                self.updateVar(device.states['IP'], str("IP-Address Error"))
+                self.updateVar(device.states['IP'], False)
                 device.updateStateOnServer(key="onOffState", value=False, uiValue="Communications Error")
                 device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
                 self.logger.error(u"getDeviceStatus: Roomba IP address not configured.")
@@ -619,17 +619,17 @@ class Plugin(indigo.PluginBase):
 
                     if errorCode == '0' and notReady == '0':
                         device.updateStateOnServer(key="deviceStatus", value=unicode(state))
-                        self.updateVar(device.states['IP'], str(state))
+                        self.updateVar(device.states['IP'], True)
                         device.updateStateOnServer(key="onOffState", value=True, uiValue=unicode(state))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
                     elif errorCode != '0':
                         device.updateStateOnServer(key="deviceStatus", value=errorText)
-                        self.updateVar(device.states['IP'], str(errorText))
+                        self.updateVar(device.states['IP'], False)
                         device.updateStateOnServer(key="onOffState", value=False, uiValue=unicode(errorText))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
                     elif notReady != '0':
                         device.updateStateOnServer(key="deviceStatus", value=notReadyText)
-                        self.updateVar(device.states['IP'], str(notReadyText))
+                        self.updateVar(device.states['IP'], False)
                         device.updateStateOnServer(key="onOffState", value=False, uiValue=unicode(notReadyText))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
