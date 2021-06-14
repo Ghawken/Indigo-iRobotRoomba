@@ -16,8 +16,8 @@ import time
 import requests
 import json
 import logging
-import OpenSSL
-from base64 import b64encode
+#import OpenSSL
+#from base64 import b64encode
 from roomba import Roomba
 from roomba import password
 #import paho.mqtt.client as mqtt
