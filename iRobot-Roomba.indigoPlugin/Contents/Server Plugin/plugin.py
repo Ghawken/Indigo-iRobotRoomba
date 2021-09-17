@@ -17,11 +17,12 @@ import requests
 import json
 import logging
 #import OpenSSL
-#from base64 import b64encode
+#rom base64 import b64encode
 from roomba import Roomba
 from roomba import password
 #import paho.mqtt.client as mqtt
 import threading
+import datetime
 
 #from requests.auth import HTTPBasicAuth
 #from requests.utils import quote
@@ -544,8 +545,12 @@ class Plugin(indigo.PluginBase):
             if self.debugOther:
                 self.logger.debug(u'Writing Master State Device:' +unicode(device.id) +":"+unicode(json.dumps(masterState)))
             state =""
+            cycle=""
             errorCode ='0'
             notReady = '0'
+            rechrgTm = 0
+            mssnStrtTm = 0
+            rechrgM = 0
             if 'state' in masterState:
                 if 'reported' in masterState['state']:
                     if 'name' in masterState['state']['reported']:
@@ -572,6 +577,7 @@ class Plugin(indigo.PluginBase):
                     if 'cleanMissionStatus' in masterState['state']['reported']:
                         if 'cycle' in masterState['state']['reported']['cleanMissionStatus']:
                             #self.logger.debug(u'MasterState Bat cycle :'+ masterState['state']['reported']['cleanMissionStatus']['cycle'])
+                            cycle = str(masterState['state']['reported']['cleanMissionStatus']['cycle'])
                             device.updateStateOnServer('Cycle',value=str(masterState['state']['reported']['cleanMissionStatus']['cycle']))
 
                         if 'phase' in masterState['state']['reported']['cleanMissionStatus']:
@@ -600,10 +606,35 @@ class Plugin(indigo.PluginBase):
                         if 'sqft' in masterState['state']['reported']['cleanMissionStatus']:
                             device.updateStateOnServer('SqFt', value=str(
                                 masterState['state']['reported']['cleanMissionStatus']['sqft']))
-                        if 'rechrgM' in masterState['state']['reported']['cleanMissionStatus']:
-                            device.updateStateOnServer('RechargeM', value=str(
-                                masterState['state']['reported']['cleanMissionStatus']['rechrgM']))
 
+                        if 'rechrgM' in masterState['state']['reported']['cleanMissionStatus']:
+                            rechrgM = masterState['state']['reported']['cleanMissionStatus']['rechrgM']
+                            #device.updateStateOnServer('RechargeM', value=int(masterState['state']['reported']['cleanMissionStatus']['rechrgM']))
+                        if 'rechrgTm' in masterState['state']['reported']['cleanMissionStatus']:
+                            rechrgTm = masterState['state']['reported']['cleanMissionStatus']['rechrgTm']
+                        if 'mssnStrtTm' in masterState['state']['reported']['cleanMissionStatus']:
+                            mssnStrtTm = masterState['state']['reported']['cleanMissionStatus']['mssnStrtTm']
+
+                        if mssnStrtTm>0 and cycle !="none":
+                            timestampMission = str(datetime.datetime.fromtimestamp(mssnStrtTm).strftime("%c"))
+                            device.updateStateOnServer('MissionStarted', value=str(timestampMission))
+                            ## Calculate minutes
+                        elif cycle=="none":
+                            device.updateStateOnServer('MissionStarted', value=str(""))
+                        elif mssnStrtTm==0:
+                            device.updateStateOnServer('MissionStarted', value=str(""))
+
+                        if rechrgTm>0:
+                            ## Time different
+                            timedifference = rechrgTm - time.time()
+                            if timedifference>0:
+                                minutesremaining = timedifference/60
+                                device.updateStateOnServer('RechargeM', value=int(minutesremaining))
+                            rechargeFinish = str(datetime.datetime.fromtimestamp(rechrgTm).strftime("%c"))
+                            device.updateStateOnServer('RechargeFinish', value=str(rechargeFinish))
+                        else:
+                            device.updateStateOnServer('RechargeM', value=int(0))
+                            device.updateStateOnServer('RechargeFinish', value=str(""))
 
                     if 'bin' in masterState['state']['reported']:
                         if 'full' in masterState['state']['reported']['bin']:
@@ -612,8 +643,16 @@ class Plugin(indigo.PluginBase):
                                 device.updateStateOnServer('BinFull', value=True)
                             if masterState['state']['reported']['bin']['full'] == False:
                                 device.updateStateOnServer('BinFull', value=False)
-
-
+                    if 'bbrun' in masterState['state']['reported']:
+                        Hourtime = ""
+                        minutetime = ""
+                        if 'hr' in masterState['state']['reported']['bbrun']:
+                            Hourtime = masterState['state']['reported']['bbrun']['hr']
+                        if 'min' in masterState['state']['reported']['bbrun']:
+                            minutetime = masterState['state']['reported']['bbrun']['min']
+                        if minutetime !="" and Hourtime !="":
+                            lifetimestring = str(Hourtime)+" hours, "+str(minutetime)+" minutes"
+                            device.updateStateOnServer('LifetimeRuntime', value=lifetimestring)
                     if currentstate != "":
                         state = str(currentstate)
 

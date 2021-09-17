@@ -89,9 +89,24 @@
                 <ControlPageLabel>BatPct</ControlPageLabel>
             </State>
             <State id="RechargeM">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Recharge Minutes Remaining</TriggerLabel>
+                <ControlPageLabel>Recharge Minutes Remaining</ControlPageLabel>
+            </State>
+            <State id="MissionStarted">
                 <ValueType>String</ValueType>
-                <TriggerLabel>RechargeM</TriggerLabel>
-                <ControlPageLabel>RechargeM</ControlPageLabel>
+                <TriggerLabel>Mission Start Time</TriggerLabel>
+                <ControlPageLabel>Mission Start Time</ControlPageLabel>
+            </State>
+            <State id="LifetimeRuntime">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Lifelong Cleaning Time</TriggerLabel>
+                <ControlPageLabel>Lifelong Cleaning Time</ControlPageLabel>
+            </State>
+            <State id="RechargeFinish">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Recharge Finish Time</TriggerLabel>
+                <ControlPageLabel>Recharge Finish Time</ControlPageLabel>
             </State>
             <State id="ErrorCode">
                 <ValueType>String</ValueType>
