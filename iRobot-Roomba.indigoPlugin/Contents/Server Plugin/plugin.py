@@ -564,6 +564,7 @@ class Plugin(indigo.PluginBase):
                 self.logger.debug(u'Writing Master State Device:' +unicode(device.id) +":"+unicode(json.dumps(masterState)))
             state =""
             cycle=""
+            statement = ""
             errorCode ='0'
             notReady = '0'
             rechrgTm = 0
@@ -610,7 +611,7 @@ class Plugin(indigo.PluginBase):
                             except:
                                 errorText = "Undocumented Error Code (%s)" % errorCode
                             device.updateStateOnServer('ErrorText', value=errorText)
-
+                            statement = "Error: "+str(errorText)
                         if 'notReady' in masterState['state']['reported']['cleanMissionStatus']:
                             device.updateStateOnServer('NotReady', value=str(
                                 masterState['state']['reported']['cleanMissionStatus']['notReady']))
@@ -620,7 +621,7 @@ class Plugin(indigo.PluginBase):
                             except:
                                 notReadyText = "Undocumented Not Ready Value (%s)" % notReady
                             device.updateStateOnServer('NotReadyText', value=notReadyText)
-
+                            statement = "Not Ready: "+str(notReadyText)
                         if 'sqft' in masterState['state']['reported']['cleanMissionStatus']:
                             device.updateStateOnServer('SqFt', value=str(
                                 masterState['state']['reported']['cleanMissionStatus']['sqft']))
@@ -642,10 +643,12 @@ class Plugin(indigo.PluginBase):
                                 lengthMis = nowTime-startMission
                                 totalmins = int(round(lengthMis.total_seconds()/60))
                                 device.updateStateOnServer('MissionDuration', value=int(totalmins))
+                                statement = "Running, Mission duration "+str(totalmins)+" minutes"
                             ## Calculate minutes
                         elif cycle=="none":
                             device.updateStateOnServer('MissionStarted', value=str(""))
                             device.updateStateOnServer('MissionDuration', value="")
+                            statement = "Idle"
                         elif mssnStrtTm==0:
                             device.updateStateOnServer('MissionStarted', value="" )
                             device.updateStateOnServer('MissionDuration', value="" )
@@ -657,6 +660,7 @@ class Plugin(indigo.PluginBase):
                                 device.updateStateOnServer('RechargeM', value=int(minutesremaining))
                             rechargeFinish = str(datetime.datetime.fromtimestamp(rechrgTm).strftime("%c"))
                             device.updateStateOnServer('RechargeFinish', value=str(rechargeFinish))
+                            statement = "Recharging, due to restart in "+str(int(minutesremaining))+" mins"
                         else:
                             device.updateStateOnServer('RechargeM', value=int(0))
                             device.updateStateOnServer('RechargeFinish', value=str(""))
@@ -694,11 +698,15 @@ class Plugin(indigo.PluginBase):
                     if currentstate != "":
                         state = str(currentstate)
 
+                    ##
+
+
                     if errorCode == '0' and notReady == '0':
                         device.updateStateOnServer(key="deviceStatus", value=unicode(state))
                         self.updateVar(device.states['IP'], True)
                         device.updateStateOnServer(key="onOffState", value=True, uiValue=unicode(state))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
+
                     elif errorCode != '0':
                         device.updateStateOnServer(key="deviceStatus", value=errorText)
                         self.updateVar(device.states['IP'], False)
@@ -710,6 +718,10 @@ class Plugin(indigo.PluginBase):
                         device.updateStateOnServer(key="onOffState", value=False, uiValue=unicode(notReadyText))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
+                    if statement !="":
+                        device.updateStateOnServer('currentState_Statement', value=unicode(statement))
+                    else:
+                        device.updateStateOnServer('currentState_Statement', value=unicode(state))
 
         return
           #  self.logger.debug(unicode(masterState))

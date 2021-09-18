@@ -123,6 +123,11 @@
                 <TriggerLabel>Lifetime Area Cleaned M2</TriggerLabel>
                 <ControlPageLabel>Lifetime Area Cleaned M2</ControlPageLabel>
             </State>
+            <State id="currentState_Statement">
+                <ValueType>String</ValueType>
+                <TriggerLabel>current State as a Statement</TriggerLabel>
+                <ControlPageLabel>current State as Statement</ControlPageLabel>
+            </State>
             <State id="RechargeFinish">
                 <ValueType>String</ValueType>
                 <TriggerLabel>Recharge Finish Time</TriggerLabel>
