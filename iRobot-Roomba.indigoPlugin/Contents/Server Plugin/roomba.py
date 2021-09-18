@@ -301,7 +301,7 @@ class Roomba(object):
               "new": "New Mission",
               "run": "Running",
               "resume": "Running",
-              "hmMidMsn": "Recharging",
+              "hmMidMsn": "Returning to Base",
               "recharge": "Recharging",
               "stuck": "Stuck",
               "hmUsrDock": "User Docking",

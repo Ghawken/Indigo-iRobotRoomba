@@ -537,6 +537,24 @@ class Plugin(indigo.PluginBase):
                 return False
         #self.logger.error(unicode(self.myroomba.master_state))
 
+    def display_time(self, seconds, granularity=2):
+        result = []
+        intervals = (
+            ('weeks', 604800),  # 60 * 60 * 24 * 7
+            ('days', 86400),  # 60 * 60 * 24
+            ('hours', 3600),  # 60 * 60
+            ('minutes', 60),
+            ('seconds', 1),
+        )
+        for name, count in intervals:
+            value = seconds // count
+            if value:
+                seconds -= value * count
+                if value == 1:
+                    name = name.rstrip('s')
+                result.append("%s %s" % (value, name))
+        return ', '.join(result[:granularity])
+
     def saveMasterStateDevice(self, masterState, device, currentstate):
         if self.debugOther:
             self.logger.debug(u'saveMasterStateDevice called.')
@@ -609,7 +627,7 @@ class Plugin(indigo.PluginBase):
 
                         if 'rechrgM' in masterState['state']['reported']['cleanMissionStatus']:
                             rechrgM = masterState['state']['reported']['cleanMissionStatus']['rechrgM']
-                            #device.updateStateOnServer('RechargeM', value=int(masterState['state']['reported']['cleanMissionStatus']['rechrgM']))
+                            device.updateStateOnServer('RechargeM', value=int(masterState['state']['reported']['cleanMissionStatus']['rechrgM']))
                         if 'rechrgTm' in masterState['state']['reported']['cleanMissionStatus']:
                             rechrgTm = masterState['state']['reported']['cleanMissionStatus']['rechrgTm']
                         if 'mssnStrtTm' in masterState['state']['reported']['cleanMissionStatus']:
@@ -618,12 +636,19 @@ class Plugin(indigo.PluginBase):
                         if mssnStrtTm>0 and cycle !="none":
                             timestampMission = str(datetime.datetime.fromtimestamp(mssnStrtTm).strftime("%c"))
                             device.updateStateOnServer('MissionStarted', value=str(timestampMission))
+                            startMission = datetime.datetime.fromtimestamp(mssnStrtTm)
+                            nowTime = datetime.datetime.fromtimestamp(time.time())
+                            if nowTime > startMission:
+                                lengthMis = nowTime-startMission
+                                totalmins = int(round(lengthMis.total_seconds()/60))
+                                device.updateStateOnServer('MissionDuration', value=int(totalmins))
                             ## Calculate minutes
                         elif cycle=="none":
                             device.updateStateOnServer('MissionStarted', value=str(""))
+                            device.updateStateOnServer('MissionDuration', value="")
                         elif mssnStrtTm==0:
-                            device.updateStateOnServer('MissionStarted', value=str(""))
-
+                            device.updateStateOnServer('MissionStarted', value="" )
+                            device.updateStateOnServer('MissionDuration', value="" )
                         if rechrgTm>0:
                             ## Time different
                             timedifference = rechrgTm - time.time()
@@ -644,15 +669,28 @@ class Plugin(indigo.PluginBase):
                             if masterState['state']['reported']['bin']['full'] == False:
                                 device.updateStateOnServer('BinFull', value=False)
                     if 'bbrun' in masterState['state']['reported']:
-                        Hourtime = ""
-                        minutetime = ""
+                        Hourtime = 0
+                        minutetime = 0
                         if 'hr' in masterState['state']['reported']['bbrun']:
-                            Hourtime = masterState['state']['reported']['bbrun']['hr']
+                            Hourtime = int(masterState['state']['reported']['bbrun']['hr'])
                         if 'min' in masterState['state']['reported']['bbrun']:
-                            minutetime = masterState['state']['reported']['bbrun']['min']
-                        if minutetime !="" and Hourtime !="":
-                            lifetimestring = str(Hourtime)+" hours, "+str(minutetime)+" minutes"
+                            minutetime = int(masterState['state']['reported']['bbrun']['min'])
+                        if minutetime !=0 and Hourtime !=0:
+                            totalseconds = (Hourtime*60*60)+(minutetime*60)
+                            lifetimestring = self.display_time(totalseconds,4)
                             device.updateStateOnServer('LifetimeRuntime', value=lifetimestring)
+
+                        if 'sqft' in masterState['state']['reported']['bbrun']:
+                            sqfttotal = int(masterState['state']['reported']['bbrun']['sqft'])*100
+                            device.updateStateOnServer('LifetimeAreaCleaned_Sqft', value=int(sqfttotal))
+                            msqtotal = float(sqfttotal/10.76391041671)
+                            device.updateStateOnServer('LifetimeAreaCleaned_m2', value=int(msqtotal))
+                    if 'bbmssn' in masterState['state']['reported']:
+                        if 'nMssn' in masterState['state']['reported']['bbmssn']:
+                            device.updateStateOnServer('LifetimeCleaningJobs', value=int(masterState['state']['reported']['bbmssn']['nMssn']))
+
+
+
                     if currentstate != "":
                         state = str(currentstate)
 
