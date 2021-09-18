@@ -648,7 +648,6 @@ class Plugin(indigo.PluginBase):
                         elif cycle=="none":
                             device.updateStateOnServer('MissionStarted', value=str(""))
                             device.updateStateOnServer('MissionDuration', value="")
-                            statement = "Idle"
                         elif mssnStrtTm==0:
                             device.updateStateOnServer('MissionStarted', value="" )
                             device.updateStateOnServer('MissionDuration', value="" )
