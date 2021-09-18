@@ -611,17 +611,19 @@ class Plugin(indigo.PluginBase):
                             except:
                                 errorText = "Undocumented Error Code (%s)" % errorCode
                             device.updateStateOnServer('ErrorText', value=errorText)
-                            statement = "Error: "+str(errorText)
+                            if errorCode !="0":
+                                statement = "Error: "+str(errorText)
                         if 'notReady' in masterState['state']['reported']['cleanMissionStatus']:
-                            device.updateStateOnServer('NotReady', value=str(
-                                masterState['state']['reported']['cleanMissionStatus']['notReady']))
+                            device.updateStateOnServer('NotReady', value=str( masterState['state']['reported']['cleanMissionStatus']['notReady']))
                             notReady = str(masterState['state']['reported']['cleanMissionStatus']['notReady'])
                             try:
                                 notReadyText = self.notReadyStrings[notReady]
                             except:
                                 notReadyText = "Undocumented Not Ready Value (%s)" % notReady
                             device.updateStateOnServer('NotReadyText', value=notReadyText)
-                            statement = "Not Ready: "+str(notReadyText)
+                            if notReady != "0":
+                                statement = "Not Ready: "+str(notReadyText)
+
                         if 'sqft' in masterState['state']['reported']['cleanMissionStatus']:
                             device.updateStateOnServer('SqFt', value=str(
                                 masterState['state']['reported']['cleanMissionStatus']['sqft']))
@@ -705,7 +707,6 @@ class Plugin(indigo.PluginBase):
                         self.updateVar(device.states['IP'], True)
                         device.updateStateOnServer(key="onOffState", value=True, uiValue=unicode(state))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
-
                     elif errorCode != '0':
                         device.updateStateOnServer(key="deviceStatus", value=errorText)
                         self.updateVar(device.states['IP'], False)
