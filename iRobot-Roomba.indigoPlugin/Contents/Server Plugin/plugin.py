@@ -637,13 +637,13 @@ class Plugin(indigo.PluginBase):
                                 totalmins = int(round(lengthMis.total_seconds()/60))
                                 device.updateStateOnServer('MissionDuration', value=int(totalmins))
                                 if phase == "run":
-                                    statement = "Running, Mission duration "+str(totalmins)+" minutes"
+                                    statement = "Running, Mission "+str(totalmins)+" mins, Bat "+str(batteryPercent)+" %"
                                 elif phase == "dockend":
                                     statement = "Docking, Mission completed " + str(totalmins) + " minutes"
                                 elif phase == "cancelled":
                                     statement = "Docking, Mission cancelled " + str(totalmins) + " minutes"
                                 elif phase == "hmMidMsn":
-                                    statement = "Docking, Mid Mission " + str(totalmins) + " minutes"
+                                    statement = "Docking, Mid Mission " + str(totalmins) + " mins, Bat "+str(batteryPercent)+" %"
                                 elif phase == "hmUsrDock":
                                     statement = "User Docking, Battery at "+str(batteryPercent)+"%"
                             ## Calculate minutes
