@@ -8,7 +8,31 @@
     <Label>Developed by: GlennNZ</Label>
   </Field>
   <Field id="sep7" type="separator"/>
+<Field id="space226" type="separator"/>
 
+    <Field id="space210" type="label" alignText="right">
+        <Label>Date/Time format:</Label>
+    </Field>
+    <Field id="sep44" type="separator"/>
+
+        <Field id="space2221" type="label" fontSize="small">
+        <Label>Date/Time format of lastUpdate field.  In format strftime.  See. strftime.org for more options
+            eg  %c  == Mon Jan 15 16:50:59 2018
+            eg.  %b %d %Y %H:%M:%S == Feb 18 2009 00:03:38
+            eg. %a %d %b %I:%M %p == Mon 15 Jan 4:57 PM
+            eg. %X == 07:06:05
+            eg. %I:%M %p == 4:57 PM
+            eg. %a %-I:%M %p  == Sun 2:01 PM
+        </Label>
+    </Field>
+
+       <Field id="datetimeFormat" type="textfield" tooltip="Date Time Format" defaultValue="">
+     <Label>Enter DateTime Format:</Label><Label/>
+     <Description>Format for datetime LastUpdate field eg. %c </Description>
+    </Field>
+
+    <Field id="space2226" type="separator"/>
+    <Field id="space22226" type="separator"/>
     <Field id="statusFrequency" type="textfield" defaultValue="1" hidden="true">
         <Label>Update device status frequency (minutes):</Label>
     </Field>

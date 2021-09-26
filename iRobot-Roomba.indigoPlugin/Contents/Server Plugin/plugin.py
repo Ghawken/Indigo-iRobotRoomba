@@ -27,7 +27,7 @@ import datetime
 #from requests.auth import HTTPBasicAuth
 #from requests.utils import quote
 
-from ghpu import GitHubPluginUpdater
+#@from ghpu import GitHubPluginUpdater
 
 kCurDevVersCount = 1        # current version of plugin devices
 
@@ -73,7 +73,7 @@ class Plugin(indigo.PluginBase):
         self.triggers = { }
         self.masterState = None
         self.currentstate = ""
-        self.updater = GitHubPluginUpdater(self)
+        #self.updater = GitHubPluginUpdater(self)
         self.KILLcount = 0
         self.restarted = 0
         self.updateFrequency = float(self.pluginPrefs.get('updateFrequency', "24")) * 60.0 * 60.0
@@ -87,7 +87,7 @@ class Plugin(indigo.PluginBase):
         self.reconnectFreq = 12*60*60
         # Testing only below
         #self.reconnectFreq = 2*60
-
+        self.datetimeFormat = self.pluginPrefs.get('datetimeFormat', '%c')
         self.connectTime = self.reconnectFreq +time.time()
 
       #  self.statusFrequency = float(self.pluginPrefs.get('statusFrequency', "10")) * 60.0
@@ -144,11 +144,10 @@ class Plugin(indigo.PluginBase):
         self.checkConnection = time.time()+ 60*60
         try:
             while True:
-
                 if time.time() > self.next_status_check:
                     if self.debugTrue:
                         self.logger.debug(u'Updating Master States....')
-                    self.updateMasterStates()   # if using continuous - should already be connected just update states here
+                    self.updateMasterStates()
                     self.next_status_check = time.time() +60  ## 1 minute later update states
 
                 if time.time() > self.checkConnection:
@@ -296,15 +295,6 @@ class Plugin(indigo.PluginBase):
     # Menu Methods
     ########################################
 
-    def checkForUpdates(self):
-        self.updater.checkForUpdate()
-
-    def updatePlugin(self):
-        self.updater.update()
-
-    def forceUpdate(self):
-        self.updater.update(currentVersion='0.0.0')
-
     ########################################
     # ConfigUI methods
     ########################################
@@ -330,7 +320,7 @@ class Plugin(indigo.PluginBase):
                 self.logLevel = logging.INFO
             self.indigo_log_handler.setLevel(self.logLevel)
             self.logger.debug(u"logLevel = " + str(self.logLevel))
-
+            self.datetimeFormat = valuesDict.get('datetimeFormat', '%c')
             self.updateFrequency = float(self.pluginPrefs.get('updateFrequency', "24")) * 60.0 * 60.0
             self.logger.debug(u"updateFrequency = " + str(self.updateFrequency))
             self.next_update_check = time.time()
@@ -506,7 +496,6 @@ class Plugin(indigo.PluginBase):
             if self.debugOther:
                 self.logger.debug(u'connecting Roomba Device: '+unicode(device.name))
             roombaIP = device.pluginProps.get('address', 0).encode('utf-8')
-
             softwareVersion = device.states['softwareVer']
             forceSSL = device.pluginProps.get('forceSSL',False)
             if roombaIP == 0:
@@ -570,6 +559,8 @@ class Plugin(indigo.PluginBase):
             rechrgTm = 0
             mssnStrtTm = 0
             rechrgM = 0
+            batteryPercent = ""
+            phase = ""
             if 'state' in masterState:
                 if 'reported' in masterState['state']:
                     if 'name' in masterState['state']['reported']:
@@ -584,7 +575,7 @@ class Plugin(indigo.PluginBase):
                                 device.updateStateOnServer('Y', value=str(masterState['state']['reported']['pose']['point']['y']))
 
                     if 'batPct' in masterState['state']['reported']:
-                        #self.logger.debug(u'MasterState Bat Pct :' + unicode(masterState['state']['reported']['batPct']))
+                        batteryPercent =  str(masterState['state']['reported']['batPct'])
                         device.updateStateOnServer('BatPct', value=str(masterState['state']['reported']['batPct']))
 
                     if 'name' in masterState['state']['reported']:
@@ -600,7 +591,7 @@ class Plugin(indigo.PluginBase):
                             device.updateStateOnServer('Cycle',value=str(masterState['state']['reported']['cleanMissionStatus']['cycle']))
 
                         if 'phase' in masterState['state']['reported']['cleanMissionStatus']:
-                            #self.logger.debug(u'MasterState Bat phase :'+ masterState['state']['reported']['cleanMissionStatus']['phase'])
+                            phase = str(masterState['state']['reported']['cleanMissionStatus']['phase'])
                             device.updateStateOnServer('Phase', value=str(masterState['state']['reported']['cleanMissionStatus']['phase']))
                             state = str("Roomba Ok - ") + str(masterState['state']['reported']['cleanMissionStatus']['phase'])
                         if 'error' in masterState['state']['reported']['cleanMissionStatus']:
@@ -637,7 +628,7 @@ class Plugin(indigo.PluginBase):
                             mssnStrtTm = masterState['state']['reported']['cleanMissionStatus']['mssnStrtTm']
 
                         if mssnStrtTm>0 and cycle !="none":
-                            timestampMission = str(datetime.datetime.fromtimestamp(mssnStrtTm).strftime("%c"))
+                            timestampMission = str(datetime.datetime.fromtimestamp(mssnStrtTm).strftime(str(self.datetimeFormat)))
                             device.updateStateOnServer('MissionStarted', value=str(timestampMission))
                             startMission = datetime.datetime.fromtimestamp(mssnStrtTm)
                             nowTime = datetime.datetime.fromtimestamp(time.time())
@@ -645,7 +636,16 @@ class Plugin(indigo.PluginBase):
                                 lengthMis = nowTime-startMission
                                 totalmins = int(round(lengthMis.total_seconds()/60))
                                 device.updateStateOnServer('MissionDuration', value=int(totalmins))
-                                statement = "Running, Mission duration "+str(totalmins)+" minutes"
+                                if phase == "run":
+                                    statement = "Running, Mission duration "+str(totalmins)+" minutes"
+                                elif phase == "dockend":
+                                    statement = "Docking, Mission completed " + str(totalmins) + " minutes"
+                                elif phase == "cancelled":
+                                    statement = "Docking, Mission cancelled " + str(totalmins) + " minutes"
+                                elif phase == "hmMidMsn":
+                                    statement = "Docking, Mid Mission " + str(totalmins) + " minutes"
+                                elif phase == "hmUsrDock":
+                                    statement = "User Docking, Battery at "+str(batteryPercent)+"%"
                             ## Calculate minutes
                         elif cycle=="none":
                             device.updateStateOnServer('MissionStarted', value=str(""))
@@ -659,7 +659,7 @@ class Plugin(indigo.PluginBase):
                             if timedifference>0:
                                 minutesremaining = timedifference/60
                                 device.updateStateOnServer('RechargeM', value=int(minutesremaining))
-                            rechargeFinish = str(datetime.datetime.fromtimestamp(rechrgTm).strftime("%c"))
+                            rechargeFinish = str(datetime.datetime.fromtimestamp(rechrgTm).strftime(str(self.datetimeFormat)))
                             device.updateStateOnServer('RechargeFinish', value=str(rechargeFinish))
                             statement = "Recharging, due to restart in "+str(int(minutesremaining))+" mins"
                         else:
@@ -684,7 +684,6 @@ class Plugin(indigo.PluginBase):
                             totalseconds = (Hourtime*60*60)+(minutetime*60)
                             lifetimestring = self.display_time(totalseconds,4)
                             device.updateStateOnServer('LifetimeRuntime', value=lifetimestring)
-
                         if 'sqft' in masterState['state']['reported']['bbrun']:
                             sqfttotal = int(masterState['state']['reported']['bbrun']['sqft'])*100
                             device.updateStateOnServer('LifetimeAreaCleaned_Sqft', value=int(sqfttotal))
@@ -694,13 +693,12 @@ class Plugin(indigo.PluginBase):
                         if 'nMssn' in masterState['state']['reported']['bbmssn']:
                             device.updateStateOnServer('LifetimeCleaningJobs', value=int(masterState['state']['reported']['bbmssn']['nMssn']))
 
-
+                    if phase == "charge":
+                        if statement == "":
+                            statement = "Charging, Battery at "+str(batteryPercent)+"%"
 
                     if currentstate != "":
                         state = str(currentstate)
-
-                    ##
-
 
                     if errorCode == '0' and notReady == '0':
                         device.updateStateOnServer(key="deviceStatus", value=unicode(state))

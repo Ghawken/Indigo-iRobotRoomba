@@ -30,6 +30,7 @@ import datetime
 from collections import OrderedDict, Mapping
 import threading
 
+
 import logging
 
 import time
@@ -528,90 +529,119 @@ class Roomba(object):
         return True
 
     def setup_client(self):
-        if self.client is None:
-            if not HAVE_MQTT:
-                self.logger.debug(u"Please install paho-mqtt '<sudo> pip install paho-mqtt' to use this library")
-                return False
+        try:
+            if self.client is None:
+                if not HAVE_MQTT:
+                    self.logger.debug(u"Please install paho-mqtt '<sudo> pip install paho-mqtt' to use this library")
+                    return False
 
-            self.client = mqtt.Client(client_id=self.blid, clean_session=self.clean, protocol=mqtt.MQTTv311)
-            # Assign event callbacks
-            self.client.on_message = self.on_message
-            self.client.on_connect = self.on_connect
-            self.client.on_publish = self.on_publish
-            self.client.on_subscribe = self.on_subscribe
-            self.client.on_disconnect = self.on_disconnect
+                self.client = mqtt.Client(client_id=self.blid, clean_session=self.clean, protocol=mqtt.MQTTv311)
+                # Assign event callbacks
+                self.client.on_message = self.on_message
+                self.client.on_connect = self.on_connect
+                self.client.on_publish = self.on_publish
+                self.client.on_subscribe = self.on_subscribe
+                self.client.on_disconnect = self.on_disconnect
 
-            # Uncomment to enable debug messages
-            # self.client.on_log = self.on_log
+                # Uncomment to enable debug messages
+                # self.client.on_log = self.on_log
 
-            #set TLS, self.cert_name is required by paho-mqtt, even if the certificate is not used...
-            #self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_TLSv1)
-            # set TLS, self.cert_name is required by paho-mqtt, even if the certificate is not used...
-            # but v1.3 changes all this, so have to do the following:
+                #set TLS, self.cert_name is required by paho-mqtt, even if the certificate is not used...
+                #self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_TLSv1)
+                # set TLS, self.cert_name is required by paho-mqtt, even if the certificate is not used...
+                # but v1.3 changes all this, so have to do the following:
 
-            self.logger.debug("Selecting the best SSL TLS Settings")
-            try:
-                if 'soho' in self.softwareversion or self.forceSSL or 'lewis+3.0.11+lewis' in self.softwareversion:
-                    self.logger.debug('s9 iRoomba VERSION:  Using Protocol SSLv23')
-                    self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_SSLv23)
-                else:
-                    self.logger.debug('Standard iRoomba VERSION:  Using Protocol TLS.  Change v0.51')
-                    self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_TLSv1)
-            except (ValueError):  # try V1.3 version
-                self.logger.debug("TLS Setting failed - trying 1.3 version")
-                self.client._ssl_context = None
-                context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-                context.verify_mode = ssl.CERT_NONE
-                context.load_default_certs()
-                self.client.tls_set_context(context)
+                self.logger.debug("Selecting the best SSL TLS Settings")
+                try:
+                    if 'soho' in self.softwareversion or self.forceSSL or 'lewis+3.0.11+lewis' in self.softwareversion:
+                        self.logger.debug('s9 iRoomba VERSION:  Using Protocol SSLv23')
+                        self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_SSLv23)
+                    else:
+                        self.logger.debug('Standard iRoomba VERSION:  Using Protocol TLS.  Change v0.51')
+                        self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_TLSv1)
+                except (ValueError):  # try V1.3 version
+                    self.logger.debug("TLS Setting failed - trying 1.3 version")
+                    self.client._ssl_context = None
+                    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+                    context.verify_mode = ssl.CERT_NONE
+                    context.load_default_certs()
+                    self.client.tls_set_context(context)
 
-            # disables peer verification
-            self.client.tls_insecure_set(True)
-            self.client.username_pw_set(self.blid, self.password)
-            self.logger.debug("MQTT Client Succesfully setup")
-            return True
-        return False
+                # disables peer verification
+                self.client.tls_insecure_set(True)
+                self.client.username_pw_set(self.blid, self.password)
+                self.logger.debug("MQTT Client Succesfully setup")
+                return True
+
+            return False
+        except:
+            self.logger.error("Error with MQTT Client Setup.")
+            return False
+
 
     def connect(self):
         try:
             if self.address is None or self.blid is None or self.password is None:
                 self.logger.error("Invalid address, blid, or password! All these must be specified!")
-                #sys.exit(1)
                 return False
             if self.roomba_connected or self.periodic_connection_running: return
 
-            if self.continuous:
-                if not self._connect():
-                    if self.mqttc is not None:
-                        self.mqttc.disconnect()
-                        self.logger.error("Mqttc Disconnect")
-                        return False
-           # else:
-                #self.periodic_connection()
-                #self._thread = threading.Thread(target=self.periodic_connection)
-                #self._thread.daemon = True
-                #self._thread.start()
-
+            if not self._connect():
+                if self.mqttc is not None:
+                    self.mqttc.disconnect()
+                    self.logger.error("Mqttc Disconnect")
+                    return False
             self.time = time.time()   #save connect time
+            return True
+
         except Exception as e:
-            self.logger.error("Error Connect: %s " % unicode(e.message))
+            self.logger.error("Error Connect: %s " % str(e.message))
+            return False
+
+    def _reconnect(self):
+        try:
+            self.logger.debug(u"Threaded version of reconnect running")
+            self.logger.debug("Attempting to Reconnect %s " % unicode(self.roombaName))
+            self.client.disconnect()
+            time.sleep(1)
+            self.client.loop_stop()
+            time.sleep(1)
+            self.client.reconnect()
+            time.sleep(1)
+        except Exception as ex:
+            self.logger.debug(u"Exception "+unicode(ex))
 
     def _connect(self, count=0, new_connection=False):
         max_retries = 3
-
-        self.logger.debug("Connecting: " + unicode(self.roombaName) + "  :  " +  unicode(self.address) + "  :  " +  unicode(self.password) )
+        self.logger.debug("Connecting: Name:" + unicode(self.roombaName) + "  && Address:" +  unicode(self.address) + "  && password:" +  unicode(self.password) + "  && Port:"+unicode(self.roomba_port))
         try:
             if self.client is None or new_connection:
                 self.logger.debug("Connecting %s" % unicode(self.roombaName))
                 self.setup_client()
-                self.logger.debug("Client Connect Running now %s" % unicode(self.roombaName))
-                self.client.connect(self.address, self.roomba_port, 60)
+                self.logger.debug("Client MQTT New Connection - Connect Running now %s" % unicode(self.roombaName))
+######## Threaded Reconnect/Connect
+                self.logger.debug(u"Threading inital connection to avoid issues if one iRoomba down...")
+                self._thread = threading.Thread(target=self.client.connect, args=(self.address,self.roomba_port,60,),)
+                self._thread.daemon = True
+                self._thread.start()
+                time.sleep(1)
+######## Threaded Reconnect/Connect
+                #self.client.connect(self.address, self.roomba_port, 60)
             else:
-                self.logger.debug("Attempting to Reconnect "  % unicode(self.roombaName))
-                self.client.loop_stop()
-                self.client.reconnect()
+                self.logger.debug("Attempting to Reconnect %s "  % unicode(self.roombaName))
+######## Threaded Reconnect/Connect
+                #self.client.disconnect()
+                #self.client.loop_stop()
+
+                self.logger.debug(u"Threading re-connection to avoid issues if one iRoomba down...")
+                self._thread = threading.Thread(target=self._reconnect())
+                self._thread.daemon = True
+                self._thread.start()
+######## Threaded Reconnect/Connect
+                #self.client.reconnect()
 
             self.logger.debug("Client LoopStart Running now %s" % unicode(self.roombaName))
+
             self.client.loop_start()
             return True
 
@@ -623,6 +653,7 @@ class Roomba(object):
             self.logger.debug("Connection Roomba Error: %s " % unicode(e[0]))
             #if e[0] == 111 or e[0] ==61 : #errno.ECONNREFUSED
             count +=1
+            time.sleep(1)
             if count <= max_retries:
                 self.logger.debug("Attempting new Connection# %d" % count)
                 time.sleep(5)
@@ -631,19 +662,6 @@ class Roomba(object):
         if count == max_retries:
             self.logger.info(u"Unable to connect to %s" % unicode(self.roombaName))
             self.logger.info(u'This may because your Roomba has lost charge and network connection.')
-            #self.logger.info(u'Restarting Plugin in effort to resolve...')
-            #self.logger.debug(u"Setting restart switch....")
-            #self.plugin.restartPlugin(self)
-            #self.plugin.KILL = True
-            #self.roomba_connected = False
-            #self.plugin.connected = False
-
-            #self.disconnect()
-            #self.plugin.removeRoomba()
-            # delete the roomba device because trying to connect does not reestablish connection
-            # Let the time for reconnection - restablish a connection
-            #if self.plugin.continuous:
-            #    self.plugin.reconnectRoomba()
 
         return False
 
