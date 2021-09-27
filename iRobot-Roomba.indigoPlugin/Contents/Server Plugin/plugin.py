@@ -24,6 +24,8 @@ from roomba import password
 import threading
 import datetime
 
+import locale
+
 #from requests.auth import HTTPBasicAuth
 #from requests.utils import quote
 
@@ -207,6 +209,8 @@ class Plugin(indigo.PluginBase):
             '7' : 'Bin Missing',
             '15': 'Battery Low',
             '16': 'Bin Full',
+            '39': 'Saving Clean Map',
+            '68': 'Saving smart map edits'
         }
 
 
@@ -219,6 +223,7 @@ class Plugin(indigo.PluginBase):
         plugin.restart()
 
     def runConcurrentThread(self):
+
         self.next_status_check = time.time()
         self.checkiRoombaConnectedtime = time.time() + 60*60
         self.checkAllRoombas()
@@ -290,8 +295,7 @@ class Plugin(indigo.PluginBase):
         device.replacePluginPropsOnServer(props)
         device.updateStateOnServer(key="onOffState", value=False, uiValue="Starting Device")
 
-
-        self.checkAllRoombas()
+      #  self.checkAllRoombas()
         time.sleep(1)
         #self.getRoombaInfo(device)
         #self.getRoombaStatus(device)
@@ -675,16 +679,8 @@ class Plugin(indigo.PluginBase):
                             phase = str(masterState['state']['reported']['cleanMissionStatus']['phase'])
                             device.updateStateOnServer('Phase', value=str(masterState['state']['reported']['cleanMissionStatus']['phase']))
                             state = str("Roomba Ok - ") + str(masterState['state']['reported']['cleanMissionStatus']['phase'])
-                        if 'error' in masterState['state']['reported']['cleanMissionStatus']:
-                            device.updateStateOnServer('ErrorCode', value=str(masterState['state']['reported']['cleanMissionStatus']['error']))
-                            errorCode = str(masterState['state']['reported']['cleanMissionStatus']['error'])
-                            try:
-                                errorText = self.errorStrings[errorCode]
-                            except:
-                                errorText = "Undocumented Error Code (%s)" % errorCode
-                            device.updateStateOnServer('ErrorText', value=errorText)
-                            if errorCode !="0":
-                                statement = "Error: "+str(errorText)
+
+
                         if 'notReady' in masterState['state']['reported']['cleanMissionStatus']:
                             device.updateStateOnServer('NotReady', value=str( masterState['state']['reported']['cleanMissionStatus']['notReady']))
                             notReady = str(masterState['state']['reported']['cleanMissionStatus']['notReady'])
@@ -695,6 +691,17 @@ class Plugin(indigo.PluginBase):
                             device.updateStateOnServer('NotReadyText', value=notReadyText)
                             if notReady != "0":
                                 statement = "Not Ready: "+str(notReadyText)
+
+                        if 'error' in masterState['state']['reported']['cleanMissionStatus']:
+                            device.updateStateOnServer('ErrorCode', value=str(masterState['state']['reported']['cleanMissionStatus']['error']))
+                            errorCode = str(masterState['state']['reported']['cleanMissionStatus']['error'])
+                            try:
+                                errorText = self.errorStrings[errorCode]
+                            except:
+                                errorText = "Undocumented Error Code (%s)" % errorCode
+                            device.updateStateOnServer('ErrorText', value=errorText)
+                            if errorCode !="0":
+                                statement = "Error: "+str(errorText)
 
                         if 'sqft' in masterState['state']['reported']['cleanMissionStatus']:
                             device.updateStateOnServer('SqFt', value=str(
@@ -711,6 +718,7 @@ class Plugin(indigo.PluginBase):
                         if mssnStrtTm>0 and cycle !="none":
                             timestampMission = str(datetime.datetime.fromtimestamp(mssnStrtTm).strftime(str(self.datetimeFormat)))
                             device.updateStateOnServer('MissionStarted', value=str(timestampMission))
+                            device.updateStateOnServer('lastMission', value=str(timestampMission))
                             startMission = datetime.datetime.fromtimestamp(mssnStrtTm)
                             nowTime = datetime.datetime.fromtimestamp(time.time())
                             if nowTime > startMission:
@@ -724,9 +732,9 @@ class Plugin(indigo.PluginBase):
                                 elif phase == "cancelled":
                                     statement = "Docking, Mission cancelled " + str(totalmins) + " minutes"
                                 elif phase == "hmMidMsn":
-                                    statement = "Docking, Mid Mission " + str(totalmins) + " mins, Bat "+str(batteryPercent)+" %"
+                                    statement = "Docking, Mid mission " + str(totalmins) + " mins, Bat "+str(batteryPercent)+" %"
                                 elif phase == "hmUsrDock":
-                                    statement = "User Docking, Battery at "+str(batteryPercent)+"%"
+                                    statement = "User docking, Battery at "+str(batteryPercent)+"%"
                             ## Calculate minutes
                         elif cycle=="none":
                             device.updateStateOnServer('MissionStarted', value=str(""))
@@ -767,12 +775,15 @@ class Plugin(indigo.PluginBase):
                             device.updateStateOnServer('LifetimeRuntime', value=lifetimestring)
                         if 'sqft' in masterState['state']['reported']['bbrun']:
                             sqfttotal = int(masterState['state']['reported']['bbrun']['sqft'])*100
-                            device.updateStateOnServer('LifetimeAreaCleaned_Sqft', value=int(sqfttotal))
-                            msqtotal = float(sqfttotal/10.76391041671)
-                            device.updateStateOnServer('LifetimeAreaCleaned_m2', value=int(msqtotal))
+                            if sqfttotal !=None and sqfttotal >0:
+                                device.updateStateOnServer('LifetimeAreaCleaned_Sqft', value=str('{:,.0f}'.format(sqfttotal) ))
+                                msqtotal = float(sqfttotal/10.76391041671)
+                                device.updateStateOnServer('LifetimeAreaCleaned_m2', value=str('{:,.0f}'.format(msqtotal) ))
                     if 'bbmssn' in masterState['state']['reported']:
                         if 'nMssn' in masterState['state']['reported']['bbmssn']:
-                            device.updateStateOnServer('LifetimeCleaningJobs', value=int(masterState['state']['reported']['bbmssn']['nMssn']))
+                            Lifetimecleaningjobs = int(masterState['state']['reported']['bbmssn']['nMssn'])
+                            if Lifetimecleaningjobs !=None and Lifetimecleaningjobs >0:
+                                device.updateStateOnServer('LifetimeCleaningJobs', value=str('{:,}'.format(Lifetimecleaningjobs) ))
 
                     if phase == "charge":
                         if statement == "":

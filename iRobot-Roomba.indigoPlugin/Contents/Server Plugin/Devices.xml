@@ -109,17 +109,17 @@
                 <ControlPageLabel>Lifelong Cleaning Time</ControlPageLabel>
             </State>
             <State id="LifetimeCleaningJobs">
-                <ValueType>Number</ValueType>
+                <ValueType>String</ValueType>
                 <TriggerLabel>Lifetime Cleaning Jobs</TriggerLabel>
                 <ControlPageLabel>Lifetime Cleaning Jobs</ControlPageLabel>
             </State>
             <State id="LifetimeAreaCleaned_Sqft">
-                <ValueType>Number</ValueType>
+                <ValueType>String</ValueType>
                 <TriggerLabel>Lifetime Area Cleaned SqFt</TriggerLabel>
                 <ControlPageLabel>Lifetime Area Cleaned SqFt</ControlPageLabel>
             </State>
             <State id="LifetimeAreaCleaned_m2">
-                <ValueType>Number</ValueType>
+                <ValueType>String</ValueType>
                 <TriggerLabel>Lifetime Area Cleaned M2</TriggerLabel>
                 <ControlPageLabel>Lifetime Area Cleaned M2</ControlPageLabel>
             </State>
@@ -132,6 +132,11 @@
                 <ValueType>String</ValueType>
                 <TriggerLabel>Recharge Finish Time</TriggerLabel>
                 <ControlPageLabel>Recharge Finish Time</ControlPageLabel>
+            </State>
+            <State id="lastMission">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Last Mission Time Stamp</TriggerLabel>
+                <ControlPageLabel>Last Mission Time Stamp</ControlPageLabel>
             </State>
             <State id="ErrorCode">
                 <ValueType>String</ValueType>
