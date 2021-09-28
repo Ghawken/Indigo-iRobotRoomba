@@ -128,6 +128,11 @@
                 <TriggerLabel>current State as a Statement</TriggerLabel>
                 <ControlPageLabel>current State as Statement</ControlPageLabel>
             </State>
+            <State id="errornotReady_Statement">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Not Ready or Error message as long sentence</TriggerLabel>
+                <ControlPageLabel>Not Ready or Error message as long sentence</ControlPageLabel>
+            </State>
             <State id="RechargeFinish">
                 <ValueType>String</ValueType>
                 <TriggerLabel>Recharge Finish Time</TriggerLabel>

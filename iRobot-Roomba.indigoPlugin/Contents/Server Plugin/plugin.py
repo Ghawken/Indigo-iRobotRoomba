@@ -65,6 +65,32 @@ class Plugin(indigo.PluginBase):
         self.debugTrue = self.pluginPrefs.get('debugTrue', '')
         self.debugOther = self.pluginPrefs.get('debugOther', True)
 
+
+        ## Load json database of errors
+        try:
+            with open('result.json') as json_file:
+                self.iroombaData = json.load(json_file)
+
+            self.logger.debug("Decoded JSON Data From File")
+            self.iroombaData = self.iroombaData['resources']['string']
+          #  for strings in self.iroombaData:
+               # self.logger.debug( unicode(strings) )
+
+            self.newiroombaData = { d['_name'] : d['__text']  for d in self.iroombaData}
+
+#self.logger.debug(unicode(self.newiroombaData))
+      #     for key in self.newiroombaData:
+       #         self.logger.debug(key + '::' + self.newiroombaData[key])
+           # self.logger.debug(self.iroombaData)
+            self.logger.debug("Done reading new json Data file")
+        except:
+            self.logger.debug("Exception in Json database")
+            pass
+
+        #self.logger.debug(json.dumps(self.iroombaData, sort_keys=True, indent=4))
+        #self.logger.error(self.iroombaData['resources']['abc_capital_on'])
+
+
     def pluginStore(self):
         self.logger.info(u'Opening Plugin Store.')
         iurl = 'http://www.indigodomo.com/pluginstore/132/'
@@ -130,6 +156,7 @@ class Plugin(indigo.PluginBase):
             "25": "Reboot required",
             "26": "Vacuum problem",
             "27": "Vacuum problem",
+            "28": "Error",
             "29": "Software update needed",
             "30": "Vacuum problem",
             "31": "Reboot required",
@@ -151,15 +178,30 @@ class Plugin(indigo.PluginBase):
             "47": "Reboot required",
             "48": "Path blocked",
             "52": "Pad required attention",
+            "54": "Blades stuck",
+            "55": "Left blades stuck",
+            "56":"Right blades stuck",
+            "57":"Cutting deck stuck",
+            "58":"Navigation problem",
+            "59":"Tilt detected",
             "53": "Software update required",
+            "60":"Rolled over",
+            "62":"Stopped button pressed",
+            "63":"Hardware Error",
             "65": "Hardware problem detected",
             "66": "Low memory",
-            "68": "Hardware problem detected",
+            "67": "Handle lifted",
+            "68": "Dead camera",
+            "70":"Problem sensing beacons",
             "73": "Pad type changed",
             "74": "Max area reached",
             "75": "Navigation problem",
             "76": "Hardware problem detected",
-             "88": "Back-up refused",
+            "78":"Left wheel error",
+            "79":"Right wheel error",
+            "85":"Path to charging station blocked",
+            "86": "Path to charging station blocked",
+             "88": "Navigation problem",
             "89": "Mission runtime too long",
             "101": "Battery isn't connected",
             "102": "Charging error",
@@ -179,6 +221,7 @@ class Plugin(indigo.PluginBase):
             "118": "Battery communication failure",
             "119": "Charging timeout",
             "120": "Battery not initialized",
+            "121": "Clean the Charging contacts",
             "122": "Charging system error",
             "123": "Battery not initialized",
             "224": "Smart Map Problem"
@@ -203,13 +246,52 @@ class Plugin(indigo.PluginBase):
         self.notReadyStrings = {
             '0' : 'Ready',
             '1': 'Near a cliff',
-            '2': 'Both wheels dropped',
+            '2': 'Both wheels off floor',
             '3': 'Left wheel dropped',
             '4': 'Right wheel dropped',
             '7' : 'Bin Missing',
+            "8": "Reboot needed",
+            "9":"Software being updated",
+            '11' : "Vacuum problem",
+            "14" : "Not ready for that request",
             '15': 'Battery Low',
             '16': 'Bin Full',
-            '39': 'Saving Clean Map',
+            "17": "Navigation problem",
+            "18" : "Software upgrade",
+            "19" : "Charging error",
+            "21" : "Reboot required",
+            "22" : "Navigation problem",
+            "23":"Battery issue",
+            "24":"Smart Map problem",
+            "25":"Reboot required",
+            "26": "Reboot required",
+            "27": "Reboot required",
+            "28": "Reboot required",
+            "31": "Tank low",
+            "32":"Lid open",
+            "33":"Bumper stuck",
+            "34":"Unrecognised cleaning pad",
+            "35":"Unrecognised cleaning pad"  ,
+            "36":"Unable to empty bin: Clog",
+            "37":"Battery issue",
+            "38":"Battery issue",
+            "39":"Saving Clean Map",
+            "40":"Software update required",
+            "51":"Hardware problem detectec",
+            "53":"Left wheel error",
+            "54":"Right wheel error",
+            "55":"Not on charging station",
+            "57":"Navigation problem",
+            "58":"Workspace path error: Retrain Roomba",
+            "59": "Workspace path error: Retrain Roomba",
+            "60": "Workspace path error: Retrain Roomba",
+            "61":"Wheel motor over temp",
+            "62":"Wheel motor under temp",
+            "63":"Blade motor over temp",
+            "64":"Blade motor under temp",
+            "65":"Software error",
+            "66":"Cleaning unavailable. Check subscriptions status",
+            "67":"Hardware problem Detected",
             '68': 'Saving smart map edits'
         }
 
@@ -787,23 +869,29 @@ class Plugin(indigo.PluginBase):
 
                     if phase == "charge":
                         if statement == "":
-                            statement = "Charging, Battery at "+str(batteryPercent)+"%"
+                            if batteryPercent !="100":
+                                statement = "Charging, Battery at "+str(batteryPercent)+"%"
+                            elif batteryPercent == "100":
+                                statement = "Fully charged. Ready to vacuum."
 
                     if currentstate != "":
                         state = str(currentstate)
 
                     if errorCode == '0' and notReady == '0':
                         device.updateStateOnServer(key="deviceStatus", value=unicode(state))
+                        device.updateStateOnServer(key="errornotReady_Statement", value="")
                         self.updateVar(device.states['IP'], True)
                         device.updateStateOnServer(key="onOffState", value=True, uiValue=unicode(state))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
                     elif errorCode != '0':
                         device.updateStateOnServer(key="deviceStatus", value=errorText)
+                        device.updateStateOnServer(key="errornotReady_Statement",value=self.geterrorNotreadySentence(device, errorCode=errorCode, notReadyCode=notReady) )
                         self.updateVar(device.states['IP'], False)
                         device.updateStateOnServer(key="onOffState", value=False, uiValue=unicode(errorText))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
                     elif notReady != '0':
                         device.updateStateOnServer(key="deviceStatus", value=notReadyText)
+                        device.updateStateOnServer(key="errornotReady_Statement", value=self.geterrorNotreadySentence(device, errorCode=errorCode, notReadyCode=notReady) )
                         self.updateVar(device.states['IP'], False)
                         device.updateStateOnServer(key="onOffState", value=False, uiValue=unicode(notReadyText))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
@@ -814,7 +902,7 @@ class Plugin(indigo.PluginBase):
                         device.updateStateOnServer('currentState_Statement', value=unicode(state))
 
         return
-          #  self.logger.debug(unicode(masterState))
+          #  self.logger.debug(unicode(masterState))100
 
       #  masterjson = json.dumps(masterState)
 
@@ -822,6 +910,39 @@ class Plugin(indigo.PluginBase):
       #      json.dump(masterjson, cfgfile, ensure_ascii=False)
       #      self.logger.debug(u'Saved Master State')
       #      cfgfile.close()
+
+    def geterrorNotreadySentence(self,device, errorCode="0", notReadyCode="0"):
+        try:
+            self.logger.debug("geterrorNotreadySentence (phew) run, with errorCode:"+unicode(errorCode)+" and notReadyCode:"+unicode(notReadyCode))
+
+            if errorCode =="0" and notReadyCode =="0":
+                self.logger.debug("No error, error")
+                return ""
+
+            iroombaName = device.states['Name']
+            if errorCode != "0":
+                self.logger.debug("Checking for notification_error_"+str(errorCode) )
+                keytouse = str("notification_error_"+str(errorCode))
+                if keytouse in self.newiroombaData:
+                    valuetouse = str(self.newiroombaData[keytouse])
+                    valuetousereplace = valuetouse.replace('%s', str(iroombaName))
+                    self.logger.debug("error_"+str(errorCode)+" exists and is "+unicode(valuetouse) )
+                    return valuetousereplace
+
+            if notReadyCode != "0":
+                self.logger.debug("Checking for notification_start_refuse_"+str(notReadyCode) )
+                keytouse = str("notification_start_refuse_"+str(notReadyCode))
+                if keytouse in self.newiroombaData:
+                    valuetouse = str(self.newiroombaData[keytouse])
+                    valuetousereplace = valuetouse.replace('%s', str(iroombaName))
+                    self.logger.debug("NotreadyCode "+str(notReadyCode)+" exists and is "+unicode(valuetouse) )
+                    return valuetousereplace
+
+            return ""
+
+        except:
+            self.logger.debug("Exception in get sentence")
+            return ""
 
     def disconnectRoomba(self,device):
         self.logger.debug(u'disconnecting Roomba Device: '+unicode(device.name))
