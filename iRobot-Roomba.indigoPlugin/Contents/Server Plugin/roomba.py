@@ -412,7 +412,6 @@ class Roomba(object):
         '''
         self.plugin = plugin
         self.debug = True
-
         self.logger  = logging.getLogger('Plugin.Roomba')
 
         if HAVE_MQTT==False:
@@ -725,10 +724,14 @@ class Roomba(object):
             #    if self.plugin.debugTrue:
             #        self.logger.debug("Received Roomba Data %s: %s, %s" % (self.roombaName, str(msg.topic), str(msg.payload)))
 
+
+
             if self.raw:
                 self.publish(msg.topic, msg.payload)
             else:
                 self.decode_topics(json_data)
+
+            self.plugin.check_onmessage(self.master_state, self.current_state, self.address)
 
             if time.time() - self.time > self.update_seconds:   #default every 5 minutes
                 if self.plugin.debugTrue:
@@ -1059,9 +1062,9 @@ class Roomba(object):
         if self.current_state != current_mission:
             if self.plugin.debugTrue:
                 self.logger.debug("updated state to: %s" % (self.current_state))
-            if self.plugin.continuous:
+           # if self.plugin.continuous:
                 #self.plugin.currentstate = self.current_state
-                self.plugin.updateMasterStates()
+             #   self.plugin.updateMasterStates()
 
         self.publish("state", self.current_state)
         self.draw_map(current_mission != self.current_state)

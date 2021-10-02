@@ -64,20 +64,20 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"logLevel = " + str(self.logLevel))
         self.debugTrue = self.pluginPrefs.get('debugTrue', '')
         self.debugOther = self.pluginPrefs.get('debugOther', True)
-
+        self.newiroombaData = {}
 
         ## Load json database of errors
         try:
-            with open('result.json') as json_file:
+            with open('errormsg.json') as json_file:
                 self.iroombaData = json.load(json_file)
 
-            self.logger.debug("Decoded JSON Data From File")
+            self.logger.debug("Reading iRoomba Strings as JSON Data From File")
             self.iroombaData = self.iroombaData['resources']['string']
           #  for strings in self.iroombaData:
                # self.logger.debug( unicode(strings) )
 
             self.newiroombaData = { d['_name'] : d['__text']  for d in self.iroombaData}
-
+            self.iroombaData = None
 #self.logger.debug(unicode(self.newiroombaData))
       #     for key in self.newiroombaData:
        #         self.logger.debug(key + '::' + self.newiroombaData[key])
@@ -392,7 +392,7 @@ class Plugin(indigo.PluginBase):
         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
     def updateVar(self, name, value):
-        self.logger.debug(u'updatevar run.')
+        #self.logger.debug(u'updatevar run.')
         name = "iRoomba-"+name
         if not ('iRoombaDevices' in indigo.variables.folders):
             # create folder
@@ -711,13 +711,34 @@ class Plugin(indigo.PluginBase):
                 result.append("%s %s" % (value, name))
         return ', '.join(result[:granularity])
 
-    def saveMasterStateDevice(self, masterState, device, currentstate):
+    def check_onmessage(self, masterState,current_state, roombaipaddress):
         if self.debugOther:
-            self.logger.debug(u'saveMasterStateDevice called.')
+            self.logger.debug(u"check on_message called by on_message iroomba function: For Device:"+unicode(roombaipaddress))
+            #self.logger.debug(unicode(masterState))
+            #self.logger.debug(unicode(roombaipaddress))
+
+        # when message received, master_state already updated.
+        # Just recall save for all states - some unchanged.. but unlikely much benefit of multiple if/choices
+
+        for dev in indigo.devices.iter("self"):
+            for myroomba in self.roomba_list:
+                if str(roombaipaddress) == str(dev.states['IP']):
+                    self.logger.debug(u"Found Device: "+unicode(roombaipaddress)+' Matching device IP'+unicode(dev.states['IP']))
+                    if (dev.deviceTypeId == "roombaDevice") and myroomba.master_state != None:
+                        self.saveMasterStateDevice(masterState, dev, current_state, fromonmessage=True)
+
+        return
+
+    def saveMasterStateDevice(self, masterState, device, currentstate, fromonmessage=False):
+        if self.debugOther:
+            self.logger.debug(u'saveMasterStateDevice called.  FromonMessage:'+unicode(fromonmessage)+" and currentstate:"+unicode(currentstate))
 
         if masterState != None:
             if self.debugOther:
+              #  if fromonmessage==False o:
                 self.logger.debug(u'Writing Master State Device:' +unicode(device.id) +":"+unicode(json.dumps(masterState)))
+              #  else:
+                #self.logger.debug(u'Writing On Message Data only: From On_Message')
             state =""
             cycle=""
             statement = ""
@@ -950,7 +971,7 @@ class Plugin(indigo.PluginBase):
             if str(myroomba.address) == str(device.states['IP']):
                 self.logger.debug("disconnectRoomba Matching iroomba found")
                 if myroomba.master_state != None:
-                    self.saveMasterStateDevice(myroomba.master_state, device, "")
+                    self.saveMasterStateDevice(myroomba.master_state, device, "", fromonmessage=False)
                     self.logger.debug(unicode(myroomba.master_state))
                 myroomba.disconnect()
                 self.roomba_list.remove(myroomba)
@@ -975,7 +996,7 @@ class Plugin(indigo.PluginBase):
             for myroomba in self.roomba_list:
                 if str(myroomba.address) == str(dev.states['IP']):
                     if (dev.deviceTypeId == "roombaDevice") and myroomba.master_state != None:
-                        self.saveMasterStateDevice(myroomba.master_state, dev, myroomba.current_state)
+                        self.saveMasterStateDevice(myroomba.master_state, dev, myroomba.current_state, fromonmessage=False)
         return
 
     def reconnectRoomba(self):
