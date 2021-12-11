@@ -4,13 +4,25 @@
         <Name>Roomba Cleaner</Name>
         <ConfigUI>
             <SupportURL></SupportURL>
-
+                         <Field id="topsep23ae4" type="separator"/>
+    <Field id="typetitlee10" type="label" alignText="right">
+                <Label>iRobot IP Settings:</Label>
+            </Field>
+             <Field id="sep23ae4" type="separator"/>
             <Field id="address" type="textfield">
                 <Label>Roomba IP Address:</Label>
             </Field>
+            <Field id="instructionsip" type="label" fontSize="small" fontColor="darkgray">
+                <Label>IP Address of iRoomba.  Needs to be entered for all below settings.  Should be fixed to this device only. </Label>
+            </Field>
+                   <Field id="sep23ae4neededaddress" type="separator"/>
+    <Field id="typetitlee10localsettings" type="label" alignText="right">
+                <Label>iRobot Local Settings:</Label>
+            </Field>
+             <Field id="sep23ae4other" type="separator"/>
             <Field id="instructions" type="label" fontSize="small" fontColor="darkgray">
                 <Label>To get Roomba into the proper mode to retrieve the password, it must be in the charging dock.  Hold down the "Home" button until Roomba plays a four note confirmation sound. Then press the Get Password button.
-                If you are using the j7+ robot enable cloud settings below, BEFORE pressing the below button.
+If you are using the j7+ robot use the cloud settings below.  The cloud settings also retrieve passwords for all icloud connected devices.
                 </Label>
             </Field>
             <Field id="getRoombaPassword" type="button">
@@ -31,9 +43,11 @@
                         <Field id="typee10" type="label" alignText="right">
                 <Label>iRobot Cloud Settings:</Label>
             </Field>
+             <Field id="anothersep234" type="separator"/>
            <Field id="icloudloging" type="label" fontSize="small" fontColor="darkgray">
-                <Label>Enable these settings if using j7+ or new models that require passwords from Robot API.
-                Also works for older models and seems far easy way to obtain password...</Label>
+                <Label>Enable these settings if wish to use mapping and room selection data.
+
+Please use the Get Password data to connect to icloud, update password and update mapping data. Please Update Maps to update mapping data if any changes. It is needed for models j7+ or new models that require passwords from Robot API.  This also works for older models and seems far easy way to obtain password.</Label>
             </Field>
             <Field id="useCloud" type="checkbox" tooltip='use Cloud' hidden="false" default="True">
                 <Label>use Robot Cloud API</Label>
@@ -43,21 +57,26 @@
             visibleBindingValue="true">
                 <Label>Roomba Cloud Login:</Label>
             </Field>
-            <Field id="cloudPassword" type="textfield"  visibleBindingId="useCloud"
+            <Field id="cloudPassword" type="textfield" visibleBindingId="useCloud"
             visibleBindingValue="true" >
                 <Label>Roomba Cloud Password:</Label>
             </Field>
-           <Field id="getRoombaPasswordCloud" type="button" visibleBindingId="useCloud"
+           <Field id="getRoombaPasswordCloud" type="button" fontSize="large" visibleBindingId="useCloud"
             visibleBindingValue="true">
                 <Title>Get Password</Title>
                 <CallbackMethod>getRoombaPassword</CallbackMethod>
             </Field>
-
+           <Field id="getRoombaMapping" type="button" visibleBindingId="useCloud"
+            visibleBindingValue="true">
+                <Title>Update Maps for this iRoomba</Title>
+                <CallbackMethod>getRoombaMaps</CallbackMethod>
+            </Field>
             <Field id="sep4" type="separator"/>
 
             <Field id="space10" type="label" alignText="right">
                 <Label>Advanced SSL Options:</Label>
             </Field>
+             <Field id="sepasdasd234" type="separator"/>
             <Field id="forceSSL" type="checkbox" tooltip='Force use of SSLv23' hidden="false" default="True">
                 <Label>Force Use of SSLv23</Label>
             <Description>Enable/Disable</Description>
@@ -102,7 +121,11 @@
                 <TriggerLabel>Phase</TriggerLabel>
                 <ControlPageLabel>Phase</ControlPageLabel>
             </State>
-
+            <State id="blid">
+                <ValueType>String</ValueType>
+                <TriggerLabel>blid ID of Robot</TriggerLabel>
+                <ControlPageLabel>blid ID of Robot</ControlPageLabel>
+            </State>
             <State id="X">
                 <ValueType>String</ValueType>
                 <TriggerLabel>X</TriggerLabel>

@@ -20,6 +20,7 @@ import logging
 #rom base64 import b64encode
 from roomba import Roomba
 from roomba import password
+from roomba import irobotAPI_Maps
 #import paho.mqtt.client as mqtt
 import threading
 import datetime
@@ -45,6 +46,11 @@ class Plugin(indigo.PluginBase):
         pfmt = logging.Formatter('%(asctime)s.%(msecs)03d\t[%(levelname)8s] %(name)20s.%(funcName)-25s%(msg)s', datefmt='%Y-%m-%d %H:%M:%S')
         self.plugin_file_handler.setFormatter(pfmt)
 
+        MAChome     = os.path.expanduser("~")+"/"
+        self.mainfolderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
+
+        #self.mappingfile = self.mainfolderLocation + str(address)+"-mapping-data.json"
+
         self.logger.info(u"")
         self.logger.info(u"{0:=^130}".format(" Initializing New Plugin Session "))
         self.logger.info(u"{0:<30} {1}".format("Plugin name:", pluginDisplayName))
@@ -55,6 +61,8 @@ class Plugin(indigo.PluginBase):
         self.logger.info(u"{0:<30} {1}".format("Python Directory:", sys.prefix.replace('\n', '')))
         #self.logger.info(u"{0:<30} {1}".format("Major Problem equals: ", MajorProblem))
         self.logger.info(u"{0:=^130}".format(""))
+
+        self.allMappingData = {}
 
         try:
             self.logLevel = int(self.pluginPrefs[u"logLevel"])
@@ -78,10 +86,7 @@ class Plugin(indigo.PluginBase):
 
             self.newiroombaData = { d['_name'] : d['__text']  for d in self.iroombaData}
             self.iroombaData = None
-#self.logger.debug(unicode(self.newiroombaData))
-      #     for key in self.newiroombaData:
-       #         self.logger.debug(key + '::' + self.newiroombaData[key])
-           # self.logger.debug(self.iroombaData)
+
             self.logger.debug("Done reading new json Data file")
         except:
             self.logger.debug("Exception in Json database")
@@ -348,7 +353,6 @@ class Plugin(indigo.PluginBase):
          #   self.logger.debug(unicode(device))
 
         device.stateListOrDisplayStateIdChanged()   # update  from device.xml info if changed
-
         device.updateStateOnServer(key="IP",value=str(device.pluginProps['address']))
 
         if device.states['IP'] != "":
@@ -382,6 +386,43 @@ class Plugin(indigo.PluginBase):
         #self.getRoombaInfo(device)
         #self.getRoombaStatus(device)
         #self.getRoombaTime(device)
+        MAChome     = os.path.expanduser("~")+"/"
+        folderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
+        roombaIP = str(device.states['IP'])
+        filename =  str(roombaIP)+"-mapping-data.json"
+        file = folderLocation + filename
+
+        if self.checkMapFile(device, file)== False:
+            self.logger.debug(u'Mapping Data File Does Not Exist.')
+            self.logger.info("No Cloud Mapping Data found for this device.  Please setup in Device Config if needed.")
+        else:
+            self.logger.debug(u'Mapping Data File Exists - using it')
+            with open(file) as data_file:
+                self.allMappingData[roombaIP] = json.load(data_file)
+
+        self.logger.debug(unicode(self.allMappingData))
+
+    def actionReturnRooms(self, filter, valuesDict,typeId, targetId):
+        self.logger.debug(u'Generate Rooms from Mapping Data')
+        self.logger.debug(targetId)
+        myArray = []
+
+        device = indigo.devices[targetId]
+        ipaddress = device.states['IP']
+
+        self.logger.debug(ipaddress)
+
+        if str(ipaddress) in self.allMappingData:
+            for items in self.allMappingData[str(ipaddress)]:
+                if 'active_pmapv_details' in items:
+                    if 'regions' in items['active_pmapv_details']:
+                        for regions in items['active_pmapv_details']['regions']:
+                            self.logger.debug(unicode(regions))
+                            myArray.append( (regions['id'],regions['name'] ))
+        else:
+            self.logger.info("No room data available.  Please update or may not be possible with this model.")
+        self.logger.debug(unicode(myArray))
+        return myArray
 
     def deviceStopComm(self, device):
         self.logger.debug(u"deviceStopComm called for " + device.name)
@@ -543,8 +584,42 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u'file should equal:' + file)
         if os.path.isfile(file):
             return True
-
         return False
+
+    def checkMapFile(self, device, file):
+
+        self.logger.debug(u'Mapping File should equal:' + file)
+        if os.path.isfile(file):
+            return True
+        return False
+
+    def getRoombaMaps(self,valuesDict, typeId, deviceId):
+        self.logger.debug(u"update Roomba Mapping Info: "+unicode(deviceId))
+
+        device = indigo.devices[deviceId]
+        roombaIP = valuesDict.get('address', 0)
+        forceSSL = valuesDict.get('forceSSL',False)
+        blid = str(device.states['blid'])
+        useCloud = valuesDict.get('useCloud', False)
+        cloudLogin = valuesDict.get('cloudLogin', '')
+        cloudPassword = valuesDict.get('cloudPassword', '')
+
+        if blid == None:
+            self.logger.info("No ID found for iRoomba.  Please press get Password Cloud button to update.")
+            self.logger.info("And then try this button again")
+            return
+
+        if blid == "":
+            self.logger.info("No ID found for iRoomba.  Please press get Password Cloud button to update.")
+            self.logger.info("And then try this button again")
+            return
+
+        if cloudLogin == "" or cloudPassword=="":
+            self.logger.info("Please enter iRobot Cloud login and Password details and try again")
+            return
+
+        result = irobotAPI_Maps(self, address=roombaIP,useCloud=useCloud, cloudLogin=cloudLogin, cloudPassword=cloudPassword, blid=blid)
+
 
     def getRoombaPassword(self, valuesDict, typeId, deviceId):
         self.logger.debug(u"getRoombaPassword called: "+unicode(deviceId))
@@ -553,7 +628,7 @@ class Plugin(indigo.PluginBase):
         device.updateStateOnServer('softwareVer', value='Unknown')
         roombaIP = valuesDict.get('address', 0)
         forceSSL = valuesDict.get('forceSSL',False)
-
+        blid = str(device.states['blid'])
         useCloud = valuesDict.get('useCloud', False)
         cloudLogin = valuesDict.get('cloudLogin', '')
         cloudPassword = valuesDict.get('cloudPassword', '')
@@ -577,7 +652,7 @@ class Plugin(indigo.PluginBase):
         #     self.logger.info(u'Password Saved. Click Ok.')
 
         ## Lets thread it...
-        getPasswordThread = threading.Thread(target=self.threadgetPassword,args=[roombaIP, filename, forceSSL, device, self.softwareVersion, useCloud, cloudLogin,cloudPassword])
+        getPasswordThread = threading.Thread(target=self.threadgetPassword,args=[roombaIP, filename, forceSSL, device, self.softwareVersion, useCloud, cloudLogin,cloudPassword, blid])
         getPasswordThread.setDaemon(True)
         getPasswordThread.start()
         return valuesDict
@@ -602,7 +677,7 @@ class Plugin(indigo.PluginBase):
             self.logger.debug("Caught Exception refreshThreadData:"+unicode(ex))
 
 
-    def threadgetPassword(self, roombaIP,filename,forceSSL, device, softwareversion, useCloud, cloudLogin, cloudPassword):
+    def threadgetPassword(self, roombaIP,filename,forceSSL, device, softwareversion, useCloud, cloudLogin, cloudPassword, blid):
         try:
             self.passwordReturned = "reset"
             self.logger.debug(u'Thread:Get Password called.' + u' & Number of Active Threads:' + unicode(threading.activeCount() ) )
@@ -620,7 +695,15 @@ class Plugin(indigo.PluginBase):
                     if value:
                         self.logger.debug('Software Version of Roomba Found:' + unicode(value))
                         device.updateStateOnServer('softwareVer', value=str(value))
+                if property =="blid":
+                    if value != "":
+                        self.logger.debug("Blid of iRoomba Found:"+unicode(value))
+                        device.updateStateOnServer('blid', value=str(value))
+                        blid = str(value)
             #self.logger.debug("Returning Result:"+unicode(result))
+            time.sleep(3)
+            self.logger.info("Checking for updated Map Info")
+            result = irobotAPI_Maps(self, address=roombaIP, useCloud=useCloud, cloudLogin=cloudLogin, cloudPassword=cloudPassword, blid=blid)
             time.sleep(5)
             self.checkAllRoombas()
             return result
@@ -1155,6 +1238,95 @@ class Plugin(indigo.PluginBase):
         except Exception as ex:
             self.logger.exception("Exception ")
 
+    def sendSpecificRoomCommand(self, pluginAction, roombaDevice):
+        self.logger.debug("send Specific Room Clean called to run")
+        self.logger.debug("pluginAction "+unicode(pluginAction))
+        self.logger.debug("roombaDevice IP:" + unicode(roombaDevice.states['IP']))
+
+        blid = str(roombaDevice.states['blid'])
+        ipaddress = str(roombaDevice.states['IP'])
+        action = {}
+        regions = []
+        actionRooms = []
+        commandtosend = ""
+
+        if blid is None:
+            self.logger.info("Please update iRobot to include Blid data.  Run Get Password via Cloud to update.")
+            return
+        if blid == "":
+            self.logger.info("Please update iRobot to include Blid data.  Run Get Password via Cloud to update.")
+            return
+
+        if ipaddress is None:
+            self.logger.info("Please update iRobot to include IP Address data.  Run Get Password via Cloud to update.")
+            return
+        if ipaddress == "":
+            self.logger.info("Please update iRobot to include Ip Address data.  Run Get Password via Cloud to update.")
+            return
+
+        action['command']='start'
+        action['ordered']=1
+        action['select_all']=False
+        action['regions']=[]
+
+        actionRooms = pluginAction.props.get("actionRooms")
+        self.logger.debug(unicode(actionRooms))
+
+        if len(actionRooms)<=0:
+            self.logger.info("Please select some options in Action Group Config.  No Rooms / Areas selected.")
+            return
+
+        for zone in actionRooms:
+            a = {}
+            a['region_id']=str(zone)
+            a['type']= "rid"
+            action['regions'].append(a)
+
+        ## remove initiator and current time - add these back in iroomba
+        if "initiator" in action:
+            action.pop("initiator", None)
+        if "time" in action:
+            action.pop("time", None)
+
+        if 'pmap_id' in self.allMappingData[ str(ipaddress) ][0]:
+            action['pmap_id']= self.allMappingData[str(ipaddress)][0]['pmap_id']
+        else:
+            self.logger.debug( self.allMappingData[ ipaddress])
+
+        action['robot_id']= blid
+
+        self.logger.debug(json.dumps(action))
+
+        try:
+            iroombaName = str(roombaDevice.states['Name'])
+            iroombaIP = str(roombaDevice.states['IP'])
+            self.logger.debug("Roomba Name:"+unicode(iroombaName))
+            self.logger.debug("Roomba IP:" + unicode(iroombaIP))
+            #self.logger.debug("Connected Roomba Name:"+unicode(self.connectedtoName))
+
+            for myroomba in self.roomba_list:
+                if str(myroomba.address) == str(iroombaIP):
+                    if myroomba.roomba_connected == False:
+                        self.logger.debug(u"Not connected to iRoomba:"+unicode(iroombaName)+" & IP:"+unicode(iroombaIP)+u" -- Should be --- Attempting to reconnect.")
+                        connected = False
+                        connected = self.connectRoomba(roombaDevice)
+                        time.sleep(5)
+                        # Add a connection check - the main library has added a base exception which might be useful to also use.
+                        if connected == False:
+                            self.logger.info(u'Failed Connected to Roomba within 5 seconds, waiting another 5.')
+                            time.sleep(5)
+                            if connected == False:
+                                self.logger.info(u'Failed Connected to Roomba within 5 seconds.  Ending attempt.')
+                                return
+                        myroomba.send_command_special(json.dumps(action))
+                    else:
+                        self.logger.debug("Sending Command to myroomba:"+unicode(myroomba.roombaName)+" and action:"+str(json.dumps(action)))
+                        myroomba.send_command_special(json.dumps(action))
+
+            return
+
+        except Exception as e:
+            self.logger.exception(u'Caught Error within RoombaAction:'+unicode(e))
 
     def lastCommandRoombaAction(self, pluginAction, roombaDevice):
         self.logger.debug("lastcommandRoombaAction")

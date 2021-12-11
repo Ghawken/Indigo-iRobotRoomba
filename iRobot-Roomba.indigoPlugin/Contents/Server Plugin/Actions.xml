@@ -26,7 +26,18 @@
             </ConfigUI>
         <CallbackMethod>lastCommandRoombaAction</CallbackMethod>
     </Action>
+    <Action id="cleanRoomRoomba" deviceFilter="self.roombaDevice">
+        <Name>Clean Specific Room/Rooms</Name>
+        <ConfigUI>
 
+
+         <Field id="actionRooms" type="list" rows="14">
+                <Label>Room(s) / Area(s) </Label>
+             <List class="self" method="actionReturnRooms" dynamicReload="true"/>
+         </Field>
+            </ConfigUI>
+        <CallbackMethod>sendSpecificRoomCommand</CallbackMethod>
+    </Action>
     <Action id="startRoomba" deviceFilter="self.roombaDevice">
         <Name>Start Roomba</Name>
         <CallbackMethod>startRoombaAction</CallbackMethod>

@@ -29,7 +29,7 @@ import json
 import datetime
 from collections import OrderedDict, Mapping
 import threading
-
+from getcloudpassword import irobotAuth
 
 import logging
 
@@ -71,6 +71,45 @@ import math
 
 #----------- Start of Classes ------------
 
+## solely for mapping data
+class irobotAPI_Maps(object):
+    def __init__(self, plugin, address, useCloud, cloudLogin, cloudPassword, blid):
+
+        self.plugin = plugin
+        self.logger  = logging.getLogger('Plugin.irobotAPI')
+        self.MAChome     = os.path.expanduser("~")+"/"
+        self.folderLocation = self.MAChome+"Documents/Indigo-iRobotRoomba/"
+        self.file = self.folderLocation + str(address)+"-mapping-data.json"
+        self.address = address
+        self.useCloud = useCloud
+        self.cloudLogin = cloudLogin
+        self.cloudPassword = cloudPassword
+        self.blid = blid
+        self.get_maps(blid)
+
+    def get_maps(self, blid):
+        iRobot = irobotAuth(self.cloudLogin, self.cloudPassword)
+        iRobot.login()
+        cloud_roombas = iRobot.get_robots()
+        self.logger.debug("Got cloud info: {}".format(json.dumps(cloud_roombas, indent=2)))
+        self.logger.debug("Found {} roombas defined in the cloud".format(len(cloud_roombas)))
+        self.logger.debug("Robot ID and data: {}".format(json.dumps(cloud_roombas, indent=2)))
+        for robot in cloud_roombas.keys():
+            #self.logger.info("Robot ID {}, MAPS: {}".format(robot, json.dumps(iRobot.get_maps(robot), indent=2)))
+            if str(robot)==str(blid):
+                self.logger.debug("Robot Found:")
+                mapdata = json.dumps(iRobot.get_maps(robot), indent=2)
+                self.logger.debug("Robot ID {}, MAPS: {}".format(robot, mapdata))
+                if not os.path.isdir(self.folderLocation):
+                    try:
+                        ret = os.makedirs(self.folderLocation)
+                    except:
+                        self.logger.error(u"Error Creating " + unicode(self.folderLocation))
+                        pass
+
+                with open(self.file,"w") as f:
+                    f.write(mapdata)
+                self.logger.info("Mapping Data Saved for this Robot.")
 
 class password(object):
     '''
@@ -98,6 +137,8 @@ class password(object):
         self.forceSSL = forceSSL
         self.useCloud = useCloud
         self.cloudLogin = cloudLogin
+        self.blid = ""
+        self.endpassword = ""
         self.cloudPassword = cloudPassword
         self.logger.info(u'File should equal:' + self.file)
         self.get_password(address)
@@ -155,7 +196,7 @@ class password(object):
 
         if self.useCloud:
             self.logger.info("Getting Roomba information from iRobot aws cloud...")
-            from getcloudpassword import irobotAuth
+
             iRobot = irobotAuth(self.cloudLogin, self.cloudPassword)
             iRobot.login()
             cloud_roombas = iRobot.get_robots()
@@ -174,6 +215,8 @@ class password(object):
         if len(roombas) == 0:
             self.logger.info("No Roombas found, try again...")
             self.plugin.passwordReturned = "Failed"
+            self.blid = ""
+            self.endpassword = ""
             return False
         else:
             self.logger.info("Found %d Matching Roombas" % len(roombas))
@@ -232,6 +275,8 @@ class password(object):
                     self.logger.info(u'Saved Device Config File/Password is Completed. Click OK to continue.')
                     # self.logger.info(u'Restart Plugin to continue.')
 
+                self.blid = str(blid)
+                self.endpassword = str(password)
                 self.plugin.passwordReturned = "OK"
                 return True
 

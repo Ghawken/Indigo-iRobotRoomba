@@ -8,7 +8,6 @@
     <Label>Developed by: GlennNZ</Label>
   </Field>
   <Field id="sep7" type="separator"/>
-<Field id="space226" type="separator"/>
 
     <Field id="space210" type="label" alignText="right">
         <Label>Date/Time format:</Label>
