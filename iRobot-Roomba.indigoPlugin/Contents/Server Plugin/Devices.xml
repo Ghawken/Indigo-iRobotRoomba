@@ -9,7 +9,9 @@
                 <Label>Roomba IP Address:</Label>
             </Field>
             <Field id="instructions" type="label" fontSize="small" fontColor="darkgray">
-                <Label>To get Roomba into the proper mode to retrieve the password, it must be in the charging dock.  Hold down the "Home" button until Roomba plays a four note confirmation sound. Then press the Get Password button.  Ignore the Timeout messages.</Label>
+                <Label>To get Roomba into the proper mode to retrieve the password, it must be in the charging dock.  Hold down the "Home" button until Roomba plays a four note confirmation sound. Then press the Get Password button.
+                If you are using the j7+ robot enable cloud settings below, BEFORE pressing the below button.
+                </Label>
             </Field>
             <Field id="getRoombaPassword" type="button">
                 <Title>Get Password</Title>
@@ -24,7 +26,35 @@
             <Field id="labelforname" type="label" fontSize="small" fontColor="darkgray">
                 <Label>Set this to the name of your iRoomba (same as in the App) Update here if happen to change name!</Label>
             </Field>
+            <Field id="sep234" type="separator"/>
+
+                        <Field id="typee10" type="label" alignText="right">
+                <Label>iRobot Cloud Settings:</Label>
+            </Field>
+           <Field id="icloudloging" type="label" fontSize="small" fontColor="darkgray">
+                <Label>Enable these settings if using j7+ or new models that require passwords from Robot API.
+                Also works for older models and seems far easy way to obtain password...</Label>
+            </Field>
+            <Field id="useCloud" type="checkbox" tooltip='use Cloud' hidden="false" default="True">
+                <Label>use Robot Cloud API</Label>
+            <Description>Enable/Disable</Description>
+            </Field>
+            <Field id="cloudLogin" type="textfield"  visibleBindingId="useCloud"
+            visibleBindingValue="true">
+                <Label>Roomba Cloud Login:</Label>
+            </Field>
+            <Field id="cloudPassword" type="textfield"  visibleBindingId="useCloud"
+            visibleBindingValue="true" >
+                <Label>Roomba Cloud Password:</Label>
+            </Field>
+           <Field id="getRoombaPasswordCloud" type="button" visibleBindingId="useCloud"
+            visibleBindingValue="true">
+                <Title>Get Password</Title>
+                <CallbackMethod>getRoombaPassword</CallbackMethod>
+            </Field>
+
             <Field id="sep4" type="separator"/>
+
             <Field id="space10" type="label" alignText="right">
                 <Label>Advanced SSL Options:</Label>
             </Field>

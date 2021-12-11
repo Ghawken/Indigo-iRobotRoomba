@@ -470,10 +470,6 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"validatePrefsConfigUi called")
         errorDict = indigo.Dict()
 
-        updateFrequency = int(valuesDict['updateFrequency'])
-        if (updateFrequency < 0) or (updateFrequency > 24):
-            errorDict['updateFrequency'] = u"Update frequency is invalid - enter a valid number (between 0 and 24)"
-
         if len(errorDict) > 0:
             return (False, valuesDict, errorDict)
 
@@ -557,12 +553,19 @@ class Plugin(indigo.PluginBase):
         device.updateStateOnServer('softwareVer', value='Unknown')
         roombaIP = valuesDict.get('address', 0)
         forceSSL = valuesDict.get('forceSSL',False)
+
+        useCloud = valuesDict.get('useCloud', False)
+        cloudLogin = valuesDict.get('cloudLogin', '')
+        cloudPassword = valuesDict.get('cloudPassword', '')
+
         if roombaIP == 0 or roombaIP == '':
             self.logger.error(u'IP Address cannot be Empty.  Please empty valid IP before using Get Password')
             return False
         #Roomba.connect()
         filename = str(roombaIP)+"-config.ini"
         self.softwareVersion = ''
+        self.validatePrefsConfigUi(valuesDict)
+
 
         # result = password(self, address=roombaIP, file=filename, forceSSL=forceSSL  )
         # #self.logger.error(unicode(result))
@@ -574,7 +577,7 @@ class Plugin(indigo.PluginBase):
         #     self.logger.info(u'Password Saved. Click Ok.')
 
         ## Lets thread it...
-        getPasswordThread = threading.Thread(target=self.threadgetPassword,args=[roombaIP, filename, forceSSL, device, self.softwareVersion])
+        getPasswordThread = threading.Thread(target=self.threadgetPassword,args=[roombaIP, filename, forceSSL, device, self.softwareVersion, useCloud, cloudLogin,cloudPassword])
         getPasswordThread.setDaemon(True)
         getPasswordThread.start()
         return valuesDict
@@ -599,12 +602,12 @@ class Plugin(indigo.PluginBase):
             self.logger.debug("Caught Exception refreshThreadData:"+unicode(ex))
 
 
-    def threadgetPassword(self, roombaIP,filename,forceSSL, device, softwareversion):
+    def threadgetPassword(self, roombaIP,filename,forceSSL, device, softwareversion, useCloud, cloudLogin, cloudPassword):
         try:
             self.passwordReturned = "reset"
             self.logger.debug(u'Thread:Get Password called.' + u' & Number of Active Threads:' + unicode(threading.activeCount() ) )
-            result = password(self, address=roombaIP, file=filename, forceSSL=forceSSL)
-            self.logger.debug("PaswordReturned:"+unicode(self.passwordReturned))
+            result = password(self, address=roombaIP, file=filename, useCloud=useCloud, cloudLogin=cloudLogin, cloudPassword=cloudPassword, forceSSL=forceSSL)
+            self.logger.debug("Password Returned:"+unicode(self.passwordReturned))
             for property, value in vars(result).items():
                 self.logger.debug(unicode(property) + ":" + unicode( value))
                 if property=="iRoombaMAC":
@@ -618,9 +621,11 @@ class Plugin(indigo.PluginBase):
                         self.logger.debug('Software Version of Roomba Found:' + unicode(value))
                         device.updateStateOnServer('softwareVer', value=str(value))
             #self.logger.debug("Returning Result:"+unicode(result))
+            time.sleep(5)
+            self.checkAllRoombas()
             return result
         except Exception as e:
-            self.logger.debug("Caught Exception:"+unicode(e))
+            self.logger.exception("Caught Exception:"+unicode(e))
             return False
 
     def logAllRoombas(self):

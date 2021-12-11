@@ -81,7 +81,7 @@ class password(object):
 
     VERSION = "1.1"
 
-    def __init__(self, plugin, address, file="config.ini",forceSSL=None):
+    def __init__(self, plugin, address, useCloud, cloudLogin, cloudPassword,file="config.ini", forceSSL=None):
 
         self.plugin = plugin
         self.logger  = logging.getLogger('Plugin.password')
@@ -96,6 +96,9 @@ class password(object):
         self.address = address
         self.file = self.folderLocation + file
         self.forceSSL = forceSSL
+        self.useCloud = useCloud
+        self.cloudLogin = cloudLogin
+        self.cloudPassword = cloudPassword
         self.logger.info(u'File should equal:' + self.file)
         self.get_password(address)
 
@@ -134,24 +137,50 @@ class password(object):
         s.close()
         return roomba_dict
 
+    def add_cloud_data(self, cloud_data, roombas):
+        for k, v in roombas.copy().items():
+            robotid = v.get('robotid', v.get("hostname", "").split('-')[1])
+            for id, data in cloud_data.items():
+                if robotid == id:
+                    roombas[k]["password"] = data.get('password')
+        return roombas
+
     def get_password(self, ipaddress):
         import struct
         #get roomba info
-        blid=None
+        blid = None
+        self.logger.info("Sending discovery to any iRoombas on network... Please wait...")
         roombas = self.receive_udp()
-
         self.logger.debug('Looking for Roomba with IP Address:'+unicode(ipaddress))
 
+        if self.useCloud:
+            self.logger.info("Getting Roomba information from iRobot aws cloud...")
+            from getcloudpassword import irobotAuth
+            iRobot = irobotAuth(self.cloudLogin, self.cloudPassword)
+            iRobot.login()
+            cloud_roombas = iRobot.get_robots()
+            self.logger.debug("Got cloud info: {}".format(json.dumps(cloud_roombas, indent=2)))
+            self.logger.info("Found {} roombas defined in the cloud".format(len(cloud_roombas)))
+            if len(cloud_roombas) > 0 and len(roombas) > 0:
+                roombas = self.add_cloud_data(cloud_roombas, roombas)
+
+            ## Map testing stuff.  ## Delete below
+  #          robots = cloud_roombas
+  #          self.logger.info("Robot ID and data: {}".format(json.dumps(robots, indent=2)))
+  #          for robot in robots.keys():
+  #              self.logger.info("Robot ID {}, MAPS: {}".format(robot, json.dumps(iRobot.get_maps(robot), indent=2)))
+
+        self.logger.debug("Roombas:"+unicode(roombas))
         if len(roombas) == 0:
             self.logger.info("No Roombas found, try again...")
             self.plugin.passwordReturned = "Failed"
             return False
         else:
-            self.logger.info("found %d Roombas" % len(roombas))
+            self.logger.info("Found %d Matching Roombas" % len(roombas))
 
         for address,parsedMsg in six.iteritems(roombas):
             addr = address[0]
-
+            password = parsedMsg.get('password')
             if addr != ipaddress:
                 self.logger.info('Roomba at IP address:'+unicode(addr)+' skipped.')
                 continue
@@ -163,11 +192,12 @@ class password(object):
             if parsedMsg['sw']:
                 self.plugin.softwareVersion = parsedMsg['sw']
                 self.iRoombaSWver = str(parsedMsg['sw'])
-            self.logger.info("Make sure your robot (%s) at IP %s is on the Home Base and powered on (green lights on). Then press and hold the HOME button on your robot until it plays a series of tones (about 2 seconds). Release the button and your robot will flash WIFI light." % (parsedMsg["robotname"],addr))
-            #raw_input("Press Enter to continue...")
 
-            self.logger.info("Received: %s"  % json.dumps(parsedMsg, indent=2))
-            self.logger.info("\r\rRoomba (%s) IP address is: %s" % (parsedMsg["robotname"],addr))
+            if password is None:
+                self.logger.info("Make sure your robot (%s) at IP %s is on the Home Base and powered on (green lights on). Then press and hold the HOME button on your robot until it plays a series of tones (about 2 seconds). Release the button and your robot will flash WIFI light." % (parsedMsg["robotname"],addr))
+            #raw_input("Press Enter to continue...")
+                self.logger.info("Received: %s"  % json.dumps(parsedMsg, indent=2))
+            self.logger.info("Found Roomba (%s) IP address is: %s" % (parsedMsg["robotname"],addr))
             if parsedMsg['robotname'] != None:
                 self.iRoombaName = str(parsedMsg["robotname"])
             if parsedMsg['mac'] != None:
@@ -176,6 +206,35 @@ class password(object):
             hostname = parsedMsg["hostname"].split('-')
             if hostname[0] == 'Roomba' or hostname[0]== 'iRobot':
                 blid = hostname[1]
+
+            if password is not None:
+                ## retrieved from icloud data..  save and return - rest if not using icloud
+                self.logger.info('Password=> %s <= Yes, all this string.' % str(password))
+
+                Config = configparser.ConfigParser()
+                Config.add_section(addr)
+                Config.set(addr, 'blid', str(blid))
+                Config.set(addr, 'password', str(password))
+                Config.set(addr, 'data', str(parsedMsg))
+                # write config file
+
+                if not os.path.isdir(self.folderLocation):
+                    try:
+                        ret = os.makedirs(self.folderLocation)
+                    except:
+                        self.logger.error(u"Error Creating " + unicode(self.folderLocation))
+                        pass
+
+                self.logger.debug(u'Using cfgfile:' + unicode(self.file))
+                with open(self.file, 'w') as cfgfile:
+                    Config.write(cfgfile)
+                    self.logger.info(u'Password Successfully obtained.')
+                    self.logger.info(u'Saved Device Config File/Password is Completed. Click OK to continue.')
+                    # self.logger.info(u'Restart Plugin to continue.')
+
+                self.plugin.passwordReturned = "OK"
+                return True
+
 
             if hasattr(str, 'decode'):
                 # this is 0xf0 (mqtt reserved) 0x05(data length)
