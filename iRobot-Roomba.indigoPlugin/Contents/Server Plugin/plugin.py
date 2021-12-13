@@ -419,8 +419,13 @@ class Plugin(indigo.PluginBase):
                         for regions in items['active_pmapv_details']['regions']:
                             self.logger.debug(unicode(regions))
                             myArray.append( (regions['id'],regions['name'] ))
+                    if 'zones' in items['active_pmapv_details']:
+                        for zones in items['active_pmapv_details']['zones']:
+                            self.logger.debug(unicode(zones))
+                            myArray.append((zones['id']+str("Z"), zones['name']))
         else:
             self.logger.info("No room data available.  Please update or may not be possible with this model.")
+
         self.logger.debug(unicode(myArray))
         return myArray
 
@@ -1278,9 +1283,14 @@ class Plugin(indigo.PluginBase):
 
         for zone in actionRooms:
             a = {}
-            a['region_id']=str(zone)
-            a['type']= "rid"
-            action['regions'].append(a)
+            if str(zone)[-1]=="Z":  ## add Z for manual ids and then remove before parsed change the type appropriately
+                a['region_id']=str(zone)[:-1]  ##remove the Z
+                a['type']= "zid"               ##mark as user zone
+                action['regions'].append(a)
+            else:
+                a['region_id'] = str(zone)
+                a['type'] = "rid"               ## Normal Zone
+                action['regions'].append(a)
 
         ## remove initiator and current time - add these back in iroomba
         if "initiator" in action:
@@ -1290,6 +1300,11 @@ class Plugin(indigo.PluginBase):
 
         if 'pmap_id' in self.allMappingData[ str(ipaddress) ][0]:
             action['pmap_id']= self.allMappingData[str(ipaddress)][0]['pmap_id']
+        else:
+            self.logger.debug( self.allMappingData[ ipaddress])
+
+        if 'user_pmapv_id' in self.allMappingData[ str(ipaddress) ][0]:
+            action['user_pmapv_id']= self.allMappingData[str(ipaddress)][0]['user_pmapv_id']
         else:
             self.logger.debug( self.allMappingData[ ipaddress])
 

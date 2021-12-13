@@ -27,7 +27,7 @@
         <CallbackMethod>lastCommandRoombaAction</CallbackMethod>
     </Action>
     <Action id="cleanRoomRoomba" deviceFilter="self.roombaDevice">
-        <Name>Clean Specific Room/Rooms</Name>
+        <Name>Clean Specific Room/Areas</Name>
         <ConfigUI>
 
 
