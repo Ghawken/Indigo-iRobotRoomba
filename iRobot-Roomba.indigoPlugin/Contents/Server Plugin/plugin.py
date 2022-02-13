@@ -31,6 +31,10 @@ import locale
 #from requests.utils import quote
 
 #@from ghpu import GitHubPluginUpdater
+try:
+    import indigo
+except:
+    pass
 
 kCurDevVersCount = 1        # current version of plugin devices
 
@@ -1201,6 +1205,17 @@ class Plugin(indigo.PluginBase):
         self.RoombaAction(pluginAction, roombaDevice, 'resume')
 
     def dockRoombaAction(self, pluginAction, roombaDevice):
+        ## Check to see if running first.
+        Cycle = roombaDevice.states['Cycle']
+        Phase = roombaDevice.states['Phase']
+        if Phase is None or Cycle is None:
+            return
+        self.logger.debug(u'Current State is:' + unicode(Cycle) + " and current Phase:" + unicode(Phase))
+        if Phase == "charge" and Cycle =="none":
+            ## charging no mission running skip
+            self.logger.info("iRoomba is not active.  Dock action not run.")
+            return
+
         self.RoombaAction(pluginAction, roombaDevice, 'pause')
         self.sleep(1)
         self.RoombaAction(pluginAction, roombaDevice, 'dock')

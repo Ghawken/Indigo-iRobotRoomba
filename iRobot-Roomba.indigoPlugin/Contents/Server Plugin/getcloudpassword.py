@@ -20,8 +20,14 @@ import random
 import requests
 import logging
 import time
-from urlparse import urlparse, parse_qs
+import sys
 
+if sys.version_info[0] < 3:  ##below for python 2.7
+    from urlparse import urlparse, parse_qs
+else:  #below for python 3 and above..
+    from urllib.parse import urlparse, urlencode
+    from urllib.request import urlopen, Request
+    from urllib.error import HTTPError
 
 class awsRequest:
     def __init__(self, region, access_key, secret_key, session_token, service):

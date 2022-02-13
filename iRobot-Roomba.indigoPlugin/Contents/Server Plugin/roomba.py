@@ -31,6 +31,9 @@ from collections import OrderedDict, Mapping
 import threading
 from getcloudpassword import irobotAuth
 
+# add for compatibility with py3 - py2 will fail..
+from builtins import str as text
+
 import logging
 
 import time

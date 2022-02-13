@@ -30,7 +30,6 @@
         <Name>Clean Specific Room/Areas</Name>
         <ConfigUI>
 
-
          <Field id="actionRooms" type="list" rows="14">
                 <Label>Room(s) / Area(s) </Label>
              <List class="self" method="actionReturnRooms" dynamicReload="true"/>
