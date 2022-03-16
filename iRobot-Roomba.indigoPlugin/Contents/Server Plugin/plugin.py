@@ -24,7 +24,7 @@ from roomba import irobotAPI_Maps
 #import paho.mqtt.client as mqtt
 import threading
 import datetime
-
+from builtins import str as text
 import locale
 
 #from requests.auth import HTTPBasicAuth
@@ -86,7 +86,7 @@ class Plugin(indigo.PluginBase):
             self.logger.debug("Reading iRoomba Strings as JSON Data From File")
             self.iroombaData = self.iroombaData['resources']['string']
           #  for strings in self.iroombaData:
-               # self.logger.debug( unicode(strings) )
+               # self.logger.debug( text(strings) )
 
             self.newiroombaData = { d['_name'] : d['__text']  for d in self.iroombaData}
             self.iroombaData = None
@@ -354,7 +354,7 @@ class Plugin(indigo.PluginBase):
     def deviceStartComm(self, device):
         self.logger.debug(u"deviceStartComm called for " + device.name)
         #if self.debugOther:
-         #   self.logger.debug(unicode(device))
+         #   self.logger.debug(text(device))
 
         device.stateListOrDisplayStateIdChanged()   # update  from device.xml info if changed
         device.updateStateOnServer(key="IP",value=str(device.pluginProps['address']))
@@ -367,7 +367,7 @@ class Plugin(indigo.PluginBase):
         #device.subType = indigo.kRelayDeviceSubType.Switch
 
         #device.replaceOnServer()
-        #self.logger.error(unicode(device))
+        #self.logger.error(text(device))
 
         #props = device.pluginProps
         if hasattr(device, 'onState')== False:  ## if custom
@@ -404,7 +404,7 @@ class Plugin(indigo.PluginBase):
             with open(file) as data_file:
                 self.allMappingData[roombaIP] = json.load(data_file)
 
-        self.logger.debug(unicode(self.allMappingData))
+        self.logger.debug(text(self.allMappingData))
 
     def actionReturnRooms(self, filter, valuesDict,typeId, targetId):
         self.logger.debug(u'Generate Rooms from Mapping Data')
@@ -421,16 +421,16 @@ class Plugin(indigo.PluginBase):
                 if 'active_pmapv_details' in items:
                     if 'regions' in items['active_pmapv_details']:
                         for regions in items['active_pmapv_details']['regions']:
-                            self.logger.debug(unicode(regions))
+                            self.logger.debug(text(regions))
                             myArray.append( (regions['id'],regions['name'] ))
                     if 'zones' in items['active_pmapv_details']:
                         for zones in items['active_pmapv_details']['zones']:
-                            self.logger.debug(unicode(zones))
+                            self.logger.debug(text(zones))
                             myArray.append((zones['id']+str("Z"), zones['name']))
         else:
             self.logger.info("No room data available.  Please update or may not be possible with this model.")
 
-        self.logger.debug(unicode(myArray))
+        self.logger.debug(text(myArray))
         return myArray
 
     def deviceStopComm(self, device):
@@ -468,7 +468,7 @@ class Plugin(indigo.PluginBase):
         del self.triggers[trigger.id]
 
     def actionControlDevice(self, action, device):
-        self.logger.debug("actionControlDevice Called: action:"+unicode(action)+" for device :"+unicode(device.name))
+        self.logger.debug("actionControlDevice Called: action:"+text(action)+" for device :"+text(device.name))
         if device.deviceTypeId == "roombaDevice":
             currentOnState = device.states['onOffState']
             command = action.deviceAction
@@ -484,7 +484,7 @@ class Plugin(indigo.PluginBase):
                 self.logger.debug("Toggling iRoomba Device")
                 self.toggleRoombaAction("Notused",device)
             else:
-                self.logger.debug("Unsupport Command sent:  Command Sent:"+unicode(command))
+                self.logger.debug("Unsupport Command sent:  Command Sent:"+text(command))
                 return
 
 
@@ -543,7 +543,7 @@ class Plugin(indigo.PluginBase):
     def closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):
         self.logger.debug(u'closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):')
         self.logger.debug(
-            u'     (' + unicode(valuesDict) + u', ' + unicode(userCancelled) + ', ' + unicode(typeId) + u', ' + unicode(
+            u'     (' + text(valuesDict) + u', ' + text(userCancelled) + ', ' + text(typeId) + u', ' + text(
                 devId) + u')')
 
 
@@ -603,7 +603,7 @@ class Plugin(indigo.PluginBase):
         return False
 
     def getRoombaMaps(self,valuesDict, typeId, deviceId):
-        self.logger.debug(u"update Roomba Mapping Info: "+unicode(deviceId))
+        self.logger.debug(u"update Roomba Mapping Info: "+text(deviceId))
 
         device = indigo.devices[deviceId]
         roombaIP = valuesDict.get('address', 0)
@@ -631,7 +631,7 @@ class Plugin(indigo.PluginBase):
 
 
     def getRoombaPassword(self, valuesDict, typeId, deviceId):
-        self.logger.debug(u"getRoombaPassword called: "+unicode(deviceId))
+        self.logger.debug(u"getRoombaPassword called: "+text(deviceId))
         valuesDict['refreshCallbackMethod'] = 'refreshThreadData'
         device = indigo.devices[deviceId]
         device.updateStateOnServer('softwareVer', value='Unknown')
@@ -652,9 +652,9 @@ class Plugin(indigo.PluginBase):
 
 
         # result = password(self, address=roombaIP, file=filename, forceSSL=forceSSL  )
-        # #self.logger.error(unicode(result))
+        # #self.logger.error(text(result))
         # if self.softwareVersion != '':
-        #     self.logger.debug('Software Version of Roomba Found:'+unicode(self.softwareVersion))
+        #     self.logger.debug('Software Version of Roomba Found:'+text(self.softwareVersion))
         #     device.updateStateOnServer('softwareVer', value=self.softwareVersion)
         # if result == True:
         #     valuesDict['password'] = 'OK'
@@ -670,7 +670,7 @@ class Plugin(indigo.PluginBase):
         try:
             self.logger.debug(u"prefsRefreshCallback called")
             #self.logger.debug(u"valuesDict: {}".format(valuesDict))
-            self.logger.debug(u'Checking Number of Active Threads:' + unicode(threading.activeCount() ) )
+            self.logger.debug(u'Checking Number of Active Threads:' + text(threading.activeCount() ) )
             if self.passwordReturned=="OK":
                 valuesDict['password'] = 'OK'
                 self.logger.info(u'Password Saved. Click Ok.')
@@ -683,17 +683,17 @@ class Plugin(indigo.PluginBase):
             return valuesDict
 
         except Exception as ex:
-            self.logger.debug("Caught Exception refreshThreadData:"+unicode(ex))
+            self.logger.debug("Caught Exception refreshThreadData:"+text(ex))
 
 
     def threadgetPassword(self, roombaIP,filename,forceSSL, device, softwareversion, useCloud, cloudLogin, cloudPassword, blid):
         try:
             self.passwordReturned = "reset"
-            self.logger.debug(u'Thread:Get Password called.' + u' & Number of Active Threads:' + unicode(threading.activeCount() ) )
+            self.logger.debug(u'Thread:Get Password called.' + u' & Number of Active Threads:' + text(threading.activeCount() ) )
             result = password(self, address=roombaIP, file=filename, useCloud=useCloud, cloudLogin=cloudLogin, cloudPassword=cloudPassword, forceSSL=forceSSL)
-            self.logger.debug("Password Returned:"+unicode(self.passwordReturned))
+            self.logger.debug("Password Returned:"+text(self.passwordReturned))
             for property, value in vars(result).items():
-                self.logger.debug(unicode(property) + ":" + unicode( value))
+                self.logger.debug(text(property) + ":" + text( value))
                 if property=="iRoombaMAC":
                     if value:
                         device.updateStateOnServer('MAC', value=str(value))
@@ -702,14 +702,14 @@ class Plugin(indigo.PluginBase):
                         device.updateStateOnServer('Name', value=str(value))
                 if property == 'iRoombaSWver':
                     if value:
-                        self.logger.debug('Software Version of Roomba Found:' + unicode(value))
+                        self.logger.debug('Software Version of Roomba Found:' + text(value))
                         device.updateStateOnServer('softwareVer', value=str(value))
                 if property =="blid":
                     if value != "":
-                        self.logger.debug("Blid of iRoomba Found:"+unicode(value))
+                        self.logger.debug("Blid of iRoomba Found:"+text(value))
                         device.updateStateOnServer('blid', value=str(value))
                         blid = str(value)
-            #self.logger.debug("Returning Result:"+unicode(result))
+            #self.logger.debug("Returning Result:"+text(result))
             time.sleep(3)
             self.logger.info("Checking for updated Map Info")
             result = irobotAPI_Maps(self, address=roombaIP, useCloud=useCloud, cloudLogin=cloudLogin, cloudPassword=cloudPassword, blid=blid)
@@ -717,7 +717,7 @@ class Plugin(indigo.PluginBase):
             self.checkAllRoombas()
             return result
         except Exception as e:
-            self.logger.exception("Caught Exception:"+unicode(e))
+            self.logger.exception("Caught Exception:"+text(e))
             return False
 
     def logAllRoombas(self):
@@ -727,7 +727,7 @@ class Plugin(indigo.PluginBase):
         for myroomba in self.roomba_list:
             self.logger.debug(u"{0:=^130}".format(""))
             for property, value in vars(myroomba).items():
-                self.logger.debug(unicode(property) + ":" + unicode(value))
+                self.logger.debug(text(property) + ":" + text(value))
 
 
     def getRoombaInfoAction(self, pluginAction, roombaDevice):
@@ -736,11 +736,11 @@ class Plugin(indigo.PluginBase):
 
     def connectRoomba(self,device):
         if self.debugOther:
-            self.logger.debug("connectRoomba Called self.roomba_list = "+unicode(self.roomba_list))
+            self.logger.debug("connectRoomba Called self.roomba_list = "+text(self.roomba_list))
 
         deviceroombaName = str(device.states['Name'])
         if self.debugOther:
-            self.logger.debug("Device Name  = "+unicode(deviceroombaName))
+            self.logger.debug("Device Name  = "+text(deviceroombaName))
 
         if any(str(roomba.address) == str(device.states['IP']) for roomba in self.roomba_list):
             if self.debugOther:
@@ -758,8 +758,8 @@ class Plugin(indigo.PluginBase):
                         return True
         else:  ## no matching Roomba in roomba_list
             if self.debugOther:
-                self.logger.debug(u'connecting Roomba Device: '+unicode(device.name))
-            roombaIP = device.pluginProps.get('address', 0).encode('utf-8')
+                self.logger.debug(u'connecting Roomba Device: '+text(device.name))
+            roombaIP = device.pluginProps.get('address', 0)
             softwareVersion = device.states['softwareVer']
             forceSSL = device.pluginProps.get('forceSSL',False)
             if roombaIP == 0:
@@ -769,12 +769,12 @@ class Plugin(indigo.PluginBase):
                 device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
                 self.logger.error(u"getDeviceStatus: Roomba IP address not configured.")
                 return
-            filename = str(roombaIP)+"-config.ini"
+            filename = text(roombaIP)+"-config.ini"
             MAChome = os.path.expanduser("~")+"/"
             folderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
             file = folderLocation + filename
             if self.debugOther:
-                self.logger.debug(u'Using config file: ' + file)
+                self.logger.debug(u'Using config file: ' + text(file))
             if os.path.isfile(file):
                 myroomba = Roomba( self, address=roombaIP, file=filename, softwareversion=softwareVersion, forceSSL=forceSSL, roombaName=deviceroombaName)
                 myroomba.set_options(raw=False, indent=0, pretty_print=False)
@@ -783,12 +783,12 @@ class Plugin(indigo.PluginBase):
                 if myroomba not in self.roomba_list:  ## not convinced this will work correctly; is checked above anyhow...
                     self.logger.debug("Adding myroomba to self.roomba_list..")
                     self.roomba_list.append(myroomba)
-                    self.logger.debug("self.roomba_list:"+unicode(self.roomba_list))
+                    self.logger.debug("self.roomba_list:"+text(self.roomba_list))
                 return True
             else:
                 self.logger.error(u'Config file for device does not exist - check Device settings')
                 return False
-        #self.logger.error(unicode(self.myroomba.master_state))
+        #self.logger.error(text(self.myroomba.master_state))
 
     def display_time(self, seconds, granularity=2):
         result = []
@@ -810,9 +810,9 @@ class Plugin(indigo.PluginBase):
 
     def check_onmessage(self, masterState,current_state, roombaipaddress):
         if self.debugOther:
-            self.logger.debug(u"check on_message called by on_message iroomba function: For Device:"+unicode(roombaipaddress))
-            #self.logger.debug(unicode(masterState))
-            #self.logger.debug(unicode(roombaipaddress))
+            self.logger.debug(u"check on_message called by on_message iroomba function: For Device:"+text(roombaipaddress))
+            #self.logger.debug(text(masterState))
+            #self.logger.debug(text(roombaipaddress))
 
         # when message received, master_state already updated.
         # Just recall save for all states - some unchanged.. but unlikely much benefit of multiple if/choices
@@ -820,7 +820,7 @@ class Plugin(indigo.PluginBase):
         for dev in indigo.devices.iter("self"):
             for myroomba in self.roomba_list:
                 if str(roombaipaddress) == str(dev.states['IP']):
-                    self.logger.debug(u"Found Device: "+unicode(roombaipaddress)+' Matching device IP'+unicode(dev.states['IP']))
+                    self.logger.debug(u"Found Device: "+text(roombaipaddress)+' Matching device IP'+text(dev.states['IP']))
                     if (dev.deviceTypeId == "roombaDevice") and myroomba.master_state != None:
                         self.saveMasterStateDevice(masterState, dev, current_state, fromonmessage=True)
 
@@ -828,12 +828,12 @@ class Plugin(indigo.PluginBase):
 
     def saveMasterStateDevice(self, masterState, device, currentstate, fromonmessage=False):
         if self.debugOther:
-            self.logger.debug(u'saveMasterStateDevice called.  FromonMessage:'+unicode(fromonmessage)+" and currentstate:"+unicode(currentstate))
+            self.logger.debug(u'saveMasterStateDevice called.  FromonMessage:'+text(fromonmessage)+" and currentstate:"+text(currentstate))
 
         if masterState != None:
             if self.debugOther:
               #  if fromonmessage==False o:
-                self.logger.debug(u'Writing Master State Device:' +unicode(device.id) +":"+unicode(json.dumps(masterState)))
+                self.logger.debug(u'Writing Master State Device:' +text(device.id) +":"+text(json.dumps(masterState)))
               #  else:
                 #self.logger.debug(u'Writing On Message Data only: From On_Message')
             state =""
@@ -864,7 +864,7 @@ class Plugin(indigo.PluginBase):
                         device.updateStateOnServer('BatPct', value=str(masterState['state']['reported']['batPct']))
 
                     if 'name' in masterState['state']['reported']:
-                        #self.logger.error(u'MasterState state/reported :' + unicode(masterState['state']['reported']) )
+                        #self.logger.error(u'MasterState state/reported :' + text(masterState['state']['reported']) )
                         if device.states['Name'] != str(masterState['state']['reported']['name']):
                             device.updateStateOnServer('Name', value=str(masterState['state']['reported']['name']))
                             self.logger.error(u"Updated Name")
@@ -957,7 +957,7 @@ class Plugin(indigo.PluginBase):
 
                     if 'bin' in masterState['state']['reported']:
                         if 'full' in masterState['state']['reported']['bin']:
-                            #self.logger.debug(u'MasterState Bin Full :'+ unicode(masterState['state']['reported']['bin']['full']))
+                            #self.logger.debug(u'MasterState Bin Full :'+ text(masterState['state']['reported']['bin']['full']))
                             if masterState['state']['reported']['bin']['full'] == True:
                                 device.updateStateOnServer('BinFull', value=True)
                             if masterState['state']['reported']['bin']['full'] == False:
@@ -995,32 +995,36 @@ class Plugin(indigo.PluginBase):
                     if currentstate != "":
                         state = str(currentstate)
 
-                    if errorCode == '0' and notReady == '0':
-                        device.updateStateOnServer(key="deviceStatus", value=unicode(state))
+                    if str(errorCode) == str('0') and str(notReady) == str('0'):
+                        self.logger.debug("Errorcode and notReady:"+str(notReady)  )
+                        device.updateStateOnServer(key="deviceStatus", value=text(state))
                         device.updateStateOnServer(key="errornotReady_Statement", value="")
                         self.updateVar(device.states['IP'], True)
-                        device.updateStateOnServer(key="onOffState", value=True, uiValue=unicode(state))
+                        device.updateStateOnServer(key="onOffState", value=True, uiValue=text(state))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOn)
-                    elif errorCode != '0':
+                    elif str(errorCode) != str('0'):
+                        self.logger.debug("Errorcode not equal to 0:"+str(errorCode))
                         device.updateStateOnServer(key="deviceStatus", value=errorText)
                         device.updateStateOnServer(key="errornotReady_Statement",value=self.geterrorNotreadySentence(device, errorCode=errorCode, notReadyCode=notReady) )
                         self.updateVar(device.states['IP'], False)
-                        device.updateStateOnServer(key="onOffState", value=False, uiValue=unicode(errorText))
+                        device.updateStateOnServer(key="onOffState", value=False, uiValue=text(errorText))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
-                    elif notReady != '0':
+                    elif str(notReady) != str('0'):
+                        self.logger.debug("notReady not equal to zero:"+str(notReady))
                         device.updateStateOnServer(key="deviceStatus", value=notReadyText)
                         device.updateStateOnServer(key="errornotReady_Statement", value=self.geterrorNotreadySentence(device, errorCode=errorCode, notReadyCode=notReady) )
                         self.updateVar(device.states['IP'], False)
-                        device.updateStateOnServer(key="onOffState", value=False, uiValue=unicode(notReadyText))
+                        device.updateStateOnServer(key="onOffState", value=False, uiValue=text(notReadyText))
                         device.updateStateImageOnServer(indigo.kStateImageSel.SensorOff)
 
                     if statement !="":
-                        device.updateStateOnServer('currentState_Statement', value=unicode(statement))
+                        device.updateStateOnServer('currentState_Statement', value=text(statement))
                     else:
-                        device.updateStateOnServer('currentState_Statement', value=unicode(state))
-
+                        device.updateStateOnServer('currentState_Statement', value=text(state))
+        else:
+            self.logger.debug("MasterState is None.")
         return
-          #  self.logger.debug(unicode(masterState))100
+          #  self.logger.debug(text(masterState))100
 
       #  masterjson = json.dumps(masterState)
 
@@ -1031,7 +1035,7 @@ class Plugin(indigo.PluginBase):
 
     def geterrorNotreadySentence(self,device, errorCode="0", notReadyCode="0"):
         try:
-            self.logger.debug("geterrorNotreadySentence (phew) run, with errorCode:"+unicode(errorCode)+" and notReadyCode:"+unicode(notReadyCode))
+            self.logger.debug("geterrorNotreadySentence (phew) run, with errorCode:"+text(errorCode)+" and notReadyCode:"+text(notReadyCode))
 
             if errorCode =="0" and notReadyCode =="0":
                 self.logger.debug("No error, error")
@@ -1044,7 +1048,7 @@ class Plugin(indigo.PluginBase):
                 if keytouse in self.newiroombaData:
                     valuetouse = str(self.newiroombaData[keytouse])
                     valuetousereplace = valuetouse.replace('%s', str(iroombaName))
-                    self.logger.debug("error_"+str(errorCode)+" exists and is "+unicode(valuetouse) )
+                    self.logger.debug("error_"+str(errorCode)+" exists and is "+text(valuetouse) )
                     return valuetousereplace
 
             if notReadyCode != "0":
@@ -1053,7 +1057,7 @@ class Plugin(indigo.PluginBase):
                 if keytouse in self.newiroombaData:
                     valuetouse = str(self.newiroombaData[keytouse])
                     valuetousereplace = valuetouse.replace('%s', str(iroombaName))
-                    self.logger.debug("NotreadyCode "+str(notReadyCode)+" exists and is "+unicode(valuetouse) )
+                    self.logger.debug("NotreadyCode "+str(notReadyCode)+" exists and is "+text(valuetouse) )
                     return valuetousereplace
 
             return ""
@@ -1063,16 +1067,16 @@ class Plugin(indigo.PluginBase):
             return ""
 
     def disconnectRoomba(self,device):
-        self.logger.debug(u'disconnecting Roomba Device: '+unicode(device.name))
+        self.logger.debug(u'disconnecting Roomba Device: '+text(device.name))
         for myroomba in self.roomba_list:
             if str(myroomba.address) == str(device.states['IP']):
                 self.logger.debug("disconnectRoomba Matching iroomba found")
                 if myroomba.master_state != None:
                     self.saveMasterStateDevice(myroomba.master_state, device, "", fromonmessage=False)
-                    self.logger.debug(unicode(myroomba.master_state))
+                    self.logger.debug(text(myroomba.master_state))
                 myroomba.disconnect()
                 self.roomba_list.remove(myroomba)
-                self.logger.debug("Self.Roomba_list:"+unicode(self.roomba_list))
+                self.logger.debug("Self.Roomba_list:"+text(self.roomba_list))
         #self.myroomba = None
 
     def getRoombaInfo(self, device):
@@ -1137,7 +1141,7 @@ class Plugin(indigo.PluginBase):
 
         if anyConnected == False:
             self.KILLcount = self.KILLcount +1
-            self.logger.debug(u"No connected iRoombas found now for "+unicode(self.KILLcount)+" times...")
+            self.logger.debug(u"No connected iRoombas found now for "+text(self.KILLcount)+" times...")
         else:
             self.KILLcount = 0
 
@@ -1151,7 +1155,7 @@ class Plugin(indigo.PluginBase):
     def checkAllRoombas(self):
         if self.debugOther:
             self.logger.debug(u'checkALlRoombas called. ')
-            #self.logger.debug(u'self.connected equals:'+unicode(self.connected)+"& self.continuous equals:"+unicode(self.continuous))
+            #self.logger.debug(u'self.connected equals:'+text(self.connected)+"& self.continuous equals:"+text(self.continuous))
         for dev in indigo.devices.iter("self"):
             if (dev.deviceTypeId == "roombaDevice"):
                 if dev.enabled:
@@ -1166,7 +1170,7 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u'toggle Roomba Action Call')
         Cycle = roombaDevice.states['Cycle']
 
-        self.logger.debug(u'Current State is:' + unicode(Cycle))
+        self.logger.debug(u'Current State is:' + text(Cycle))
 
         if Cycle =='clean':
             self.logger.debug(u'Roomba Cycle clean changing to docking...')
@@ -1210,7 +1214,7 @@ class Plugin(indigo.PluginBase):
         Phase = roombaDevice.states['Phase']
         if Phase is None or Cycle is None:
             return
-        self.logger.debug(u'Current State is:' + unicode(Cycle) + " and current Phase:" + unicode(Phase))
+        self.logger.debug(u'Current State is:' + text(Cycle) + " and current Phase:" + text(Phase))
         if Phase == "charge" and Cycle =="none":
             ## charging no mission running skip
             self.logger.info("iRoomba is not active.  Dock action not run.")
@@ -1224,9 +1228,9 @@ class Plugin(indigo.PluginBase):
         self.RoombaAction(pluginAction, roombaDevice, 'evac')
 
     def getLastCommand(self, valuesDict, typeId, deviceId):
-        self.logger.debug(u"getLastCommand called: "+unicode(deviceId))
-        self.logger.debug(u"getLastCommand valuesDict: " + unicode(valuesDict))
-        self.logger.debug(u"getLastCommand typeId: " + unicode(typeId))
+        self.logger.debug(u"getLastCommand called: "+text(deviceId))
+        self.logger.debug(u"getLastCommand valuesDict: " + text(valuesDict))
+        self.logger.debug(u"getLastCommand typeId: " + text(typeId))
         try:
             roombaDeviceID = int(valuesDict.get("roombatoUse",0))
             if roombaDeviceID == 0:
@@ -1235,8 +1239,8 @@ class Plugin(indigo.PluginBase):
             roombaDevice = indigo.devices[roombaDeviceID]
             iroombaName = str(roombaDevice.states['Name'])
             iroombaIP = str(roombaDevice.states['IP'])
-            self.logger.debug("Roomba Name:" + unicode(iroombaName))
-            self.logger.debug("Roomba IP:" + unicode(iroombaIP))
+            self.logger.debug("Roomba Name:" + text(iroombaName))
+            self.logger.debug("Roomba IP:" + text(iroombaIP))
             lastcommand = ""
             for myroomba in self.roomba_list:
                 if str(myroomba.address) == str(iroombaIP):
@@ -1247,9 +1251,9 @@ class Plugin(indigo.PluginBase):
                                 lastcommand = myroomba.master_state["state"]["reported"]["lastCommand"]
                                 #lastcommand ='thisisasteing'
                                 self.logger.info("Saving this Command:")
-                                self.logger.info(unicode(json.dumps(lastcommand)))
+                                self.logger.info(text(json.dumps(lastcommand)))
                                 valuesDict['commandToSend']=json.dumps(lastcommand)
-                                self.logger.debug(unicode(valuesDict))
+                                self.logger.debug(text(valuesDict))
                                 return valuesDict
                             else:
                                 self.logger.info("No Last Command found please try again")
@@ -1260,8 +1264,8 @@ class Plugin(indigo.PluginBase):
 
     def sendSpecificRoomCommand(self, pluginAction, roombaDevice):
         self.logger.debug("send Specific Room Clean called to run")
-        self.logger.debug("pluginAction "+unicode(pluginAction))
-        self.logger.debug("roombaDevice IP:" + unicode(roombaDevice.states['IP']))
+        self.logger.debug("pluginAction "+text(pluginAction))
+        self.logger.debug("roombaDevice IP:" + text(roombaDevice.states['IP']))
 
         blid = str(roombaDevice.states['blid'])
         ipaddress = str(roombaDevice.states['IP'])
@@ -1290,7 +1294,7 @@ class Plugin(indigo.PluginBase):
         action['regions']=[]
 
         actionRooms = pluginAction.props.get("actionRooms")
-        self.logger.debug(unicode(actionRooms))
+        self.logger.debug(text(actionRooms))
 
         if len(actionRooms)<=0:
             self.logger.info("Please select some options in Action Group Config.  No Rooms / Areas selected.")
@@ -1330,14 +1334,14 @@ class Plugin(indigo.PluginBase):
         try:
             iroombaName = str(roombaDevice.states['Name'])
             iroombaIP = str(roombaDevice.states['IP'])
-            self.logger.debug("Roomba Name:"+unicode(iroombaName))
-            self.logger.debug("Roomba IP:" + unicode(iroombaIP))
-            #self.logger.debug("Connected Roomba Name:"+unicode(self.connectedtoName))
+            self.logger.debug("Roomba Name:"+text(iroombaName))
+            self.logger.debug("Roomba IP:" + text(iroombaIP))
+            #self.logger.debug("Connected Roomba Name:"+text(self.connectedtoName))
 
             for myroomba in self.roomba_list:
                 if str(myroomba.address) == str(iroombaIP):
                     if myroomba.roomba_connected == False:
-                        self.logger.debug(u"Not connected to iRoomba:"+unicode(iroombaName)+" & IP:"+unicode(iroombaIP)+u" -- Should be --- Attempting to reconnect.")
+                        self.logger.debug(u"Not connected to iRoomba:"+text(iroombaName)+" & IP:"+text(iroombaIP)+u" -- Should be --- Attempting to reconnect.")
                         connected = False
                         connected = self.connectRoomba(roombaDevice)
                         time.sleep(5)
@@ -1350,23 +1354,23 @@ class Plugin(indigo.PluginBase):
                                 return
                         myroomba.send_command_special(json.dumps(action))
                     else:
-                        self.logger.debug("Sending Command to myroomba:"+unicode(myroomba.roombaName)+" and action:"+str(json.dumps(action)))
+                        self.logger.debug("Sending Command to myroomba:"+text(myroomba.roombaName)+" and action:"+str(json.dumps(action)))
                         myroomba.send_command_special(json.dumps(action))
 
             return
 
         except Exception as e:
-            self.logger.exception(u'Caught Error within RoombaAction:'+unicode(e))
+            self.logger.exception(u'Caught Error within RoombaAction:'+text(e))
 
     def lastCommandRoombaAction(self, pluginAction, roombaDevice):
         self.logger.debug("lastcommandRoombaAction")
-        self.logger.debug("pluginAction "+unicode(pluginAction))
+        self.logger.debug("pluginAction "+text(pluginAction))
 
         action = []
         commandtosend = ""
         if "commandToSend" in pluginAction.props:
             commandtosend = pluginAction.props.get("commandToSend")
-            self.logger.debug(unicode(commandtosend))
+            self.logger.debug(text(commandtosend))
 
         action = json.loads(commandtosend)
 
@@ -1381,14 +1385,14 @@ class Plugin(indigo.PluginBase):
         try:
             iroombaName = str(roombaDevice.states['Name'])
             iroombaIP = str(roombaDevice.states['IP'])
-            self.logger.debug("Roomba Name:"+unicode(iroombaName))
-            self.logger.debug("Roomba IP:" + unicode(iroombaIP))
-            #self.logger.debug("Connected Roomba Name:"+unicode(self.connectedtoName))
+            self.logger.debug("Roomba Name:"+text(iroombaName))
+            self.logger.debug("Roomba IP:" + text(iroombaIP))
+            #self.logger.debug("Connected Roomba Name:"+text(self.connectedtoName))
 
             for myroomba in self.roomba_list:
                 if str(myroomba.address) == str(iroombaIP):
                     if myroomba.roomba_connected == False:
-                        self.logger.debug(u"Not connected to iRoomba:"+unicode(iroombaName)+" & IP:"+unicode(iroombaIP)+u" -- Should be --- Attempting to reconnect.")
+                        self.logger.debug(u"Not connected to iRoomba:"+text(iroombaName)+" & IP:"+text(iroombaIP)+u" -- Should be --- Attempting to reconnect.")
                         connected = False
                         connected = self.connectRoomba(roombaDevice)
                         time.sleep(5)
@@ -1401,28 +1405,28 @@ class Plugin(indigo.PluginBase):
                                 return
                         myroomba.send_command_special(json.dumps(action))
                     else:
-                        self.logger.debug("Sending Command to myroomba:"+unicode(myroomba.roombaName)+" and action:"+str(json.dumps(action)))
+                        self.logger.debug("Sending Command to myroomba:"+text(myroomba.roombaName)+" and action:"+str(json.dumps(action)))
                         myroomba.send_command_special(json.dumps(action))
 
             return
 
         except Exception as e:
-            self.logger.exception(u'Caught Error within RoombaAction:'+unicode(e))
+            self.logger.exception(u'Caught Error within RoombaAction:'+text(e))
 
     def RoombaAction(self, pluginAction, roombaDevice, action):
-        self.logger.debug(u"startRoombaAction for "+unicode(roombaDevice.name)+": Action : "+str(action))
+        self.logger.debug(u"startRoombaAction for "+text(roombaDevice.name)+": Action : "+str(action))
         # Add a try except loop to catch nicely any errors.
         try:
             iroombaName = str(roombaDevice.states['Name'])
             iroombaIP = str(roombaDevice.states['IP'])
-            self.logger.debug("Roomba Name:"+unicode(iroombaName))
-            self.logger.debug("Roomba IP:" + unicode(iroombaIP))
-            #self.logger.debug("Connected Roomba Name:"+unicode(self.connectedtoName))
+            self.logger.debug("Roomba Name:"+text(iroombaName))
+            self.logger.debug("Roomba IP:" + text(iroombaIP))
+            #self.logger.debug("Connected Roomba Name:"+text(self.connectedtoName))
 
             for myroomba in self.roomba_list:
                 if str(myroomba.address) == str(iroombaIP):
                     if myroomba.roomba_connected == False:
-                        self.logger.debug(u"Not connected to iRoomba:"+unicode(iroombaName)+" & IP:"+unicode(iroombaIP)+u" -- Should be --- Attempting to reconnect.")
+                        self.logger.debug(u"Not connected to iRoomba:"+text(iroombaName)+" & IP:"+text(iroombaIP)+u" -- Should be --- Attempting to reconnect.")
                         connected = False
                         connected = self.connectRoomba(roombaDevice)
                         time.sleep(5)
@@ -1435,11 +1439,11 @@ class Plugin(indigo.PluginBase):
                                 return
                         myroomba.send_command(str(action))
                     else:
-                        self.logger.debug("Sending Command to myroomba:"+unicode(myroomba.roombaName)+" and action:"+str(action))
+                        self.logger.debug("Sending Command to myroomba:"+text(myroomba.roombaName)+" and action:"+str(action))
                         myroomba.send_command(str(action))
 
             return
 
 
         except Exception as e:
-            self.logger.debug(u'Caught Error within RoombaAction:'+unicode(e))
+            self.logger.debug(u'Caught Error within RoombaAction:'+text(e))

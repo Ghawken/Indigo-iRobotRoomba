@@ -23,16 +23,24 @@ try:
 except ImportError:
     print("paho mqtt client not found")
 
+from builtins import str as text
 import sys, os
 import ssl
 import json
 import datetime
-from collections import OrderedDict, Mapping
+
+if sys.version[0]==2:
+    from collections import OrderedDict, Mapping
+else:
+    from collections import OrderedDict
+    from collections.abc import Mapping
+    
 import threading
 from getcloudpassword import irobotAuth
 
 # add for compatibility with py3 - py2 will fail..
-from builtins import str as text
+if str(sys.version_info[0]) == "3":
+    from builtins import str as text
 
 import logging
 
@@ -107,7 +115,7 @@ class irobotAPI_Maps(object):
                     try:
                         ret = os.makedirs(self.folderLocation)
                     except:
-                        self.logger.error(u"Error Creating " + unicode(self.folderLocation))
+                        self.logger.error(u"Error Creating " + text(self.folderLocation))
                         pass
 
                 with open(self.file,"w") as f:
@@ -195,7 +203,7 @@ class password(object):
         blid = None
         self.logger.info("Sending discovery to any iRoombas on network... Please wait...")
         roombas = self.receive_udp()
-        self.logger.debug('Looking for Roomba with IP Address:'+unicode(ipaddress))
+        self.logger.debug('Looking for Roomba with IP Address:'+text(ipaddress))
 
         if self.useCloud:
             self.logger.info("Getting Roomba information from iRobot aws cloud...")
@@ -214,7 +222,7 @@ class password(object):
   #          for robot in robots.keys():
   #              self.logger.info("Robot ID {}, MAPS: {}".format(robot, json.dumps(iRobot.get_maps(robot), indent=2)))
 
-        self.logger.debug("Roombas:"+unicode(roombas))
+        self.logger.debug("Roombas:"+text(roombas))
         if len(roombas) == 0:
             self.logger.info("No Roombas found, try again...")
             self.plugin.passwordReturned = "Failed"
@@ -228,7 +236,7 @@ class password(object):
             addr = address[0]
             password = parsedMsg.get('password')
             if addr != ipaddress:
-                self.logger.info('Roomba at IP address:'+unicode(addr)+' skipped.')
+                self.logger.info('Roomba at IP address:'+text(addr)+' skipped.')
                 continue
 
             if int(parsedMsg["ver"]) < 2:
@@ -268,10 +276,10 @@ class password(object):
                     try:
                         ret = os.makedirs(self.folderLocation)
                     except:
-                        self.logger.error(u"Error Creating " + unicode(self.folderLocation))
+                        self.logger.error(u"Error Creating " + text(self.folderLocation))
                         pass
 
-                self.logger.debug(u'Using cfgfile:' + unicode(self.file))
+                self.logger.debug(u'Using cfgfile:' + text(self.file))
                 with open(self.file, 'w') as cfgfile:
                     Config.write(cfgfile)
                     self.logger.info(u'Password Successfully obtained.')
@@ -324,7 +332,7 @@ class password(object):
                         if len(data) >= data_len+2: #NOTE data is 0xf0 (mqtt RESERVED) length (0x23 = 35), 0xefcc3b2900 (magic packet), 0xXXXX... (30 bytes of password). so 7 bytes, followed by 30 bytes of password (total of 37)
                             break
                         data_received = wrappedSocket.recv(1024)
-                        #self.logger.error('datareceived:'+unicode(data_received))
+                        #self.logger.error('datareceived:'+text(data_received))
                     except socket.error as e:
                         self.logger.debug("Socket Error: %s" % e)
                         break
@@ -337,7 +345,7 @@ class password(object):
                         if len(data) >= 2:
                             data_len = struct.unpack("B", data[1:2])[0]
             except Exception as e:
-                self.logger.error(u'Error in send Packet.  Exception:' + unicode(e))
+                self.logger.error(u'Error in send Packet.  Exception:' + text(e))
                 self.plugin.passwordReturned = "Failed"
                 return False
 
@@ -374,11 +382,11 @@ class password(object):
                     try:
                         ret = os.makedirs(self.folderLocation)
                     except:
-                        self.logger.error(u"Error Creating " + unicode(self.folderLocation))
+                        self.logger.error(u"Error Creating " + text(self.folderLocation))
                         pass
 
 
-                self.logger.debug(u'Using cfgfile:'+ unicode(self.file))
+                self.logger.debug(u'Using cfgfile:'+ text(self.file))
                 with open(self.file, 'w') as cfgfile:
                     Config.write(cfgfile)
                     self.logger.info(u'Saved Device Config File/Password. Click OK to continue.')
@@ -535,7 +543,7 @@ class Roomba(object):
         #self.log = logging.getLogger(__name__+'.Roomba')
         #if self.log.getEffectiveLevel() == logging.DEBUG:
          #   self.debug = True
-        self.address = address.encode('utf-8')
+        self.address = text(address)
         if cert_name == "":
             self.cert_name = "./ca-certificates.crt" #/etc/ssl/certs/ca-certificates.crt is default for Linux Debian based systems
         else:
@@ -619,18 +627,19 @@ class Roomba(object):
 
         addresses = Config.sections()
 
-        self.logger.debug(u'Sections %s ' %unicode(Config.sections()))
+        self.logger.debug(u'Sections %s ' %text(Config.sections()))
 
         if self.address is None:
             if len(addresses) > 1:
                 self.logger.error("config file has entries for %d Roombas, only configuring the first!")
-                self.address = addresses[0]
+                self.address = text(addresses[0])
 
-        self.blid = Config.get(self.address, "blid")
-        self.password = Config.get(self.address, "password")
+        self.blid = text(Config.get(self.address, "blid"))
+
+        self.password = text(Config.get(self.address, "password"))
         if self.roombaName == "":
             self.logger.debug(u"No device Name for iRoomba using config File")
-            self.roombaName = literal_eval(Config.get(self.address, "data"))["robotname"]
+            self.roombaName = text(literal_eval(Config.get(self.address, "data"))["robotname"])
 
         return True
 
@@ -701,13 +710,13 @@ class Roomba(object):
             return True
 
         except Exception as e:
-            self.logger.error("Error Connect: %s " % str(e.message))
+            self.logger.error("Error Connect: %s " % str(e.args))
             return False
 
     def _reconnect(self):
         try:
             self.logger.debug(u"Threaded version of reconnect running")
-            self.logger.debug("Attempting to Reconnect %s " % unicode(self.roombaName))
+            self.logger.debug("Attempting to Reconnect %s " % text(self.roombaName))
             self.client.disconnect()
             time.sleep(1)
             self.client.loop_stop()
@@ -715,16 +724,16 @@ class Roomba(object):
             self.client.reconnect()
             time.sleep(1)
         except Exception as ex:
-            self.logger.debug(u"Exception "+unicode(ex))
+            self.logger.debug(u"Exception "+text(ex))
 
     def _connect(self, count=0, new_connection=False):
         max_retries = 3
-        self.logger.debug("Connecting: Name:" + unicode(self.roombaName) + "  && Address:" +  unicode(self.address) + "  && password:" +  unicode(self.password) + "  && Port:"+unicode(self.roomba_port))
+        self.logger.debug("Connecting: Name:" + text(self.roombaName) + "  && Address:" +  text(self.address) + "  && password:" +  text(self.password) + "  && Port:"+text(self.roomba_port))
         try:
             if self.client is None or new_connection:
-                self.logger.debug("Connecting %s" % unicode(self.roombaName))
+                self.logger.debug("Connecting %s" % text(self.roombaName))
                 self.setup_client()
-                self.logger.debug("Client MQTT New Connection - Connect Running now %s" % unicode(self.roombaName))
+                self.logger.debug("Client MQTT New Connection - Connect Running now %s" % text(self.roombaName))
 ######## Threaded Reconnect/Connect
                 self.logger.debug(u"Threading inital connection to avoid issues if one iRoomba down...")
                 self._thread = threading.Thread(target=self.client.connect, args=(self.address,self.roomba_port,60,),)
@@ -734,7 +743,7 @@ class Roomba(object):
 ######## Threaded Reconnect/Connect
                 #self.client.connect(self.address, self.roomba_port, 60)
             else:
-                self.logger.debug("Attempting to Reconnect %s "  % unicode(self.roombaName))
+                self.logger.debug("Attempting to Reconnect %s "  % text(self.roombaName))
 ######## Threaded Reconnect/Connect
                 #self.client.disconnect()
                 #self.client.loop_stop()
@@ -746,7 +755,7 @@ class Roomba(object):
 ######## Threaded Reconnect/Connect
                 #self.client.reconnect()
 
-            self.logger.debug("Client LoopStart Running now %s" % unicode(self.roombaName))
+            self.logger.debug("Client LoopStart Running now %s" % text(self.roombaName))
 
             self.client.loop_start()
             return True
@@ -754,9 +763,9 @@ class Roomba(object):
         except Exception as e:
             #exc_type, exc_obj, exc_tb = sys.exc_info()
             #fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            #self.logger.error(unicode(exc_type)+ unicode(fname) +unicode( exc_tb.tb_lineno))
+            #self.logger.error(text(exc_type)+ text(fname) +text( exc_tb.tb_lineno))
 
-            self.logger.debug("Connection Roomba Error: %s " % unicode(e[0]))
+            self.logger.debug("Connection Roomba Error: %s " % text(e[0]))
             #if e[0] == 111 or e[0] ==61 : #errno.ECONNREFUSED
             count +=1
             time.sleep(1)
@@ -766,7 +775,7 @@ class Roomba(object):
                 self._connect(count, True)
 
         if count == max_retries:
-            self.logger.info(u"Unable to connect to %s" % unicode(self.roombaName))
+            self.logger.info(u"Unable to connect to %s" % text(self.roombaName))
             self.logger.info(u'This may because your Roomba has lost charge and network connection.')
 
         return False
@@ -866,7 +875,7 @@ class Roomba(object):
             self.logger.debug("Disconnected From Roomba %s" % self.roombaName)
 
     def on_log(self, mosq, obj, level, string):
-        self.logger.debug(unicode(string))
+        self.logger.debug(text(string))
 
     def set_mqtt_client(self, mqttc=None, brokerFeedback=""):
         self.mqttc = mqttc
@@ -1026,7 +1035,7 @@ class Roomba(object):
         '''
         decode json data dict, and publish as individual topics to brokerFeedback/topic
         the keys are concatinated with _ to make one unique topic name
-        strings are expressely converted to strings to avoid unicode representations
+        strings are expressely converted to strings to avoid text representations
         '''
         for k, v in six.iteritems(state):
             if isinstance(v, dict):
@@ -1159,7 +1168,7 @@ class Roomba(object):
             try:
                 self.current_state = self.states[self.cleanMissionStatus_phase]
             except:
-                self.logger.error(u"Unknown State Reported: "+unicode(self.cleanMissionStatus_phase))
+                self.logger.error(u"Unknown State Reported: "+text(self.cleanMissionStatus_phase))
                 self.current_state = "Unknown"
 
         if new_state is not None:
