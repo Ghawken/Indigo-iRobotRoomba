@@ -154,40 +154,77 @@ class password(object):
         self.logger.info(u'File should equal:' + self.file)
         self.get_password(address)
 
-
     def receive_udp(self):
-        #set up UDP socket to receive data from robot
+        # set up UDP socket to receive data from robot
         port = 5678
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(10)
         if self.address == '255.255.255.255':
             s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        s.bind(("", port))  #bind all intefaces to port
-        self.logger.debug("waiting on port: %d for data" % port)
+        s.bind(("", port))  # bind all interfaces to port
+        self.logger.debug("waiting on port: {} for data".format(port))
         message = 'irobotmcs'
         s.sendto(message.encode(), (self.address, port))
         roomba_dict = {}
         while True:
             try:
-                udp_data, addr = s.recvfrom(1024)   #wait for udp data
-                #self.logger.debug('Received: Robot addr: %s Data: %s ' % (addr, udp_data))
-                if len(udp_data) > 0:
-                    if udp_data != message:
-                        try:
-                            if self.address != addr[0]:
-                                self.logger.error("supplied address %s does not match discovered address %s, using discovered address..." % (self.address, addr[0]))
-                            parsedMsg = json.loads(udp_data)
-                            roomba_dict[addr]=parsedMsg
-                        except Exception as e:
-                            self.logger.debug("json decode error: %s" % e)
-                            break
-                        #self.logger.debug('Robot Data: %s ' % json.dumps(parsedMsg, indent=2))
-                else:
-                    break
+                udp_data, addr = s.recvfrom(1024)  # wait for udp data
+                # self.log.debug('Received: Robot addr: {} Data: {}'.format(addr, udp_data))
+                if udp_data and udp_data.decode() != message:
+                    try:
+                        # if self.address != addr[0]:
+                        #    self.log.warning(
+                        #        "supplied address {} does not match "
+                        #        "discovered address {}, using discovered "
+                        #        "address...".format(self.address, addr[0]))
+
+                        parsedMsg = json.loads(udp_data.decode())
+                        if addr[0] not in roomba_dict.keys():
+                            s.sendto(message.encode(), (self.address, port))
+                            roomba_dict[addr[0]] = parsedMsg
+                            self.logger.debug('Robot at IP: {} Data: {}'.format(addr[0], json.dumps(parsedMsg, indent=2)))
+                    except Exception as e:
+                        self.loggger.debug("json decode error: {}".format(e))
+                        self.logger.debug('RECEIVED: {}'.format(udp_data))
+
             except socket.timeout:
                 break
         s.close()
         return roomba_dict
+
+    # def receive_udp(self):
+    #     #set up UDP socket to receive data from robot
+    #     port = 5678
+    #     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #     s.settimeout(10)
+    #     if self.address == '255.255.255.255':
+    #         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    #     s.bind(("", port))  #bind all intefaces to port
+    #     self.logger.debug("waiting on port: %d for data" % port)
+    #     message = 'irobotmcs'
+    #     s.sendto(message.encode(), (self.address, port))
+    #     roomba_dict = {}
+    #     while True:
+    #         try:
+    #             udp_data, addr = s.recvfrom(1024)   #wait for udp data
+    #             #self.logger.debug('Received: Robot addr: %s Data: %s ' % (addr, udp_data))
+    #             if len(udp_data) > 0:
+    #                 if udp_data != message:
+    #                     try:
+    #                         if self.address != addr[0]:
+    #                             self.logger.error("supplied address %s does not match discovered address %s, using discovered address..." % (self.address, addr[0]))
+    #                         parsedMsg = json.loads(udp_data)
+    #                         roomba_dict[addr]=parsedMsg
+    #                     except Exception as e:
+    #                         self.logger.debug("json decode error: %s" % e)
+    #                         break
+    #                     #self.logger.debug('Robot Data: %s ' % json.dumps(parsedMsg, indent=2))
+    #             else:
+    #                 break
+    #         except socket.timeout:
+    #             break
+    #     s.close()
+    #     return roomba_dict
 
     def add_cloud_data(self, cloud_data, roombas):
         for k, v in roombas.copy().items():
@@ -667,20 +704,33 @@ class Roomba(object):
                 # but v1.3 changes all this, so have to do the following:
 
                 self.logger.debug("Selecting the best SSL TLS Settings")
+                self.logger.info("Setting TLS")
                 try:
-                    if 'soho' in self.softwareversion or self.forceSSL or 'lewis+3.0.11+lewis' in self.softwareversion:
-                        self.logger.debug('s9 iRoomba VERSION:  Using Protocol SSLv23')
-                        self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_SSLv23)
-                    else:
-                        self.logger.debug('Standard iRoomba VERSION:  Using Protocol TLS.  Change v0.51')
-                        self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_TLSv1)
-                except (ValueError):  # try V1.3 version
-                    self.logger.debug("TLS Setting failed - trying 1.3 version")
-                    self.client._ssl_context = None
-                    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-                    context.verify_mode = ssl.CERT_NONE
-                    context.load_default_certs()
+                    # self.client._ssl_context = None
+                    context = ssl.SSLContext()
+                    # Either of the following context settings works - choose one
+                    # Needed for 980 and earlier robots as their security level is 1.
+                    # context.set_ciphers('HIGH:!DH:!aNULL')
+                    context.set_ciphers('DEFAULT@SECLEVEL=1')
                     self.client.tls_set_context(context)
+                except Exception as e:
+                    self.logger.exception("Error setting TLS: {}".format(e))
+
+                # try:
+                #     if 'soho' in self.softwareversion or self.forceSSL or 'lewis+3.0.11+lewis' in self.softwareversion:
+                #         self.logger.debug('s9 iRoomba VERSION:  Using Protocol SSLv23')
+                #         #self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE,  tls_version=ssl.PROTOCOL_SSLv23)
+                #     else:
+                #         self.logger.debug('Standard iRoomba VERSION:  Using Protocol TLS.  Change v0.51')
+                #         #self.client.tls_set(self.cert_name, cert_reqs=ssl.CERT_NONE, tls_version=ssl.PROTOCOL_TLSv1)
+                #
+                # except (ValueError):  # try V1.3 version
+                #     self.logger.debug("TLS Setting failed - trying 1.3 version")
+                #     self.client._ssl_context = None
+                #     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+                #     context.verify_mode = ssl.CERT_NONE
+                #     context.load_default_certs()
+                #     self.client.tls_set_context(context)
 
                 # disables peer verification
                 self.client.tls_insecure_set(True)
@@ -690,7 +740,8 @@ class Roomba(object):
 
             return False
         except:
-            self.logger.error("Error with MQTT Client Setup.")
+            self.logger.exception("Error with MQTT Client Setup.")
+            self.logger.debug("Error MQTT Client",exc_info=True)
             return False
 
 
