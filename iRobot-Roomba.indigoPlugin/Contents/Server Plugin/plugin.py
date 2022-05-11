@@ -348,7 +348,7 @@ class Plugin(indigo.PluginBase):
 
                 self.sleep(20.0)
 
-        except self.stopThread:
+        except self.StopThread:
             pass
 
     def deviceStartComm(self, device):
@@ -553,7 +553,7 @@ class Plugin(indigo.PluginBase):
         self.logger.debug(u"validateDeviceConfigUi called")
         errorDict = indigo.Dict()
         address = valuesDict['address']
-        if address == None or address <= 0:
+        if address == None:
             errorDict['address'] = u'IP Address can not be blank, please enter valid IP'
             return (False, valuesDict, errorDict)
 
