@@ -165,7 +165,7 @@ class password(object):
         s.bind(("", port))  #bind all intefaces to port
         self.logger.debug("waiting on port: %d for data" % port)
         message = 'irobotmcs'
-        s.sendto(message, (self.address, port))
+        s.sendto(message.encode(), (self.address, port))
         roomba_dict = {}
         while True:
             try:

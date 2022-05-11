@@ -111,7 +111,7 @@ class irobotAuth:
 
         response = r.json()
 
-        self.logger.debug(unicode(response))
+        self.logger.debug(str(response))
 
         if 'errorMessage' in response:
             if response['errorMessage']=="Invalid LoginID":
@@ -146,7 +146,7 @@ class irobotAuth:
 
         response = r.json()
 
-        self.logger.debug("2nd Response:" + unicode(response))
+        self.logger.debug("2nd Response:" + str(response))
 
         access_key = response['credentials']['AccessKeyId']
         secret_key = response['credentials']['SecretKey']
