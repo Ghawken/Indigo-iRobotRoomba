@@ -88,8 +88,9 @@ class irobotAPI_Maps(object):
 
         self.plugin = plugin
         self.logger  = logging.getLogger('Plugin.irobotAPI')
-        self.MAChome     = os.path.expanduser("~")+"/"
-        self.folderLocation = self.MAChome+"Documents/Indigo-iRobotRoomba/"
+        #self.MAChome     = os.path.expanduser("~")+"/"
+        self.folderLocation = self.plugin.pluginprefDirectory #self.MAChome+"Documents/Indigo-iRobotRoomba/"
+
         self.file = self.folderLocation + str(address)+"-mapping-data.json"
         self.address = address
         self.useCloud = useCloud
@@ -138,8 +139,8 @@ class password(object):
         self.iRoombaName = ""
         self.iRoombaMAC = ""
         self.iRoombaSWver =""
-        self.MAChome     = os.path.expanduser("~")+"/"
-        self.folderLocation = self.MAChome+"Documents/Indigo-iRobotRoomba/"
+        #self.MAChome     = os.path.expanduser("~")+"/"
+        self.folderLocation = self.plugin.pluginprefDirectory #.self.MAChome+"Documents/Indigo-iRobotRoomba/"
         #self.logger = logging.getLogger('Roomba-Lib.iRobot')
         #self.folderLocation = self.plugin.folderLocation
         #self.log = logging.getLogger(__name__ + '.Roomba')
@@ -607,9 +608,9 @@ class Roomba(object):
         #self.logger.error('software Version:'+self.softwareversion)
         #self.MACuserName = pwd.getpwuid(os.getuid())[0]
 
-        self.MAChome     = os.path.expanduser("~")+"/"
+       # self.MAChome     = os.path.expanduser("~")+"/"
 
-        self.folderLocation = self.MAChome+"Documents/Indigo-iRobotRoomba/"
+        self.folderLocation = self.plugin.pluginprefDirectory #.MAChome+"Documents/Indigo-iRobotRoomba/"
 
         self.file = self.folderLocation + file
         self.topic = topic

@@ -26,6 +26,7 @@ import threading
 import datetime
 from builtins import str as text
 import locale
+import shutil
 
 #from requests.auth import HTTPBasicAuth
 #from requests.utils import quote
@@ -67,7 +68,7 @@ class Plugin(indigo.PluginBase):
         self.logger.info(u"{0:=^130}".format(""))
 
         self.allMappingData = {}
-
+        self.pluginprefDirectory = '{}/Preferences/Plugins/com.GlennNZ.indigoplugin.irobot/'.format(indigo.server.getInstallFolderPath())
         try:
             self.logLevel = int(self.pluginPrefs[u"logLevel"])
         except:
@@ -117,6 +118,19 @@ class Plugin(indigo.PluginBase):
         self.passwordReturned = "not set yet"
         self.logger.debug(u"updateFrequency = " + str(self.updateFrequency))
         self.next_update_check = time.time()
+
+        if not os.path.exists(self.pluginprefDirectory):
+            os.makedirs(self.pluginprefDirectory)
+
+        ## Check old config files and move them all.
+        try:
+            file_names = os.listdir(self.mainfolderLocation)
+            source_dir = self.mainfolderLocation
+            target_dir = self.pluginprefDirectory
+            for file_name in file_names:
+                shutil.move(os.path.join(source_dir, file_name), target_dir)
+        except:
+            self.logger.debug("Error trying to move files.  Skippping.", exc_info=True)
 
         self.continuous = self.pluginPrefs.get('continuous', False)
 
@@ -390,8 +404,10 @@ class Plugin(indigo.PluginBase):
         #self.getRoombaInfo(device)
         #self.getRoombaStatus(device)
         #self.getRoombaTime(device)
-        MAChome     = os.path.expanduser("~")+"/"
-        folderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
+        #MAChome     = os.path.expanduser("~")+"/"
+
+        folderLocation = self.pluginprefDirectory # MAChome+"Documents/Indigo-iRobotRoomba/"
+
         roombaIP = str(device.states['IP'])
         filename =  str(roombaIP)+"-mapping-data.json"
         file = folderLocation + filename
@@ -585,8 +601,8 @@ class Plugin(indigo.PluginBase):
     ########################################
 
     def checkConfigFile(self,valuesDict, deviceId):
-        MAChome     = os.path.expanduser("~")+"/"
-        folderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
+        #MAChome     = os.path.expanduser("~")+"/"
+        folderLocation = self.pluginprefDirectory #+"Documents/Indigo-iRobotRoomba/"
         roombaIP = valuesDict['address']
         filename = str(roombaIP) + "-config.ini"
         file = folderLocation + filename
@@ -770,8 +786,8 @@ class Plugin(indigo.PluginBase):
                 self.logger.error(u"getDeviceStatus: Roomba IP address not configured.")
                 return
             filename = text(roombaIP)+"-config.ini"
-            MAChome = os.path.expanduser("~")+"/"
-            folderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
+            # = os.path.expanduser("~")+"/"
+            folderLocation = self.pluginprefDirectory #+"Documents/Indigo-iRobotRoomba/"
             file = folderLocation + filename
             if self.debugOther:
                 self.logger.debug(u'Using config file: ' + text(file))
