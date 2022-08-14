@@ -270,7 +270,9 @@ class password(object):
             self.logger.info("Found %d Matching Roombas" % len(roombas))
 
         for address,parsedMsg in six.iteritems(roombas):
-            addr = address[0]
+            self.logger.debug(f"address: {address} and ParsedMsg: {parsedMsg}")
+
+            addr = address
             password = parsedMsg.get('password')
             if addr != ipaddress:
                 self.logger.info('Roomba at IP address:'+text(addr)+' skipped.')
@@ -316,13 +318,15 @@ class password(object):
                         self.logger.error(u"Error Creating " + text(self.folderLocation))
                         pass
 
-                self.logger.debug(u'Using cfgfile:' + text(self.file))
-                with open(self.file, 'w') as cfgfile:
-                    Config.write(cfgfile)
-                    self.logger.info(u'Password Successfully obtained.')
-                    self.logger.info(u'Saved Device Config File/Password is Completed. Click OK to continue.')
-                    # self.logger.info(u'Restart Plugin to continue.')
-
+                self.logger.info(u'Using cfgfile:' + text(self.file))
+                try:
+                    with open(self.file, 'w+') as cfgfile:
+                        Config.write(cfgfile)
+                        self.logger.info(u'Password Successfully obtained.')
+                        self.logger.info(u'Saved Device Config File/Password is Completed. Click OK to continue.')
+                        # self.logger.info(u'Restart Plugin to continue.')
+                except:
+                    self.logger.exception("Exception Saving Config File")
                 self.blid = str(blid)
                 self.endpassword = str(password)
                 self.plugin.passwordReturned = "OK"
