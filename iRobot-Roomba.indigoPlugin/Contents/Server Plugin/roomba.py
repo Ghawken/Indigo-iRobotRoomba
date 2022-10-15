@@ -410,7 +410,8 @@ class password(object):
 
                 # strip null character from end of string
                 # from EricMcM and for iRobot i7 Roomba
-                passwordroomba = str(data[7:]).partition(b'\0')[0]
+                #passwordroomba = str(data[7:]).partition(b'\0')[0]
+                passwordroomba  = str(data[7:].decode().rstrip('\x00'))
                 self.logger.info('Password=> %s <= Yes, all this string.' % str(passwordroomba))
 
                 Config = configparser.ConfigParser()
