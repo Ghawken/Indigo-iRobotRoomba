@@ -1073,15 +1073,20 @@ class Roomba(object):
 
         try:
             #if it's json data, decode it (use OrderedDict to preserve keys order), else return as is...
-            json_data = json.loads(payload.replace(b":nan", b":NaN").replace(b":inf", b":Infinity").replace(b":-inf", b":-Infinity"), object_pairs_hook=OrderedDict)
+            json_data = json.loads(payload.replace(b":nan", b":NaN").replace(b":inf", b":Infinity").replace(b":-inf", b":-Infinity"))
             if not isinstance(json_data, dict): #if it's not a dictionary, probably just a number
                 return json_data, dict(json_data)
             json_data_string = "\n".join((indent * " ") + i for i in (json.dumps(json_data, indent = 2)).splitlines())
-
             formatted_data = "Decoded JSON: \n%s" % (json_data_string)
 
         except ValueError as e:
+            self.logger.debug(f"Decode_Payload has a ValueError Exception: {e}", exc_info=True)
+            self.logger.debug(f"Payload with this error: {payload}")
             formatted_data = payload
+            json_data = ""
+
+        if self.plugin.debugTrue:
+            self.logger.debug(f"decode_payload: json_data {json_data}\n formated_data: {formatted_data}\n json_string_data: {json_data_string}")
 
         if self.raw:
             formatted_data = payload
