@@ -1069,31 +1069,31 @@ class Roomba(object):
         '''
         Format json for pretty printing, return string sutiable for logging, and a dict of the json data
         '''
-        indent = self.master_indent + 31 #number of spaces to indent json data
-        json_data= ""
-        json_data_string = ""
-        formatted_data = ""
-        
         try:
-            #if it's json data, decode it (use OrderedDict to preserve keys order), else return as is...
-            json_data = json.loads(payload.replace(b":nan", b":NaN").replace(b":inf", b":Infinity").replace(b":-inf", b":-Infinity"))
-            if not isinstance(json_data, dict): #if it's not a dictionary, probably just a number
-                return json_data, dict(json_data)
-            json_data_string = "\n".join((indent * " ") + i for i in (json.dumps(json_data, indent = 2)).splitlines())
-            formatted_data = "Decoded JSON: \n%s" % (json_data_string)
+            indent = self.master_indent + 31 #number of spaces to indent json data
+            json_data= ""
+            json_data_string = ""
+            formatted_data = ""
+            try:
+                #if it's json data, decode it (use OrderedDict to preserve keys order), else return as is...
+                json_data = json.loads(payload.replace(b":nan", b":NaN").replace(b":inf", b":Infinity").replace(b":-inf", b":-Infinity"))
+                if not isinstance(json_data, dict): #if it's not a dictionary, probably just a number
+                    return json_data, dict(json_data)
+                json_data_string = "\n".join((indent * " ") + i for i in (json.dumps(json_data, indent = 2)).splitlines())
+                formatted_data = "Decoded JSON: \n%s" % (json_data_string)
+            except ValueError as e:
+                self.logger.debug(f"Decode_Payload has a ValueError Exception: {e}", exc_info=True)
+                self.logger.debug(f"Payload with this error: {payload}")
+                formatted_data = payload
+            if self.plugin.debugTrue:
+                self.logger.debug(f"decode_payload: json_data {json_data}\n formated_data: {formatted_data}\n json_string_data: {json_data_string}")
+            if self.raw:
+                formatted_data = payload
 
-        except ValueError as e:
-            self.logger.debug(f"Decode_Payload has a ValueError Exception: {e}", exc_info=True)
-            self.logger.debug(f"Payload with this error: {payload}")
-            formatted_data = payload
-
-        if self.plugin.debugTrue:
-            self.logger.debug(f"decode_payload: json_data {json_data}\n formated_data: {formatted_data}\n json_string_data: {json_data_string}")
-
-        if self.raw:
-            formatted_data = payload
-
-        return formatted_data, dict(json_data)
+            return formatted_data, dict(json_data)
+        except:
+            self.logger.debug("Caught Exception in decode_payload", exc_info=True)
+            return '',dict('')
 
     def decode_topics(self, state, prefix=None):
         '''
