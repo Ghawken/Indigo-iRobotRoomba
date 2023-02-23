@@ -1070,7 +1070,10 @@ class Roomba(object):
         Format json for pretty printing, return string sutiable for logging, and a dict of the json data
         '''
         indent = self.master_indent + 31 #number of spaces to indent json data
-
+        json_data= ""
+        json_data_string = ""
+        formatted_data = ""
+        
         try:
             #if it's json data, decode it (use OrderedDict to preserve keys order), else return as is...
             json_data = json.loads(payload.replace(b":nan", b":NaN").replace(b":inf", b":Infinity").replace(b":-inf", b":-Infinity"))
@@ -1083,7 +1086,6 @@ class Roomba(object):
             self.logger.debug(f"Decode_Payload has a ValueError Exception: {e}", exc_info=True)
             self.logger.debug(f"Payload with this error: {payload}")
             formatted_data = payload
-            json_data = ""
 
         if self.plugin.debugTrue:
             self.logger.debug(f"decode_payload: json_data {json_data}\n formated_data: {formatted_data}\n json_string_data: {json_data_string}")
