@@ -1457,6 +1457,7 @@ class Plugin(indigo.PluginBase):
                     else:
                         self.logger.debug("Sending Command to myroomba:"+text(myroomba.roombaName)+" and action:"+str(action))
                         myroomba.send_command(str(action))
+                    self.logger.info(f"iRobot {iroombaName} sent command: {action}")
 
             return
 
