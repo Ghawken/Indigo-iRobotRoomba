@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 ####################
 
-# UPDATE FOR ROOMBA - FOR USE WITH MQTT
-# BASED ON ROOMBA980-PYTHON (ROOMBA.PY) FILE
-# AND EARLIER INDIGO PLUGIN BY FLYING DIVER
-
-#VERSION 0.0.2
-#PROOF OF CONCEPT.
-
+import logging
+try:
+    import indigo
+except:
+    pass
+installation_output= ""
+from auto_installer import install_package_and_retry_import
 
 import sys
 import os.path
@@ -18,6 +18,12 @@ import json
 import logging
 #import OpenSSL
 #rom base64 import b64encode
+
+try:
+    from roomba import Roomba
+except:
+    installation_output = install_package_and_retry_import()
+
 from roomba import Roomba
 from roomba import password
 from roomba import irobotAPI_Maps
@@ -47,7 +53,7 @@ class Plugin(indigo.PluginBase):
     ########################################
     def __init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs):
         indigo.PluginBase.__init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs)
-
+        global installation_output
         pfmt = logging.Formatter('%(asctime)s.%(msecs)03d\t[%(levelname)8s] %(name)20s.%(funcName)-25s%(msg)s', datefmt='%Y-%m-%d %H:%M:%S')
         self.plugin_file_handler.setFormatter(pfmt)
 
@@ -55,6 +61,9 @@ class Plugin(indigo.PluginBase):
         self.mainfolderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
 
         #self.mappingfile = self.mainfolderLocation + str(address)+"-mapping-data.json"
+        if installation_output !="":
+            self.logger.warning(f"Dependencies Found for Plugin.  One time installation:\n{installation_output}")
+            self.logger.warning(f"Installed Correctly, now Starting plugin.")
 
         self.logger.info(u"")
         self.logger.info(u"{0:=^130}".format(" Initializing New Plugin Session "))

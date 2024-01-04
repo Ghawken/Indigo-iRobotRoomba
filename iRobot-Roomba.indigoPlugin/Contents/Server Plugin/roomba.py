@@ -17,11 +17,10 @@ global HAVE_SIX
 HAVE_MQTT=False
 HAVE_SIX=False
 
-try:
-    import paho.mqtt.client as mqtt
-    HAVE_MQTT=True
-except ImportError:
-    print("paho mqtt client not found")
+
+import paho.mqtt.client as mqtt
+HAVE_MQTT=True
+
 
 from builtins import str as text
 import sys, os
