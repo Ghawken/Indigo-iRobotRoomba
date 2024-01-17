@@ -19,11 +19,7 @@ iRoomba s9/S9+
 
 ***Installation:***
 
-Indigo 7 Only
-
-**Needs paho-mqtt for python installed via terminal window:
-Within a terminal Window:
-` <sudo> pip install paho-mqtt  `**
+Indigo 2023.2 API 3.4 Only Version 0.9.35+
 
 Download and Install from Plugin Store as below link:
 
@@ -38,7 +34,7 @@ For this plugin to work correctly you irobot needs to have a fixed IP address so
 Install the plugin.
 
 *Configure the Plugin:*
-![](https://preview.ibb.co/gS30CG/Plugin_Config.png)
+![](https://github.com/Ghawken/Indigo-iRobotRoomba/blob/master/Images/pluginConfig.png?raw=True)
 
 [i]Update Device status frequency[/i]:  This is the interval between checks on iroomba status.  Does not apply if running as continuous connection.
 [i]Continous connection to ONE Roomba Device only[/i]  Preferred method of communication.  Maintains constant local connection to iroomba.  If any status change any triggers or status change triggers will occur immediately.  Reestablishes the connection only every 24 hours.   If any communication issues restarts the plugin to overcome.
@@ -49,7 +45,7 @@ Install the plugin.
 &
 Edit Settings
 
-![](https://image.ibb.co/nMD0CG/Configure_IRobot.png)
+![](https://github.com/Ghawken/Indigo-iRobotRoomba/blob/master/Images/DeviceCloud.png?raw=True)
 
 [i]Roomba IP Address:[/i]  Enter the IP address (fixed ideally) of your iroomba robot
 
@@ -71,7 +67,7 @@ The plugin reports the following status - and this is updated live in the settin
 
 The plugin supports the following actions to control you iroomba.
 
-[![](https://image.ibb.co/bwo3zw/irobotactions.png)](https://imgbb.com/)
+[![](https://image.ibb.co/bwo3zw/irobotactions.png)](https://github.com/Ghawken/Indigo-iRobotRoomba/blob/master/Images/iRoombaActions.png?raw=True)
 
 
 
