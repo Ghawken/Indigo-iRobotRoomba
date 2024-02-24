@@ -1,1340 +1,1338 @@
 {
-	"resources": {
-		"string": [
-			{
-    "_name": "notification",
-    "__text": "Notifications"
-  },
-  {
-    "_name": "notification_channel_paused_jobs",
-    "__text": "Paused jobs"
-  },
-  {
-    "_name": "notification_charging_error_1",
-    "__text": "\"Unable to detect %s's battery.\""
-  },
-  {
-    "_name": "notification_charging_error_10",
-    "__text": "%s has a battery error."
-  },
-  {
-    "_name": "notification_charging_error_11",
-    "__text": "%s has a battery error."
-  },
-  {
-    "_name": "notification_charging_error_12",
-    "__text": "%s has a battery error."
-  },
-  {
-    "_name": "notification_charging_error_13",
-    "__text": "%s has a battery error."
-  },
-  {
-    "_name": "notification_charging_error_14",
-    "__text": "%s has a battery error."
-  },
-  {
-    "_name": "notification_charging_error_15",
-    "__text": "%s has a battery error."
-  },
-  {
-    "_name": "notification_charging_error_16",
-    "__text": "%s has a battery error."
-  },
-  {
-    "_name": "notification_charging_error_17",
-    "__text": "%s has a battery error."
-  },
-  {
-    "_name": "notification_charging_error_18",
-    "__text": "%s has a battery error."
-  },
-  {
-    "_name": "notification_charging_error_19",
-    "__text": "%s has a battery error."
-  },
-  {
-    "_name": "notification_charging_error_2",
-    "__text": "%s has a battery error. Remove from the charging station."
-  },
-  {
-    "_name": "notification_charging_error_20",
-    "__text": "%s has a battery error."
-  },
-  {
-    "_name": "notification_charging_error_21",
-    "__text": "Please clean my charging contacts with a slightly dampened melamine sponge."
-  },
-  {
-    "_name": "notification_charging_error_2_mow",
-    "__text": "%s has a charging error. Remove from charging station."
-  },
-  {
-    "_name": "notification_charging_error_3",
-    "__text": "%s has a charging error."
-  },
-  {
-    "_name": "notification_charging_error_4",
-    "__text": "%s has a charging error."
-  },
-  {
-    "_name": "notification_charging_error_5",
-    "__text": "%s has a charging error."
-  },
-  {
-    "_name": "notification_charging_error_6",
-    "__text": "%s has a battery error. Remove from the charging station."
-  },
-  {
-    "_name": "notification_charging_error_6_mow",
-    "__text": "%s has a battery error. Remove from charging station."
-  },
-  {
-    "_name": "notification_charging_error_7",
-    "__text": "%s has a battery error. Remove from the charging station."
-  },
-  {
-    "_name": "notification_charging_error_7_mow",
-    "__text": "%s has a battery error. Remove from charging station."
-  },
-  {
-    "_name": "notification_charging_error_8",
-    "__text": "%s has a battery error."
-  },
-  {
-    "_name": "notification_charging_error_9",
-    "__text": "%s has a battery error. Remove from the charging station."
-  },
-  {
-    "_name": "notification_charging_error_9_mow",
-    "__text": "%s has a battery error. Remove from charging station."
-  },
-  {
-    "_name": "notification_commercial_messages_setting_desc",
-    "__text": "Receive access to special offers on robots or accessories, and be the first to hear about exciting new products from iRobot."
-  },
-  {
-    "_name": "notification_commercial_messages_setting_title",
-    "__text": "Special offers and new products"
-  },
-  {
-    "_name": "notification_email_notification_title",
-    "__text": "Email Notifications"
-  },
-  {
-    "_name": "notification_empty_desc",
-    "__text": "Tips and reminders will show up here."
-  },
-  {
-    "_name": "notification_empty_title",
-    "__text": "You are up to date!"
-  },
-  {
-    "_name": "notification_error_0",
-    "__text": "%s is stuck and needs help."
-  },
-  {
-    "_name": "notification_error_1",
-    "__text": "%s is stuck. Move your robot to a flat surface, then press ‘Resume’ or ‘CLEAN’ on the robot to continue."
-  },
-  {
-    "_name": "notification_error_10",
-    "__text": "\"%s's right wheel has an error.\""
-  },
-  {
-    "_name": "notification_error_1000",
-    "__text": "Clear %s’s left edge-sweeping brush, then press CLEAN to restart."
-  },
-  {
-    "_name": "notification_error_1001",
-    "__text": "Clear %s’s right edge-sweeping brush, then press CLEAN to restart."
-  },
-  {
-    "_name": "notification_error_1002",
-    "__text": "Check your connection or subscription status and try again."
-  },
-  {
-    "_name": "notification_error_1007",
-    "__text": "To clear error, press and hold robot cleaning button for 15 seconds to reboot. (Error 1007)"
-  },
-  {
-    "_name": "notification_error_1008",
-    "__text": "Move robot from obstacles that could be blocking its mop arm and resume job. If error persists, tap ‘Learn more’. (Error 1008)"
-  },
-  {
-    "_name": "notification_error_1009",
-    "__text": "Press %s’s CLEAN button to continue."
-  },
-  {
-    "_name": "notification_error_1010",
-    "__text": "Keep %s’s path clear. Check for items on the floor, like a blocked doorway etc."
-  },
-  {
-    "_name": "notification_error_1011",
-    "__text": "Cleaning may switch to vacuum-only to avoid mopping carpets. Reboot the robot to reset carpet detection."
-  },
-  {
-    "_name": "notification_error_1012",
-    "__text": "You can still get there! Use the app to drive %s to the viewpoint."
-  },
-  {
-    "_name": "notification_error_1013",
-    "__text": "Check water tank for leaks. If no leak is visible, fill the tank with water. Wait 30 mins to ensure that there is no leak before resuming."
-  },
-  {
-    "_name": "notification_error_1014",
-    "__text": "Ready to vacuum, not mop. The fluid sensor isn’t working. Press %s’s button for 9 secs to reboot."
-  },
-  {
-    "_name": "notification_error_1015",
-    "__text": "Ready to vacuum, not mop. Sensor isn’t working. Press %s’s button for 9 secs to reboot."
-  },
-  {
-    "_name": "notification_error_1019",
-    "__text": "Don’t worry, there’s no damage. Please tap ‘Show me how’ for instructions on replacing and installing this part."
-  },
-  {
-    "_name": "notification_error_10_mow",
-    "__text": "Right wheel error. Move to the charging station and restart the mowing job."
-  },
-  {
-    "_name": "notification_error_11",
-    "__text": "\"%s's bin has an error.\""
-  },
-  {
-    "_name": "notification_error_12",
-    "__text": "%s stopped because of a problem with the cliff sensors."
-  },
-  {
-    "_name": "notification_error_13",
-    "__text": "%s is stuck. Move your robot to a flat surface, then press ‘Resume’ or ‘CLEAN’ on the robot to continue."
-  },
-  {
-    "_name": "notification_error_13_mow",
-    "__text": "%s is stuck. Drop-off detected."
-  },
-  {
-    "_name": "notification_error_14",
-    "__text": "Re-install %s’s bin, then press ‘Resume’ or ‘CLEAN’ on the robot to continue."
-  },
-  {
-    "_name": "notification_error_15",
-    "__text": "%s encountered an issue and ended its job early. Press CLEAN on the robot to clean."
-  },
-  {
-    "_name": "notification_error_16",
-    "__text": "%s was being moved while starting."
-  },
-  {
-    "_name": "notification_error_17",
-    "__text": "Navigation problem. Clear obstacles and check for sufficient lighting. (error 17)"
-  },
-  {
-    "_name": "notification_error_18",
-    "__text": "%s encountered docking troubles."
-  },
-  {
-    "_name": "notification_error_19",
-    "__text": "Undocking problems. Clear the area around the charging station and clean any debris from the drip tray, wheels and cleaning pad."
-  },
-  {
-    "_name": "notification_error_19_mow",
-    "__text": "Undocking problem."
-  },
-  {
-    "_name": "notification_error_1_mow",
-    "__text": "%s is stuck and needs assistance. Please move it to the charging station and restart the mowing job."
-  },
-  {
-    "_name": "notification_error_2",
-    "__text": "Follow our step-by-step guide to see how to clean the two green brushes (error 2)."
-  },
-  {
-    "_name": "notification_error_20",
-    "__text": "%s encountered docking troubles."
-  },
-  {
-    "_name": "notification_error_21",
-    "__text": "%s could not finish cleaning."
-  },
-  {
-    "_name": "notification_error_21_mow",
-    "__text": "Unable to finish mowing. Error 21."
-  },
-  {
-    "_name": "notification_error_22",
-    "__text": "%s is stuck and needs assistance."
-  },
-  {
-    "_name": "notification_error_22_mow",
-    "__text": "%s is stuck."
-  },
-  {
-    "_name": "notification_error_23",
-    "__text": "\"%s's battery is not detected.\""
-  },
-  {
-    "_name": "notification_error_24",
-    "__text": "%s needs maintenance."
-  },
-  {
-    "_name": "notification_error_25",
-    "__text": "%s has a communication error. Reboot and try again. (error 25)"
-  },
-  {
-    "_name": "notification_error_26",
-    "__text": "Vacuum problem. Inspect %s’s filter and remove any debris. (error 26)"
-  },
-  {
-    "_name": "notification_error_27",
-    "__text": "%s needs maintenance."
-  },
-  {
-    "_name": "notification_error_28",
-    "__text": "Robot Error 28."
-  },
-  {
-    "_name": "notification_error_29",
-    "__text": "%s’s software is updating. Cleaning will be available in a moment."
-  },
-  {
-    "_name": "notification_error_2_brush",
-    "__text": "\"Clear %s's main brushes, then press CLEAN to restart.\""
-  },
-  {
-    "_name": "notification_error_3",
-    "__text": "%s is stuck. Move your robot to a flat surface, then press ‘Resume’ or ‘CLEAN’ on the robot to continue."
-  },
-  {
-    "_name": "notification_error_30",
-    "__text": "Vacuum problem. Inspect filter and bin and remove any debris. (error 30)"
-  },
-  {
-    "_name": "notification_error_31",
-    "__text": "Press Resume or CLEAN on the robot to restart cleaning mission. Reboot %s if needed."
-  },
-  {
-    "_name": "notification_error_32",
-    "__text": "\"%s can't find the correct map.\""
-  },
-  {
-    "_name": "notification_error_33",
-    "__text": "%s is trapped. Move to a new area then press Resume or CLEAN on the robot to continue."
-  },
-  {
-    "_name": "notification_error_33_mow",
-    "__text": "Path blocked. Check the workspace for obstacles. Error 33."
-  },
-  {
-    "_name": "notification_error_34",
-    "__text": "%s needs assistance. Press Resume or CLEAN on the robot to continue. Tap the red icon for more."
-  },
-  {
-    "_name": "notification_error_34_mow",
-    "__text": "Couldn’t finish mowing. Error 34."
-  },
-  {
-    "_name": "notification_error_35",
-    "__text": "Attach a pad."
-  },
-  {
-    "_name": "notification_error_36",
-    "__text": "Clean Base couldn’t empty the bin completely, or the bin full sensors are dusty. Follow our step-by-step guide to fix error 36"
-  },
-  {
-    "_name": "notification_error_36_evac",
-    "__text": "Clean Base couldn’t empty the bin completely, or the bin full sensors are dusty. Follow our step-by-step guide to fix (error 36)."
-  },
-  {
-    "_name": "notification_error_37",
-    "__text": "Tank is low. Fill tank and press Resume or CLEAN on the robot to resume mopping."
-  },
-  {
-    "_name": "notification_error_38",
-    "__text": "%s experienced an error."
-  },
-  {
-    "_name": "notification_error_38_mow",
-    "__text": "%s experienced an error. Please move it to the charging station and restart the mowing job."
-  },
-  {
-    "_name": "notification_error_39",
-    "__text": "%1$s is having trouble. Please reboot %1$s and try again."
-  },
-  {
-    "_name": "notification_error_39_mow",
-    "__text": "Couldn’t finish mowing. Error 39."
-  },
-  {
-    "_name": "notification_error_3_mow",
-    "__text": "%s is stuck and needs assistance. Please move it to the charging station and restart the mowing job."
-  },
-  {
-    "_name": "notification_error_4",
-    "__text": "\"%s's left wheel is stuck.\""
-  },
-  {
-    "_name": "notification_error_40",
-    "__text": "%1$s is stuck and needs assistance. Please move %1$s to a new area."
-  },
-  {
-    "_name": "notification_error_41",
-    "__text": "Robot Error 41."
-  },
-  {
-    "_name": "notification_error_41_mow",
-    "__text": "Couldn’t finish mowing. Error 41."
-  },
-  {
-    "_name": "notification_error_42",
-    "__text": "\"%s couldn't get to the room you asked it to clean. Please clear the path and try again.\""
-  },
-  {
-    "_name": "notification_error_42_mow",
-    "__text": "%s couldn’t read your workspace. Please move it to the charging station and restart the mowing job."
-  },
-  {
-    "_name": "notification_error_43",
-    "__text": "%1$s is stuck and needs assistance. Please move %1$s to a new area."
-  },
-  {
-    "_name": "notification_error_44",
-    "__text": "Pump issue."
-  },
-  {
-    "_name": "notification_error_45",
-    "__text": "Close the lid."
-  },
-  {
-    "_name": "notification_error_46",
-    "__text": "\"%s's battery is low. Please charge.\""
-  },
-  {
-    "_name": "notification_error_47",
-    "__text": "%1$s is having trouble. Please reboot %1$s and try again."
-  },
-  {
-    "_name": "notification_error_48",
-    "__text": "\"%s couldn't get to the room you asked it to clean. Please clear the path and try again.\""
-  },
-  {
-    "_name": "notification_error_48_mow",
-    "__text": "%s couldn’t reach all of your workspace. Please clear its path and try again."
-  },
-  {
-    "_name": "notification_error_4_mow",
-    "__text": "Left wheel is stuck. Clear the wheels."
-  },
-  {
-    "_name": "notification_error_5",
-    "__text": "\"%s's right wheel is stuck.\""
-  },
-  {
-    "_name": "notification_error_52",
-    "__text": "\"The cleaning pad is too dirty to continue.\nReplace the pad or remove debris from its surface.\""
-  },
-  {
-    "_name": "notification_error_54",
-    "__text": "\"%s's blades are stuck. Check for obstructions or grass build-up.\""
-  },
-  {
-    "_name": "notification_error_55",
-    "__text": "\"%s's left blades are stuck. Check for obstructions or grass build-up.\""
-  },
-  {
-    "_name": "notification_error_56",
-    "__text": "\"%s's right blades are stuck. Check for obstructions or grass build-up.\""
-  },
-  {
-    "_name": "notification_error_57",
-    "__text": "\"%s's cutting deck is stuck. Remove obstructions around the deck and restart the mowing job.\""
-  },
-  {
-    "_name": "notification_error_58",
-    "__text": "Travelled outside of boundary. Press STOP on the robot and place on charging station to reset."
-  },
-  {
-    "_name": "notification_error_59",
-    "__text": "Tilt detected. Press STOP on the robot and place on the charging station to restart."
-  },
-  {
-    "_name": "notification_error_5_mow",
-    "__text": "Right wheel is stuck. Clear the wheels."
-  },
-  {
-    "_name": "notification_error_6",
-    "__text": "%s stopped because of a cliff. Please move your robot, then press ‘Resume’ or ‘CLEAN’ on the robot to continue."
-  },
-  {
-    "_name": "notification_error_60",
-    "__text": "Rolled over. Press STOP on the robot and return it to the charging station to reset."
-  },
-  {
-    "_name": "notification_error_61",
-    "__text": "Picked up while mowing. Press START or Home under the lid to reset."
-  },
-  {
-    "_name": "notification_error_62",
-    "__text": "Stop button pushed. Press START or Home under the lid to reset."
-  },
-  {
-    "_name": "notification_error_63",
-    "__text": "Hardware error 63. Press START or Home under the lid to reset."
-  },
-  {
-    "_name": "notification_error_64",
-    "__text": "Error 64. Press START or Home under the lid to reset."
-  },
-  {
-    "_name": "notification_error_65",
-    "__text": "%s has a hardware problem and needs to be serviced. Contact iRobot Support."
-  },
-  {
-    "_name": "notification_error_66",
-    "__text": "Memory problem"
-  },
-  {
-    "_name": "notification_error_66_mow",
-    "__text": "Memory problem. Place on the charging station then restart the mowing job."
-  },
-  {
-    "_name": "notification_error_67",
-    "__text": "Handle lifted. Press START or Home under the lid to reset."
-  },
-  {
-    "_name": "notification_error_68",
-    "__text": "%s is having hardware trouble. Please contact iRobot Customer Support."
-  },
-  {
-    "_name": "notification_error_69",
-    "__text": "%s could not locate its charging station. Check for obstacles."
-  },
-  {
-    "_name": "notification_error_69_mow",
-    "__text": "Navigation problem. Place on charging station and restart mowing job."
-  },
-  {
-    "_name": "notification_error_7",
-    "__text": "\"%s's left wheel has an error.\""
-  },
-  {
-    "_name": "notification_error_70",
-    "__text": "%s is having trouble sensing its beacons. Place on charging station and press START or Home button to reset."
-  },
-  {
-    "_name": "notification_error_71",
-    "__text": "Problem charging."
-  },
-  {
-    "_name": "notification_error_72",
-    "__text": "Problem charging."
-  },
-  {
-    "_name": "notification_error_73",
-    "__text": "The type of cleaning pad changed."
-  },
-  {
-    "_name": "notification_error_74",
-    "__text": "%s ended the job because it reached its cleaning limit."
-  },
-  {
-    "_name": "notification_error_75",
-    "__text": "Navigation problem"
-  },
-  {
-    "_name": "notification_error_76",
-    "__text": "%s is unable to update its software and needs to be rebooted. Tap ‘Learn More’ for instructions. (Error 76)"
-  },
-  {
-    "_name": "notification_error_78",
-    "__text": "Left wheel has an error. Clear the wheel then press the START button to resume the mowing job."
-  },
-  {
-    "_name": "notification_error_79",
-    "__text": "Right wheel has an error. Clear the wheel then press the START button to resume the mowing job."
-  },
-  {
-    "_name": "notification_error_7_mow",
-    "__text": "Left wheel error. Move to the charging station and restart the mowing job."
-  },
-  {
-    "_name": "notification_error_8",
-    "__text": "\"%s's bin has an error.\""
-  },
-  {
-    "_name": "notification_error_88",
-    "__text": "Move %s to a nearby location then press Resume or CLEAN on the robot to continue."
-  },
-  {
-    "_name": "notification_error_9",
-    "__text": "%s has stopped because of a bumper problem."
-  },
-  {
-    "_name": "notification_error_91",
-    "__text": "%s is having trouble with the path to its workspace and needs to be retrained."
-  },
-  {
-    "_name": "notification_error_92",
-    "__text": "%s is having trouble with the path to its charging station and needs to be retrained."
-  },
-  {
-    "_name": "notification_error_93",
-    "__text": "%s is having trouble with the path to its workspace and needs to be retrained."
-  },
-  {
-    "_name": "notification_error_94",
-    "__text": "Wheel motor is overheating. Allow motor to cool and press START to resume."
-  },
-  {
-    "_name": "notification_error_95",
-    "__text": "Wheel motor is too cold to resume. Try scheduling a mowing job for a warmer day."
-  },
-  {
-    "_name": "notification_error_96",
-    "__text": "\"Blade motor is overheating. Adjust the cutting height in the app, and make sure the lawn isn't too wet.\""
-  },
-  {
-    "_name": "notification_error_97",
-    "__text": "Blade motor is too cold to resume. Try scheduling a mowing job for a warmer day."
-  },
-  {
-    "_name": "notification_error_98",
-    "__text": "%s is temporarily disabled. Tap the red warning icon for more details."
-  },
-  {
-    "_name": "notification_error_99",
-    "__text": "Clear the area around %s’s charging station before starting a new job."
-  },
-  {
-    "_name": "notification_error_9_mow",
-    "__text": "Bumper stuck. Press START or Home under the lid to reset."
-  },
-  {
-    "_name": "notification_feedback_dialog_title",
-    "__text": "Was this information useful to you?"
-  },
-  {
-    "_name": "notification_hkc_setting_desc",
-    "__text": "\"Receive maintenance reminders, tutorials, and tips on how to optimise your robot's performance over time.\""
-  },
-  {
-    "_name": "notification_hkc_setting_title",
-    "__text": "Personalised tips and reminders"
-  },
-  {
-    "_name": "notification_locate_failure_title",
-    "__text": "Cannot Locate %s"
-  },
-  {
-    "_name": "notification_messages",
-    "__text": "Messages"
-  },
-  {
-    "_name": "notification_push_notification_title",
-    "__text": "Push Notifications"
-  },
-  {
-    "_name": "notification_recommendation_map_region",
-    "__text": "%1$s / %2$s"
-  },
-  {
-    "_name": "notification_return_to_app",
-    "__text": "Connection successful! Tap here to return to the iRobot Home app."
-  },
-  {
-    "_name": "notification_settings",
-    "__text": "Notifications"
-  },
-  {
-    "_name": "notification_settings_advertising_and_promotional_desc",
-    "__text": "Receive notifications on the latest product promotions, deals and offers"
-  },
-  {
-    "_name": "notification_settings_advertising_and_promotional_title",
-    "__text": "Advertising and promotional"
-  },
-  {
-    "_name": "notification_settings_bin_full_desc",
-    "__text": "The robot‘s bin is full. It cannot continue cleaning until it is emptied."
-  },
-  {
-    "_name": "notification_settings_bin_full_title",
-    "__text": "Bin Full"
-  },
-  {
-    "_name": "notification_settings_cancelations_title",
-    "__text": "Job Cancellation"
-  },
-  {
-    "_name": "notification_settings_cleaning_error_desc",
-    "__text": "The robot encountered an error while cleaning."
-  },
-  {
-    "_name": "notification_settings_cleaning_error_title",
-    "__text": "Cleaning Errors"
-  },
-  {
-    "_name": "notification_settings_cleaning_report_desc",
-    "__text": "The robot has sent a status update during a cleaning job."
-  },
-  {
-    "_name": "notification_settings_cleaning_report_title",
-    "__text": "Job Status"
-  },
-  {
-    "_name": "notification_settings_job_errors_desc",
-    "__text": "The robot has encountered an error and may require help."
-  },
-  {
-    "_name": "notification_settings_job_errors_title",
-    "__text": "Job Errors"
-  },
-  {
-    "_name": "notification_settings_loading_disabled_error",
-    "__text": "Push notifications are disabled for this app. Go to phone settings to enable push notifications."
-  },
-  {
-    "_name": "notification_settings_loading_error",
-    "__text": "There was an error loading your notification settings. Check your internet connection and try again."
-  },
-  {
-    "_name": "notification_settings_opt_in_emails",
-    "__text": "iRobot News and Product Updates"
-  },
-  {
-    "_name": "notification_settings_opt_in_emails_desc",
-    "__text": "Find out about special offers and new products."
-  },
-  {
-    "_name": "notification_settings_ota_desc",
-    "__text": "The robot‘s software has been updated."
-  },
-  {
-    "_name": "notification_settings_ota_title",
-    "__text": "Robot Software Updates"
-  },
-  {
-    "_name": "notification_settings_precheck_readiness_desc",
-    "__text": "Receive notifications before scheduled jobs if your robot isn’t ready to clean."
-  },
-  {
-    "_name": "notification_settings_precheck_readiness_title",
-    "__text": "Pre-job alert"
-  },
-  {
-    "_name": "notification_settings_review_obstacles_description",
-    "__text": "Review areas that the robot had trouble navigating."
-  },
-  {
-    "_name": "notification_settings_review_obstacles_reminders_description",
-    "__text": "Get reminded to review obstacles your robot encountered to improve future jobs."
-  },
-  {
-    "_name": "notification_settings_review_obstacles_reminders_title",
-    "__text": "Obstacle review reminders"
-  },
-  {
-    "_name": "notification_settings_review_obstacles_title",
-    "__text": "Obstacle review"
-  },
-  {
-    "_name": "notification_settings_title",
-    "__text": "App Notifications"
-  },
-  {
-    "_name": "notification_settings_update_error",
-    "__text": "There was an error updating this notification setting. Check your internet connection and try again."
-  },
-  {
-    "_name": "notification_shelf_navigation_action_title",
-    "__text": "View All"
-  },
-  {
-    "_name": "notification_start_refuse_1",
-    "__text": "Move %s to a new location."
-  },
-  {
-    "_name": "notification_start_refuse_10",
-    "__text": "Start %s in a new location."
-  },
-  {
-    "_name": "notification_start_refuse_14",
-    "__text": "%s has an error."
-  },
-  {
-    "_name": "notification_start_refuse_14_mow",
-    "__text": "%s has an error. Please move it to the charging station and restart the mowing job."
-  },
-  {
-    "_name": "notification_start_refuse_15",
-    "__text": "\"%s's battery is too low to start.\""
-  },
-  {
-    "_name": "notification_start_refuse_16",
-    "__text": "Dust bin may be full. Please empty the bin and clean its sensor to maintain optimal performance."
-  },
-  {
-    "_name": "notification_start_refuse_17",
-    "__text": "%s encountered an error when starting. Please try again."
-  },
-  {
-    "_name": "notification_start_refuse_17_mow",
-    "__text": "%s encountered an error when starting. Please try again."
-  },
-  {
-    "_name": "notification_start_refuse_18",
-    "__text": "%s’s software is updating. Cleaning will be available in a moment."
-  },
-  {
-    "_name": "notification_start_refuse_19",
-    "__text": "Start Refuse Error 19 – Charging-Sleep."
-  },
-  {
-    "_name": "notification_start_refuse_2",
-    "__text": "Place %s on a flat surface."
-  },
-  {
-    "_name": "notification_start_refuse_21",
-    "__text": "%1$s is having trouble starting. Please reboot %1$s and try again."
-  },
-  {
-    "_name": "notification_start_refuse_22",
-    "__text": "\"%s's pad is missing.\""
-  },
-  {
-    "_name": "notification_start_refuse_22_mow",
-    "__text": "Please move %s to the charging station and restart the mowing job."
-  },
-  {
-    "_name": "notification_start_refuse_23",
-    "__text": "\"%s's battery is not detected.\""
-  },
-  {
-    "_name": "notification_start_refuse_24",
-    "__text": "Start Refuse Error 24 – Map Version Mismatch."
-  },
-  {
-    "_name": "notification_start_refuse_25",
-    "__text": "%1$s is having trouble starting. Please reboot %1$s and try again."
-  },
-  {
-    "_name": "notification_start_refuse_26",
-    "__text": "%1$s is having trouble starting. Please reboot %1$s and try again."
-  },
-  {
-    "_name": "notification_start_refuse_27",
-    "__text": "%1$s is having trouble starting. Please reboot %1$s and try again."
-  },
-  {
-    "_name": "notification_start_refuse_271",
-    "__text": "Cleaning may switch to vacuum-only to avoid mopping carpets. Reboot the robot to reset carpet detection."
-  },
-  {
-    "_name": "notification_start_refuse_28",
-    "__text": "%1$s is having trouble starting. Please reboot %1$s and try again."
-  },
-  {
-    "_name": "notification_start_refuse_29",
-    "__text": "Start Refuse Error 29 – Inside Halo."
-  },
-  {
-    "_name": "notification_start_refuse_29_mow",
-    "__text": "Place %s back on its charging station and try again."
-  },
-  {
-    "_name": "notification_start_refuse_2_mow",
-    "__text": "Place %s on the charging station and restart the mowing job."
-  },
-  {
-    "_name": "notification_start_refuse_3",
-    "__text": "Place %s on a flat surface."
-  },
-  {
-    "_name": "notification_start_refuse_30",
-    "__text": "\"%s's tank is missing.\""
-  },
-  {
-    "_name": "notification_start_refuse_31",
-    "__text": "Please fill the tank completely before starting your next job."
-  },
-  {
-    "_name": "notification_start_refuse_32",
-    "__text": "Close the lid."
-  },
-  {
-    "_name": "notification_start_refuse_32_mow",
-    "__text": "%s needs your help. Please close the lid."
-  },
-  {
-    "_name": "notification_start_refuse_33",
-    "__text": "%s is having trouble starting. Please tap the bumper to unstick."
-  },
-  {
-    "_name": "notification_start_refuse_33_mow",
-    "__text": "%s is having trouble starting. Please tap the bumper to unstick."
-  },
-  {
-    "_name": "notification_start_refuse_34",
-    "__text": "Attach a pad."
-  },
-  {
-    "_name": "notification_start_refuse_35",
-    "__text": "Attach a pad."
-  },
-  {
-    "_name": "notification_start_refuse_36",
-    "__text": "Unable to empty bin. Check for clogging"
-  },
-  {
-    "_name": "notification_start_refuse_37",
-    "__text": "\"%s's battery is not detected.\""
-  },
-  {
-    "_name": "notification_start_refuse_38",
-    "__text": "\"%s's battery is not detected.\""
-  },
-  {
-    "_name": "notification_start_refuse_39",
-    "__text": "Saving Clean Map. Cleaning available shortly."
-  },
-  {
-    "_name": "notification_start_refuse_3_mow",
-    "__text": "Place %s on the charging station and restart the mowing job."
-  },
-  {
-    "_name": "notification_start_refuse_4",
-    "__text": "Place %s on a flat surface."
-  },
-  {
-    "_name": "notification_start_refuse_40",
-    "__text": "\"New cleaning head detected. Please update %s's software.\""
-  },
-  {
-    "_name": "notification_start_refuse_41",
-    "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
-  },
-  {
-    "_name": "notification_start_refuse_42",
-    "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
-  },
-  {
-    "_name": "notification_start_refuse_43",
-    "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
-  },
-  {
-    "_name": "notification_start_refuse_44",
-    "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
-  },
-  {
-    "_name": "notification_start_refuse_45",
-    "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
-  },
-  {
-    "_name": "notification_start_refuse_46",
-    "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
-  },
-  {
-    "_name": "notification_start_refuse_47",
-    "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
-  },
-  {
-    "_name": "notification_start_refuse_48",
-    "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
-  },
-  {
-    "_name": "notification_start_refuse_49",
-    "__text": "Navigation problem. Return Terra to its charging station."
-  },
-  {
-    "_name": "notification_start_refuse_4_mow",
-    "__text": "Place %s on the charging station and restart the mowing job."
-  },
-  {
-    "_name": "notification_start_refuse_5",
-    "__text": "%s is already on the charging station."
-  },
-  {
-    "_name": "notification_start_refuse_50",
-    "__text": "Problem sensing beacons."
-  },
-  {
-    "_name": "notification_start_refuse_51",
-    "__text": "%s is having hardware trouble. Please contact iRobot Customer Support."
-  },
-  {
-    "_name": "notification_start_refuse_52",
-    "__text": "%s has an error."
-  },
-  {
-    "_name": "notification_start_refuse_53",
-    "__text": "Left wheel has an error. Clear the wheel then press the START button to resume the mowing job."
-  },
-  {
-    "_name": "notification_start_refuse_54",
-    "__text": "Right wheel has an error. Clear the wheel then press the START button to resume the mowing job."
-  },
-  {
-    "_name": "notification_start_refuse_55",
-    "__text": "Place Terra on the charging station to mow."
-  },
-  {
-    "_name": "notification_start_refuse_57",
-    "__text": "Move %s to a nearby location then press Resume or CLEAN on the robot to continue."
-  },
-  {
-    "_name": "notification_start_refuse_58",
-    "__text": "%s is having trouble with the path to its workspace and needs to be retrained."
-  },
-  {
-    "_name": "notification_start_refuse_59",
-    "__text": "%s is having trouble with the path to its charging station and needs to be retrained."
-  },
-  {
-    "_name": "notification_start_refuse_5_mow",
-    "__text": "%s is already on the charging station."
-  },
-  {
-    "_name": "notification_start_refuse_6",
-    "__text": "\"Clear %s's debris extractors.\""
-  },
-  {
-    "_name": "notification_start_refuse_60",
-    "__text": "%s is having trouble with the path to its workspace and needs to be retrained."
-  },
-  {
-    "_name": "notification_start_refuse_61",
-    "__text": "Wheel motor is overheating. Allow motor to cool and press START to resume."
-  },
-  {
-    "_name": "notification_start_refuse_62",
-    "__text": "Wheel motor is too cold to resume. Try scheduling a mowing job for a warmer day."
-  },
-  {
-    "_name": "notification_start_refuse_63",
-    "__text": "\"Blade motor is overheating. Adjust the cutting height in the app, and make sure the lawn isn't too wet.\""
-  },
-  {
-    "_name": "notification_start_refuse_64",
-    "__text": "Blade motor is too cold to resume. Try scheduling a mowing job for a warmer day."
-  },
-  {
-    "_name": "notification_start_refuse_65",
-    "__text": "%s is temporarily disabled."
-  },
-  {
-    "_name": "notification_start_refuse_66",
-    "__text": "Check your connection or subscription status and try again."
-  },
-  {
-    "_name": "notification_start_refuse_67",
-    "__text": "%s is having hardware trouble. Please contact iRobot Customer Support."
-  },
-  {
-    "_name": "notification_start_refuse_6_brush",
-    "__text": "\"Clear %s's main brushes then press CLEAN to restart.\""
-  },
-  {
-    "_name": "notification_start_refuse_7",
-    "__text": "\"Re-install %s's bin.\""
-  },
-  {
-    "_name": "notification_start_refuse_72",
-    "__text": "Check water tank for leaks. If no leak is visible, fill the tank with water. Wait 30 mins to ensure that there is no leak before resuming."
-  },
-  {
-    "_name": "notification_start_refuse_73",
-    "__text": "Ready to vacuum, not mop. The fluid sensor isn’t working. Press %s’s button for 9 secs to reboot."
-  },
-  {
-    "_name": "notification_start_refuse_74",
-    "__text": "Ready to vacuum, not mop. Sensor isn’t working. Press %s’s button for 9 secs to reboot."
-  },
-  {
-    "_name": "notification_start_refuse_78",
-    "__text": "Don’t worry, there’s no damage. Please tap ‘Show me how’ for instructions on replacing and installing this part."
-  },
-  {
-    "_name": "notification_start_refuse_8",
-    "__text": "%s experienced an error. Press try again."
-  },
-  {
-    "_name": "notification_start_refuse_8_mow",
-    "__text": "%s experienced an error. Please move it to the charging station and restart the mowing job."
-  },
-  {
-    "_name": "notification_start_refuse_9",
-    "__text": "%s’s software is updating. Cleaning will be available in a moment."
-  },
-  {
-    "_name": "notification_text_mashup",
-    "__text": "\"%1$s\n%2$s Badge!\""
-  },
-  {
-    "_name": "notification_text_milestone",
-    "__text": "Congratulations! You just unlocked the:"
-  },
-  {
-    "_name": "notification_text_milestone_1",
-    "__text": "Maiden Voyage"
-  },
-  {
-    "_name": "notification_text_milestone_10",
-    "__text": "Birthday Party"
-  },
-  {
-    "_name": "notification_text_milestone_10_desc",
-    "__text": "\"Happy birthday %1$s! A little cake to celebrate? Not to worry, %1$s will clean up when you're done.\""
-  },
-  {
-    "_name": "notification_text_milestone_11",
-    "__text": "Best Friend"
-  },
-  {
-    "_name": "notification_text_milestone_11_desc",
-    "__text": "\"Best friends count on each other, like you've counted on %s to complete the last 50 cleaning missions. Go ahead and brag about your BFF.\""
-  },
-  {
-    "_name": "notification_text_milestone_12",
-    "__text": "Spring Clean"
-  },
-  {
-    "_name": "notification_text_milestone_12_desc",
-    "__text": "\"It's that time of year, spring cleaning! Let %s do the work for you.\""
-  },
-  {
-    "_name": "notification_text_milestone_1_desc",
-    "__text": "%s just completed its inaugural run. This is the start of a beautiful friendship. Not to mention, a clean one!"
-  },
-  {
-    "_name": "notification_text_milestone_2",
-    "__text": "Time Saver (5 hours)"
-  },
-  {
-    "_name": "notification_text_milestone_2_desc",
-    "__text": "\"Your wish for more hours in the day has come true. By letting %s do the work, you've earned 5 hours back. Now go and have fun!\""
-  },
-  {
-    "_name": "notification_text_milestone_3",
-    "__text": "Time Saver (20 hours)"
-  },
-  {
-    "_name": "notification_text_milestone_3_desc",
-    "__text": "\"You've almost got a full day back! It's like a leap year. So go ahead, start a hobby, watch your favourite movie trilogy...\""
-  },
-  {
-    "_name": "notification_text_milestone_4",
-    "__text": "Time Saver (40 hours)"
-  },
-  {
-    "_name": "notification_text_milestone_4_desc",
-    "__text": "\"Friends noticing your clean floors and that relaxed look on your face? Not surprising, as the time you've saved with your %s is similar to a week off!\""
-  },
-  {
-    "_name": "notification_text_milestone_5",
-    "__text": "Dirt Buster"
-  },
-  {
-    "_name": "notification_text_milestone_5_desc",
-    "__text": "%s has now picked up the equivalent of a wheelie bin full of dirt off your floor. Cool? Gross? It could go either way."
-  },
-  {
-    "_name": "notification_text_milestone_6",
-    "__text": "Roomba Mile"
-  },
-  {
-    "_name": "notification_text_milestone_6_desc",
-    "__text": "Go %s! Your robot has now driven one mile while vacuuming. Keep pressing CLEAN!"
-  },
-  {
-    "_name": "notification_text_milestone_7",
-    "__text": "Marathon Medal"
-  },
-  {
-    "_name": "notification_text_milestone_7_desc",
-    "__text": "26.2 miles driven - give that Roomba a medal!! %s is going the distance to clean your home."
-  },
-  {
-    "_name": "notification_text_milestone_8",
-    "__text": "Globetrotter"
-  },
-  {
-    "_name": "notification_text_milestone_8_desc",
-    "__text": "%s has driven the distance of 1/100th of the way around the earth while cleaning. Keep pressing CLEAN!"
-  },
-  {
-    "_name": "notification_text_milestone_9",
-    "__text": "Six Months Sidekick"
-  },
-  {
-    "_name": "notification_text_milestone_9_desc",
-    "__text": "\"Feel the love! It's been six months since the first time you pushed CLEAN. Happy half birthday %s!\""
-  },
-  {
-    "_name": "notification_text_ready",
-    "__text": "%1$s will clean at %2$s"
-  },
-  {
-    "_name": "notification_text_share_1",
-    "__text": "I just unlocked the Maiden Voyage Badge!"
-  },
-  {
-    "_name": "notification_text_share_10",
-    "__text": "\"%s amazes me at every turn. So far, it has picked up the equivalent of a wheelie bin full of dirt off my floors. Don't judge. What's on your floors?\""
-  },
-  {
-    "_name": "notification_text_share_11",
-    "__text": "\"I've just unlocked the Roomba Mile Badge!\""
-  },
-  {
-    "_name": "notification_text_share_12",
-    "__text": "This is one busy robot. %1$s has already driven one mile while vacuuming my floors for me. Keep going, %1$s!"
-  },
-  {
-    "_name": "notification_text_share_13",
-    "__text": "\"I've just unlocked the Marathon Medal Badge!\""
-  },
-  {
-    "_name": "notification_text_share_14",
-    "__text": "%s has driven the full distance of a marathon while cleaning my home. Apparently those trips under the bed and around the chair legs are adding up. Give this robot a medal!"
-  },
-  {
-    "_name": "notification_text_share_15",
-    "__text": "\"I've just unlocked the Globetrotter Badge!\""
-  },
-  {
-    "_name": "notification_text_share_16",
-    "__text": "I knew %s was covering some serious ground, but wow! It has now driven the distance of 1/100th of the way around the earth while cleaning my home."
-  },
-  {
-    "_name": "notification_text_share_17",
-    "__text": "\"I've just unlocked the Six Months Sidekick Badge!\""
-  },
-  {
-    "_name": "notification_text_share_18",
-    "__text": "\"Six months ago today I handed over the vacuuming to %1$s. It's one of the best things I've ever done. Thanks %1$s!\""
-  },
-  {
-    "_name": "notification_text_share_19",
-    "__text": "\"I've just unlocked the Birthday Party Badge!\""
-  },
-  {
-    "_name": "notification_text_share_2",
-    "__text": "\"I don't know who was more productive – %1$s or me? %1$s vacuumed my floors at the push of a button. I could get used to this.\""
-  },
-  {
-    "_name": "notification_text_share_20",
-    "__text": "\"Happy birthday %1$s! It's my robot's special day, but I feel like I got the gift. Thanks %1$s for all the time you've saved me over the past year. Here's to many more!\""
-  },
-  {
-    "_name": "notification_text_share_21",
-    "__text": "\"I've just unlocked the Best Friend Badge!\""
-  },
-  {
-    "_name": "notification_text_share_22",
-    "__text": "Is it possible to be best friends with a robot? Of course, especially one that does so much for me. %1$s has cleaned my floors 50 times so far. Thanks, %1$s!"
-  },
-  {
-    "_name": "notification_text_share_23",
-    "__text": "\"I've just unlocked the Spring Clean Badge!\""
-  },
-  {
-    "_name": "notification_text_share_24",
-    "__text": "\"This year, I'm leaving the job to my vacuum cleaning robot!...Thanks %s, I'll be outside enjoying the sunshine if you need me.\""
-  },
-  {
-    "_name": "notification_text_share_25",
-    "__text": "My Roomba just completed its first mission! Clean floors at the push of a button? I could get used to this! #iRobotRoomba"
-  },
-  {
-    "_name": "notification_text_share_26",
-    "__text": "By letting Roomba vacuum my floors, my wish for more hours in the day has come true. Thanks #iRobotRoomba!"
-  },
-  {
-    "_name": "notification_text_share_27",
-    "__text": "My floors are cleaner and my to-do list shorter. That means more time for fun. I love this robot! #iRobotRoomba"
-  },
-  {
-    "_name": "notification_text_share_28",
-    "__text": "\"My Roomba has cleaned for a total of 40 hours. It's like I'm accruing my own holiday time! Thanks #iRobotRoomba\""
-  },
-  {
-    "_name": "notification_text_share_29",
-    "__text": "\"My Roomba has picked up the equivalent of a wheelie bin full of dirt from my floors. Don't judge. What's on your floors? #iRobotRoomba\""
-  },
-  {
-    "_name": "notification_text_share_3",
-    "__text": "\"I've just unlocked the Time Saver (5 hours) Badge!\""
-  },
-  {
-    "_name": "notification_text_share_30",
-    "__text": "My Roomba has already driven one mile throughout my home while vacuuming my floors for me. Keep going, Roomba! #iRobotRoomba"
-  },
-  {
-    "_name": "notification_text_share_31",
-    "__text": "\"Those trips cleaning under the bed are adding up. Roomba is officially a marathon runner. It's gone 26.2 miles round my house! #iRobotRoomba\""
-  },
-  {
-    "_name": "notification_text_share_32",
-    "__text": "Got the iRobot Globetrotter Badge! Roomba has now driven the distance of 1/100th of the way around the earth cleaning my home. #iRobotRoomba"
-  },
-  {
-    "_name": "notification_text_share_33",
-    "__text": "\"Six months ago today I handed over the vacuuming to my Roomba. It's one of the best things I've ever done. Thanks, Roomba! #iRobotRoomba\""
-  },
-  {
-    "_name": "notification_text_share_34",
-    "__text": "\"Happy birthday, Roomba! Thanks for all the time you've saved me over the past year. Here's to many more! #iRobotRoomba\""
-  },
-  {
-    "_name": "notification_text_share_35",
-    "__text": "Is it possible to be best friends with a robot? Yes, especially one that does so much for me. 50 cleaning missions so far! #iRobotRoomba"
-  },
-  {
-    "_name": "notification_text_share_36",
-    "__text": "\"Spring cleaning? Roomba's got it covered. Thanks, little robot! I'll be outside enjoying the sunshine if you need me. #iRobotRoomba\""
-  },
-  {
-    "_name": "notification_text_share_4",
-    "__text": "\"My wish for more hours in the day has come true. %s vacuumed my floors this week, so I've earned 5 hours back. What should I do with them?\""
-  },
-  {
-    "_name": "notification_text_share_5",
-    "__text": "\"I've just unlocked the Time Saver (20 hours) Badge!\""
-  },
-  {
-    "_name": "notification_text_share_6",
-    "__text": "\"Body Copy: I'm saving so much time by letting %s vacuum my floors for me. My to-do list is getting shorter, leaving more room for fun. What should I do?\""
-  },
-  {
-    "_name": "notification_text_share_7",
-    "__text": "\"I've just unlocked the Time Saver (40 hours) Badge!\""
-  },
-  {
-    "_name": "notification_text_share_8",
-    "__text": "\"You may have noticed my new relaxed attitude. These things happen when you save 40 hours by letting %s do the cleaning. It's like a holiday!\""
-  },
-  {
-    "_name": "notification_text_share_9",
-    "__text": "\"I've just unlocked the Dirt Buster Badge!\""
-  },
-  {
-    "_name": "notification_title",
-    "__text": "%s requires your attention"
-  },
-  {
-    "_name": "notification_title_robot_name",
-    "__text": "%s"
-  },
-  {
-    "_name": "notifications",
-    "__text": "Notifications"
-  },
-  {
-    "_name": "notificationtimeout",
-    "__text": "An error occurred while processing this notification."
+  "resources": {
+    "string": [
+      {
+        "_name": "notification",
+        "__text": "Notifications"
+      },
+      {
+        "_name": "notification_channel_paused_jobs",
+        "__text": "Paused jobs"
+      },
+      {
+        "_name": "notification_charging_error_1",
+        "__text": "\"Unable to detect %s's battery.\""
+      },
+      {
+        "_name": "notification_charging_error_10",
+        "__text": "%s has a battery error."
+      },
+      {
+        "_name": "notification_charging_error_11",
+        "__text": "%s has a battery error."
+      },
+      {
+        "_name": "notification_charging_error_12",
+        "__text": "%s has a battery error."
+      },
+      {
+        "_name": "notification_charging_error_13",
+        "__text": "%s has a battery error."
+      },
+      {
+        "_name": "notification_charging_error_14",
+        "__text": "%s has a battery error."
+      },
+      {
+        "_name": "notification_charging_error_15",
+        "__text": "%s has a battery error."
+      },
+      {
+        "_name": "notification_charging_error_16",
+        "__text": "%s has a battery error."
+      },
+      {
+        "_name": "notification_charging_error_17",
+        "__text": "%s has a battery error."
+      },
+      {
+        "_name": "notification_charging_error_18",
+        "__text": "%s has a battery error."
+      },
+      {
+        "_name": "notification_charging_error_19",
+        "__text": "%s has a battery error."
+      },
+      {
+        "_name": "notification_charging_error_2",
+        "__text": "%s has a battery error. Remove from the charging station."
+      },
+      {
+        "_name": "notification_charging_error_20",
+        "__text": "%s has a battery error."
+      },
+      {
+        "_name": "notification_charging_error_21",
+        "__text": "Please clean my charging contacts with a slightly dampened melamine sponge."
+      },
+      {
+        "_name": "notification_charging_error_2_mow",
+        "__text": "%s has a charging error. Remove from charging station."
+      },
+      {
+        "_name": "notification_charging_error_3",
+        "__text": "%s has a charging error."
+      },
+      {
+        "_name": "notification_charging_error_4",
+        "__text": "%s has a charging error."
+      },
+      {
+        "_name": "notification_charging_error_5",
+        "__text": "%s has a charging error."
+      },
+      {
+        "_name": "notification_charging_error_6",
+        "__text": "%s has a battery error. Remove from the charging station."
+      },
+      {
+        "_name": "notification_charging_error_6_mow",
+        "__text": "%s has a battery error. Remove from charging station."
+      },
+      {
+        "_name": "notification_charging_error_7",
+        "__text": "%s has a battery error. Remove from the charging station."
+      },
+      {
+        "_name": "notification_charging_error_7_mow",
+        "__text": "%s has a battery error. Remove from charging station."
+      },
+      {
+        "_name": "notification_charging_error_8",
+        "__text": "%s has a battery error."
+      },
+      {
+        "_name": "notification_charging_error_9",
+        "__text": "%s has a battery error. Remove from the charging station."
+      },
+      {
+        "_name": "notification_charging_error_9_mow",
+        "__text": "%s has a battery error. Remove from charging station."
+      },
+      {
+        "_name": "notification_commercial_messages_setting_desc",
+        "__text": "Receive access to special offers on robots or accessories, and be the first to hear about exciting new products from iRobot."
+      },
+      {
+        "_name": "notification_commercial_messages_setting_title",
+        "__text": "Special offers and new products"
+      },
+      {
+        "_name": "notification_email_notification_title",
+        "__text": "Email Notifications"
+      },
+      {
+        "_name": "notification_empty_desc",
+        "__text": "Tips and reminders will show up here."
+      },
+      {
+        "_name": "notification_empty_title",
+        "__text": "You are up to date!"
+      },
+      {
+        "_name": "notification_error_0",
+        "__text": "%s is stuck and needs help."
+      },
+      {
+        "_name": "notification_error_1",
+        "__text": "%s is stuck. Move your robot to a flat surface, then press ‘Resume’ or ‘CLEAN’ on the robot to continue."
+      },
+      {
+        "_name": "notification_error_10",
+        "__text": "\"%s's right wheel has an error.\""
+      },
+      {
+        "_name": "notification_error_1000",
+        "__text": "Clear %s’s left edge-sweeping brush, then press CLEAN to restart."
+      },
+      {
+        "_name": "notification_error_1001",
+        "__text": "Clear %s’s right edge-sweeping brush, then press CLEAN to restart."
+      },
+      {
+        "_name": "notification_error_1002",
+        "__text": "Check your connection or subscription status and try again."
+      },
+      {
+        "_name": "notification_error_1007",
+        "__text": "To clear error, press and hold robot cleaning button for 15 seconds to reboot. (Error 1007)"
+      },
+      {
+        "_name": "notification_error_1008",
+        "__text": "Move robot from obstacles that could be blocking its mop arm and resume job. If error persists, tap ‘Learn more’. (Error 1008)"
+      },
+      {
+        "_name": "notification_error_1009",
+        "__text": "Press %s’s CLEAN button to continue."
+      },
+      {
+        "_name": "notification_error_1010",
+        "__text": "Keep %s’s path clear. Check for items on the floor, like a blocked doorway etc."
+      },
+      {
+        "_name": "notification_error_1011",
+        "__text": "Cleaning may switch to vacuum-only to avoid mopping carpets. Reboot the robot to reset carpet detection."
+      },
+      {
+        "_name": "notification_error_1012",
+        "__text": "You can still get there! Use the app to drive %s to the viewpoint."
+      },
+      {
+        "_name": "notification_error_1013",
+        "__text": "Check water tank for leaks. If no leak is visible, fill the tank with water. Wait 30 mins to ensure that there is no leak before resuming."
+      },
+      {
+        "_name": "notification_error_1014",
+        "__text": "Ready to vacuum, not mop. The fluid sensor isn’t working. Press %s’s button for 9 secs to reboot."
+      },
+      {
+        "_name": "notification_error_1015",
+        "__text": "Ready to vacuum, not mop. Sensor isn’t working. Press %s’s button for 9 secs to reboot."
+      },
+      {
+        "_name": "notification_error_1019",
+        "__text": "Don’t worry, there’s no damage. Please tap ‘Show me how’ for instructions on replacing and installing this part."
+      },
+      {
+        "_name": "notification_error_10_mow",
+        "__text": "Right wheel error. Move to the charging station and restart the mowing job."
+      },
+      {
+        "_name": "notification_error_11",
+        "__text": "\"%s's bin has an error.\""
+      },
+      {
+        "_name": "notification_error_12",
+        "__text": "%s stopped because of a problem with the cliff sensors."
+      },
+      {
+        "_name": "notification_error_13",
+        "__text": "%s is stuck. Move your robot to a flat surface, then press ‘Resume’ or ‘CLEAN’ on the robot to continue."
+      },
+      {
+        "_name": "notification_error_13_mow",
+        "__text": "%s is stuck. Drop-off detected."
+      },
+      {
+        "_name": "notification_error_14",
+        "__text": "Re-install %s’s bin, then press ‘Resume’ or ‘CLEAN’ on the robot to continue."
+      },
+      {
+        "_name": "notification_error_15",
+        "__text": "%s encountered an issue and ended its job early. Press CLEAN on the robot to clean."
+      },
+      {
+        "_name": "notification_error_16",
+        "__text": "%s was being moved while starting."
+      },
+      {
+        "_name": "notification_error_17",
+        "__text": "Navigation problem. Clear obstacles and check for sufficient lighting. (error 17)"
+      },
+      {
+        "_name": "notification_error_18",
+        "__text": "%s encountered docking troubles."
+      },
+      {
+        "_name": "notification_error_19",
+        "__text": "Undocking problems. Clear the area around the charging station and clean any debris from the drip tray, wheels and cleaning pad."
+      },
+      {
+        "_name": "notification_error_19_mow",
+        "__text": "Undocking problem."
+      },
+      {
+        "_name": "notification_error_1_mow",
+        "__text": "%s is stuck and needs assistance. Please move it to the charging station and restart the mowing job."
+      },
+      {
+        "_name": "notification_error_2",
+        "__text": "Follow our step-by-step guide to see how to clean the two green brushes (error 2)."
+      },
+      {
+        "_name": "notification_error_20",
+        "__text": "%s encountered docking troubles."
+      },
+      {
+        "_name": "notification_error_21",
+        "__text": "%s could not finish cleaning."
+      },
+      {
+        "_name": "notification_error_21_mow",
+        "__text": "Unable to finish mowing. Error 21."
+      },
+      {
+        "_name": "notification_error_22",
+        "__text": "%s is stuck and needs assistance."
+      },
+      {
+        "_name": "notification_error_22_mow",
+        "__text": "%s is stuck."
+      },
+      {
+        "_name": "notification_error_23",
+        "__text": "\"%s's battery is not detected.\""
+      },
+      {
+        "_name": "notification_error_24",
+        "__text": "%s needs maintenance."
+      },
+      {
+        "_name": "notification_error_25",
+        "__text": "%s has a communication error. Reboot and try again. (error 25)"
+      },
+      {
+        "_name": "notification_error_26",
+        "__text": "Vacuum problem. Inspect %s’s filter and remove any debris. (error 26)"
+      },
+      {
+        "_name": "notification_error_27",
+        "__text": "%s needs maintenance."
+      },
+      {
+        "_name": "notification_error_28",
+        "__text": "Robot Error 28."
+      },
+      {
+        "_name": "notification_error_29",
+        "__text": "%s’s software is updating. Cleaning will be available in a moment."
+      },
+      {
+        "_name": "notification_error_2_brush",
+        "__text": "\"Clear %s's main brushes, then press CLEAN to restart.\""
+      },
+      {
+        "_name": "notification_error_3",
+        "__text": "%s is stuck. Move your robot to a flat surface, then press ‘Resume’ or ‘CLEAN’ on the robot to continue."
+      },
+      {
+        "_name": "notification_error_30",
+        "__text": "Vacuum problem. Inspect filter and bin and remove any debris. (error 30)"
+      },
+      {
+        "_name": "notification_error_31",
+        "__text": "Press Resume or CLEAN on the robot to restart cleaning mission. Reboot %s if needed."
+      },
+      {
+        "_name": "notification_error_32",
+        "__text": "\"%s can't find the correct map.\""
+      },
+      {
+        "_name": "notification_error_33",
+        "__text": "%s is trapped. Move to a new area then press Resume or CLEAN on the robot to continue."
+      },
+      {
+        "_name": "notification_error_33_mow",
+        "__text": "Path blocked. Check the workspace for obstacles. Error 33."
+      },
+      {
+        "_name": "notification_error_34",
+        "__text": "%s needs assistance. Press Resume or CLEAN on the robot to continue. Tap the red icon for more."
+      },
+      {
+        "_name": "notification_error_34_mow",
+        "__text": "Couldn’t finish mowing. Error 34."
+      },
+      {
+        "_name": "notification_error_35",
+        "__text": "Attach a pad."
+      },
+      {
+        "_name": "notification_error_36",
+        "__text": "Clean Base couldn’t empty the bin completely, or the bin full sensors are dusty. Follow our step-by-step guide to fix error 36"
+      },
+      {
+        "_name": "notification_error_36_evac",
+        "__text": "Clean Base couldn’t empty the bin completely, or the bin full sensors are dusty. Follow our step-by-step guide to fix (error 36)."
+      },
+      {
+        "_name": "notification_error_37",
+        "__text": "Tank is low. Fill tank and press Resume or CLEAN on the robot to resume mopping."
+      },
+      {
+        "_name": "notification_error_38",
+        "__text": "%s experienced an error."
+      },
+      {
+        "_name": "notification_error_38_mow",
+        "__text": "%s experienced an error. Please move it to the charging station and restart the mowing job."
+      },
+      {
+        "_name": "notification_error_39",
+        "__text": "%1$s is having trouble. Please reboot %1$s and try again."
+      },
+      {
+        "_name": "notification_error_39_mow",
+        "__text": "Couldn’t finish mowing. Error 39."
+      },
+      {
+        "_name": "notification_error_3_mow",
+        "__text": "%s is stuck and needs assistance. Please move it to the charging station and restart the mowing job."
+      },
+      {
+        "_name": "notification_error_4",
+        "__text": "\"%s's left wheel is stuck.\""
+      },
+      {
+        "_name": "notification_error_40",
+        "__text": "%s is stuck and needs assistance. Please move %s to a new area."
+      },
+      {
+        "_name": "notification_error_41",
+        "__text": "Robot Error 41."
+      },
+      {
+        "_name": "notification_error_41_mow",
+        "__text": "Couldn’t finish mowing. Error 41."
+      },
+      {
+        "_name": "notification_error_42",
+        "__text": "\"%s couldn't get to the room you asked it to clean. Please clear the path and try again.\""
+      },
+      {
+        "_name": "notification_error_42_mow",
+        "__text": "%s couldn’t read your workspace. Please move it to the charging station and restart the mowing job."
+      },
+      {
+        "_name": "notification_error_43",
+        "__text": "%s is stuck and needs assistance. Please move %s to a new area."
+      },
+      {
+        "_name": "notification_error_44",
+        "__text": "Pump issue."
+      },
+      {
+        "_name": "notification_error_45",
+        "__text": "Close the lid."
+      },
+      {
+        "_name": "notification_error_46",
+        "__text": "\"%s's battery is low. Please charge.\""
+      },
+      {
+        "_name": "notification_error_47",
+        "__text": "%s is having trouble. Please reboot %s and try again."
+      },
+      {
+        "_name": "notification_error_48",
+        "__text": "\"%s couldn't get to the room you asked it to clean. Please clear the path and try again.\""
+      },
+      {
+        "_name": "notification_error_48_mow",
+        "__text": "%s couldn’t reach all of your workspace. Please clear its path and try again."
+      },
+      {
+        "_name": "notification_error_4_mow",
+        "__text": "Left wheel is stuck. Clear the wheels."
+      },
+      {
+        "_name": "notification_error_5",
+        "__text": "\"%s's right wheel is stuck.\""
+      },
+      {
+        "_name": "notification_error_52",
+        "__text": "\"The cleaning pad is too dirty to continue.\nReplace the pad or remove debris from its surface.\""
+      },
+      {
+        "_name": "notification_error_54",
+        "__text": "\"%s's blades are stuck. Check for obstructions or grass build-up.\""
+      },
+      {
+        "_name": "notification_error_55",
+        "__text": "\"%s's left blades are stuck. Check for obstructions or grass build-up.\""
+      },
+      {
+        "_name": "notification_error_56",
+        "__text": "\"%s's right blades are stuck. Check for obstructions or grass build-up.\""
+      },
+      {
+        "_name": "notification_error_57",
+        "__text": "\"%s's cutting deck is stuck. Remove obstructions around the deck and restart the mowing job.\""
+      },
+      {
+        "_name": "notification_error_58",
+        "__text": "Travelled outside of boundary. Press STOP on the robot and place on charging station to reset."
+      },
+      {
+        "_name": "notification_error_59",
+        "__text": "Tilt detected. Press STOP on the robot and place on the charging station to restart."
+      },
+      {
+        "_name": "notification_error_5_mow",
+        "__text": "Right wheel is stuck. Clear the wheels."
+      },
+      {
+        "_name": "notification_error_6",
+        "__text": "%s stopped because of a cliff. Please move your robot, then press ‘Resume’ or ‘CLEAN’ on the robot to continue."
+      },
+      {
+        "_name": "notification_error_60",
+        "__text": "Rolled over. Press STOP on the robot and return it to the charging station to reset."
+      },
+      {
+        "_name": "notification_error_61",
+        "__text": "Picked up while mowing. Press START or Home under the lid to reset."
+      },
+      {
+        "_name": "notification_error_62",
+        "__text": "Stop button pushed. Press START or Home under the lid to reset."
+      },
+      {
+        "_name": "notification_error_63",
+        "__text": "Hardware error 63. Press START or Home under the lid to reset."
+      },
+      {
+        "_name": "notification_error_64",
+        "__text": "Error 64. Press START or Home under the lid to reset."
+      },
+      {
+        "_name": "notification_error_65",
+        "__text": "%s has a hardware problem and needs to be serviced. Contact iRobot Support."
+      },
+      {
+        "_name": "notification_error_66",
+        "__text": "Memory problem"
+      },
+      {
+        "_name": "notification_error_66_mow",
+        "__text": "Memory problem. Place on the charging station then restart the mowing job."
+      },
+      {
+        "_name": "notification_error_67",
+        "__text": "Handle lifted. Press START or Home under the lid to reset."
+      },
+      {
+        "_name": "notification_error_68",
+        "__text": "%s is having hardware trouble. Please contact iRobot Customer Support."
+      },
+      {
+        "_name": "notification_error_69",
+        "__text": "%s could not locate its charging station. Check for obstacles."
+      },
+      {
+        "_name": "notification_error_69_mow",
+        "__text": "Navigation problem. Place on charging station and restart mowing job."
+      },
+      {
+        "_name": "notification_error_7",
+        "__text": "\"%s's left wheel has an error.\""
+      },
+      {
+        "_name": "notification_error_70",
+        "__text": "%s is having trouble sensing its beacons. Place on charging station and press START or Home button to reset."
+      },
+      {
+        "_name": "notification_error_71",
+        "__text": "Problem charging."
+      },
+      {
+        "_name": "notification_error_72",
+        "__text": "Problem charging."
+      },
+      {
+        "_name": "notification_error_73",
+        "__text": "The type of cleaning pad changed."
+      },
+      {
+        "_name": "notification_error_74",
+        "__text": "%s ended the job because it reached its cleaning limit."
+      },
+      {
+        "_name": "notification_error_75",
+        "__text": "Navigation problem"
+      },
+      {
+        "_name": "notification_error_76",
+        "__text": "%s is unable to update its software and needs to be rebooted. Tap ‘Learn More’ for instructions. (Error 76)"
+      },
+      {
+        "_name": "notification_error_78",
+        "__text": "Left wheel has an error. Clear the wheel then press the START button to resume the mowing job."
+      },
+      {
+        "_name": "notification_error_79",
+        "__text": "Right wheel has an error. Clear the wheel then press the START button to resume the mowing job."
+      },
+      {
+        "_name": "notification_error_7_mow",
+        "__text": "Left wheel error. Move to the charging station and restart the mowing job."
+      },
+      {
+        "_name": "notification_error_8",
+        "__text": "\"%s's bin has an error.\""
+      },
+      {
+        "_name": "notification_error_88",
+        "__text": "Move %s to a nearby location then press Resume or CLEAN on the robot to continue."
+      },
+      {
+        "_name": "notification_error_9",
+        "__text": "%s has stopped because of a bumper problem."
+      },
+      {
+        "_name": "notification_error_91",
+        "__text": "%s is having trouble with the path to its workspace and needs to be retrained."
+      },
+      {
+        "_name": "notification_error_92",
+        "__text": "%s is having trouble with the path to its charging station and needs to be retrained."
+      },
+      {
+        "_name": "notification_error_93",
+        "__text": "%s is having trouble with the path to its workspace and needs to be retrained."
+      },
+      {
+        "_name": "notification_error_94",
+        "__text": "Wheel motor is overheating. Allow motor to cool and press START to resume."
+      },
+      {
+        "_name": "notification_error_95",
+        "__text": "Wheel motor is too cold to resume. Try scheduling a mowing job for a warmer day."
+      },
+      {
+        "_name": "notification_error_96",
+        "__text": "\"Blade motor is overheating. Adjust the cutting height in the app, and make sure the lawn isn't too wet.\""
+      },
+      {
+        "_name": "notification_error_97",
+        "__text": "Blade motor is too cold to resume. Try scheduling a mowing job for a warmer day."
+      },
+      {
+        "_name": "notification_error_98",
+        "__text": "%s is temporarily disabled. Tap the red warning icon for more details."
+      },
+      {
+        "_name": "notification_error_99",
+        "__text": "Clear the area around %s’s charging station before starting a new job."
+      },
+      {
+        "_name": "notification_error_9_mow",
+        "__text": "Bumper stuck. Press START or Home under the lid to reset."
+      },
+      {
+        "_name": "notification_feedback_dialog_title",
+        "__text": "Was this information useful to you?"
+      },
+      {
+        "_name": "notification_hkc_setting_desc",
+        "__text": "\"Receive maintenance reminders, tutorials, and tips on how to optimise your robot's performance over time.\""
+      },
+      {
+        "_name": "notification_hkc_setting_title",
+        "__text": "Personalised tips and reminders"
+      },
+      {
+        "_name": "notification_locate_failure_title",
+        "__text": "Cannot Locate %s"
+      },
+      {
+        "_name": "notification_messages",
+        "__text": "Messages"
+      },
+      {
+        "_name": "notification_push_notification_title",
+        "__text": "Push Notifications"
+      },
+      {
+        "_name": "notification_recommendation_map_region",
+        "__text": "%1$s / %2$s"
+      },
+      {
+        "_name": "notification_return_to_app",
+        "__text": "Connection successful! Tap here to return to the iRobot Home app."
+      },
+      {
+        "_name": "notification_settings",
+        "__text": "Notifications"
+      },
+      {
+        "_name": "notification_settings_advertising_and_promotional_desc",
+        "__text": "Receive notifications on the latest product promotions, deals and offers"
+      },
+      {
+        "_name": "notification_settings_advertising_and_promotional_title",
+        "__text": "Advertising and promotional"
+      },
+      {
+        "_name": "notification_settings_bin_full_desc",
+        "__text": "The robot‘s bin is full. It cannot continue cleaning until it is emptied."
+      },
+      {
+        "_name": "notification_settings_bin_full_title",
+        "__text": "Bin Full"
+      },
+      {
+        "_name": "notification_settings_cancelations_title",
+        "__text": "Job Cancellation"
+      },
+      {
+        "_name": "notification_settings_cleaning_error_desc",
+        "__text": "The robot encountered an error while cleaning."
+      },
+      {
+        "_name": "notification_settings_cleaning_error_title",
+        "__text": "Cleaning Errors"
+      },
+      {
+        "_name": "notification_settings_cleaning_report_desc",
+        "__text": "The robot has sent a status update during a cleaning job."
+      },
+      {
+        "_name": "notification_settings_cleaning_report_title",
+        "__text": "Job Status"
+      },
+      {
+        "_name": "notification_settings_job_errors_desc",
+        "__text": "The robot has encountered an error and may require help."
+      },
+      {
+        "_name": "notification_settings_job_errors_title",
+        "__text": "Job Errors"
+      },
+      {
+        "_name": "notification_settings_loading_disabled_error",
+        "__text": "Push notifications are disabled for this app. Go to phone settings to enable push notifications."
+      },
+      {
+        "_name": "notification_settings_loading_error",
+        "__text": "There was an error loading your notification settings. Check your internet connection and try again."
+      },
+      {
+        "_name": "notification_settings_opt_in_emails",
+        "__text": "iRobot News and Product Updates"
+      },
+      {
+        "_name": "notification_settings_opt_in_emails_desc",
+        "__text": "Find out about special offers and new products."
+      },
+      {
+        "_name": "notification_settings_ota_desc",
+        "__text": "The robot‘s software has been updated."
+      },
+      {
+        "_name": "notification_settings_ota_title",
+        "__text": "Robot Software Updates"
+      },
+      {
+        "_name": "notification_settings_precheck_readiness_desc",
+        "__text": "Receive notifications before scheduled jobs if your robot isn’t ready to clean."
+      },
+      {
+        "_name": "notification_settings_precheck_readiness_title",
+        "__text": "Pre-job alert"
+      },
+      {
+        "_name": "notification_settings_review_obstacles_description",
+        "__text": "Review areas that the robot had trouble navigating."
+      },
+      {
+        "_name": "notification_settings_review_obstacles_reminders_description",
+        "__text": "Get reminded to review obstacles your robot encountered to improve future jobs."
+      },
+      {
+        "_name": "notification_settings_review_obstacles_reminders_title",
+        "__text": "Obstacle review reminders"
+      },
+      {
+        "_name": "notification_settings_review_obstacles_title",
+        "__text": "Obstacle review"
+      },
+      {
+        "_name": "notification_settings_title",
+        "__text": "App Notifications"
+      },
+      {
+        "_name": "notification_settings_update_error",
+        "__text": "There was an error updating this notification setting. Check your internet connection and try again."
+      },
+      {
+        "_name": "notification_shelf_navigation_action_title",
+        "__text": "View All"
+      },
+      {
+        "_name": "notification_start_refuse_1",
+        "__text": "Move %s to a new location."
+      },
+      {
+        "_name": "notification_start_refuse_10",
+        "__text": "Start %s in a new location."
+      },
+      {
+        "_name": "notification_start_refuse_14",
+        "__text": "%s has an error."
+      },
+      {
+        "_name": "notification_start_refuse_14_mow",
+        "__text": "%s has an error. Please move it to the charging station and restart the mowing job."
+      },
+      {
+        "_name": "notification_start_refuse_15",
+        "__text": "\"%s's battery is too low to start.\""
+      },
+      {
+        "_name": "notification_start_refuse_16",
+        "__text": "Dust bin may be full. Please empty the bin and clean its sensor to maintain optimal performance."
+      },
+      {
+        "_name": "notification_start_refuse_17",
+        "__text": "%s encountered an error when starting. Please try again."
+      },
+      {
+        "_name": "notification_start_refuse_17_mow",
+        "__text": "%s encountered an error when starting. Please try again."
+      },
+      {
+        "_name": "notification_start_refuse_18",
+        "__text": "%s’s software is updating. Cleaning will be available in a moment."
+      },
+      {
+        "_name": "notification_start_refuse_19",
+        "__text": "Start Refuse Error 19 – Charging-Sleep."
+      },
+      {
+        "_name": "notification_start_refuse_2",
+        "__text": "Place %s on a flat surface."
+      },
+      {
+        "_name": "notification_start_refuse_21",
+        "__text": "%1$s is having trouble starting. Please reboot %1$s and try again."
+      },
+      {
+        "_name": "notification_start_refuse_22",
+        "__text": "\"%s's pad is missing.\""
+      },
+      {
+        "_name": "notification_start_refuse_22_mow",
+        "__text": "Please move %s to the charging station and restart the mowing job."
+      },
+      {
+        "_name": "notification_start_refuse_23",
+        "__text": "\"%s's battery is not detected.\""
+      },
+      {
+        "_name": "notification_start_refuse_24",
+        "__text": "Start Refuse Error 24 – Map Version Mismatch."
+      },
+      {
+        "_name": "notification_start_refuse_25",
+        "__text": "%1$s is having trouble starting. Please reboot %1$s and try again."
+      },
+      {
+        "_name": "notification_start_refuse_26",
+        "__text": "%1$s is having trouble starting. Please reboot %1$s and try again."
+      },
+      {
+        "_name": "notification_start_refuse_27",
+        "__text": "%1$s is having trouble starting. Please reboot %1$s and try again."
+      },
+      {
+        "_name": "notification_start_refuse_271",
+        "__text": "Cleaning may switch to vacuum-only to avoid mopping carpets. Reboot the robot to reset carpet detection."
+      },
+      {
+        "_name": "notification_start_refuse_28",
+        "__text": "%1$s is having trouble starting. Please reboot %1$s and try again."
+      },
+      {
+        "_name": "notification_start_refuse_29",
+        "__text": "Start Refuse Error 29 – Inside Halo."
+      },
+      {
+        "_name": "notification_start_refuse_29_mow",
+        "__text": "Place %s back on its charging station and try again."
+      },
+      {
+        "_name": "notification_start_refuse_2_mow",
+        "__text": "Place %s on the charging station and restart the mowing job."
+      },
+      {
+        "_name": "notification_start_refuse_3",
+        "__text": "Place %s on a flat surface."
+      },
+      {
+        "_name": "notification_start_refuse_30",
+        "__text": "\"%s's tank is missing.\""
+      },
+      {
+        "_name": "notification_start_refuse_31",
+        "__text": "Please fill the tank completely before starting your next job."
+      },
+      {
+        "_name": "notification_start_refuse_32",
+        "__text": "Close the lid."
+      },
+      {
+        "_name": "notification_start_refuse_32_mow",
+        "__text": "%s needs your help. Please close the lid."
+      },
+      {
+        "_name": "notification_start_refuse_33",
+        "__text": "%s is having trouble starting. Please tap the bumper to unstick."
+      },
+      {
+        "_name": "notification_start_refuse_33_mow",
+        "__text": "%s is having trouble starting. Please tap the bumper to unstick."
+      },
+      {
+        "_name": "notification_start_refuse_34",
+        "__text": "Attach a pad."
+      },
+      {
+        "_name": "notification_start_refuse_35",
+        "__text": "Attach a pad."
+      },
+      {
+        "_name": "notification_start_refuse_36",
+        "__text": "Unable to empty bin. Check for clogging"
+      },
+      {
+        "_name": "notification_start_refuse_37",
+        "__text": "\"%s's battery is not detected.\""
+      },
+      {
+        "_name": "notification_start_refuse_38",
+        "__text": "\"%s's battery is not detected.\""
+      },
+      {
+        "_name": "notification_start_refuse_39",
+        "__text": "Saving Clean Map. Cleaning available shortly."
+      },
+      {
+        "_name": "notification_start_refuse_3_mow",
+        "__text": "Place %s on the charging station and restart the mowing job."
+      },
+      {
+        "_name": "notification_start_refuse_4",
+        "__text": "Place %s on a flat surface."
+      },
+      {
+        "_name": "notification_start_refuse_40",
+        "__text": "\"New cleaning head detected. Please update %s's software.\""
+      },
+      {
+        "_name": "notification_start_refuse_41",
+        "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
+      },
+      {
+        "_name": "notification_start_refuse_42",
+        "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
+      },
+      {
+        "_name": "notification_start_refuse_43",
+        "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
+      },
+      {
+        "_name": "notification_start_refuse_44",
+        "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
+      },
+      {
+        "_name": "notification_start_refuse_45",
+        "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
+      },
+      {
+        "_name": "notification_start_refuse_46",
+        "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
+      },
+      {
+        "_name": "notification_start_refuse_47",
+        "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
+      },
+      {
+        "_name": "notification_start_refuse_48",
+        "__text": "\"Press start or home under Terra's lid to reset, then return to its charging station.\""
+      },
+      {
+        "_name": "notification_start_refuse_49",
+        "__text": "Navigation problem. Return Terra to its charging station."
+      },
+      {
+        "_name": "notification_start_refuse_4_mow",
+        "__text": "Place %s on the charging station and restart the mowing job."
+      },
+      {
+        "_name": "notification_start_refuse_5",
+        "__text": "%s is already on the charging station."
+      },
+      {
+        "_name": "notification_start_refuse_50",
+        "__text": "Problem sensing beacons."
+      },
+      {
+        "_name": "notification_start_refuse_51",
+        "__text": "%s is having hardware trouble. Please contact iRobot Customer Support."
+      },
+      {
+        "_name": "notification_start_refuse_52",
+        "__text": "%s has an error."
+      },
+      {
+        "_name": "notification_start_refuse_53",
+        "__text": "Left wheel has an error. Clear the wheel then press the START button to resume the mowing job."
+      },
+      {
+        "_name": "notification_start_refuse_54",
+        "__text": "Right wheel has an error. Clear the wheel then press the START button to resume the mowing job."
+      },
+      {
+        "_name": "notification_start_refuse_55",
+        "__text": "Place Terra on the charging station to mow."
+      },
+      {
+        "_name": "notification_start_refuse_57",
+        "__text": "Move %s to a nearby location then press Resume or CLEAN on the robot to continue."
+      },
+      {
+        "_name": "notification_start_refuse_58",
+        "__text": "%s is having trouble with the path to its workspace and needs to be retrained."
+      },
+      {
+        "_name": "notification_start_refuse_59",
+        "__text": "%s is having trouble with the path to its charging station and needs to be retrained."
+      },
+      {
+        "_name": "notification_start_refuse_5_mow",
+        "__text": "%s is already on the charging station."
+      },
+      {
+        "_name": "notification_start_refuse_6",
+        "__text": "\"Clear %s's debris extractors.\""
+      },
+      {
+        "_name": "notification_start_refuse_60",
+        "__text": "%s is having trouble with the path to its workspace and needs to be retrained."
+      },
+      {
+        "_name": "notification_start_refuse_61",
+        "__text": "Wheel motor is overheating. Allow motor to cool and press START to resume."
+      },
+      {
+        "_name": "notification_start_refuse_62",
+        "__text": "Wheel motor is too cold to resume. Try scheduling a mowing job for a warmer day."
+      },
+      {
+        "_name": "notification_start_refuse_63",
+        "__text": "\"Blade motor is overheating. Adjust the cutting height in the app, and make sure the lawn isn't too wet.\""
+      },
+      {
+        "_name": "notification_start_refuse_64",
+        "__text": "Blade motor is too cold to resume. Try scheduling a mowing job for a warmer day."
+      },
+      {
+        "_name": "notification_start_refuse_65",
+        "__text": "%s is temporarily disabled."
+      },
+      {
+        "_name": "notification_start_refuse_66",
+        "__text": "Check your connection or subscription status and try again."
+      },
+      {
+        "_name": "notification_start_refuse_67",
+        "__text": "%s is having hardware trouble. Please contact iRobot Customer Support."
+      },
+      {
+        "_name": "notification_start_refuse_6_brush",
+        "__text": "\"Clear %s's main brushes then press CLEAN to restart.\""
+      },
+      {
+        "_name": "notification_start_refuse_7",
+        "__text": "\"Re-install %s's bin.\""
+      },
+      {
+        "_name": "notification_start_refuse_72",
+        "__text": "Check water tank for leaks. If no leak is visible, fill the tank with water. Wait 30 mins to ensure that there is no leak before resuming."
+      },
+      {
+        "_name": "notification_start_refuse_73",
+        "__text": "Ready to vacuum, not mop. The fluid sensor isn’t working. Press %s’s button for 9 secs to reboot."
+      },
+      {
+        "_name": "notification_start_refuse_74",
+        "__text": "Ready to vacuum, not mop. Sensor isn’t working. Press %s’s button for 9 secs to reboot."
+      },
+      {
+        "_name": "notification_start_refuse_78",
+        "__text": "Don’t worry, there’s no damage. Please tap ‘Show me how’ for instructions on replacing and installing this part."
+      },
+      {
+        "_name": "notification_start_refuse_8",
+        "__text": "%s experienced an error. Press try again."
+      },
+      {
+        "_name": "notification_start_refuse_8_mow",
+        "__text": "%s experienced an error. Please move it to the charging station and restart the mowing job."
+      },
+      {
+        "_name": "notification_start_refuse_9",
+        "__text": "%s’s software is updating. Cleaning will be available in a moment."
+      },
+      {
+        "_name": "notification_text_mashup",
+        "__text": "\"%1$s\n%2$s Badge!\""
+      },
+      {
+        "_name": "notification_text_milestone",
+        "__text": "Congratulations! You just unlocked the:"
+      },
+      {
+        "_name": "notification_text_milestone_1",
+        "__text": "Maiden Voyage"
+      },
+      {
+        "_name": "notification_text_milestone_10",
+        "__text": "Birthday Party"
+      },
+      {
+        "_name": "notification_text_milestone_10_desc",
+        "__text": "\"Happy birthday %1$s! A little cake to celebrate? Not to worry, %1$s will clean up when you're done.\""
+      },
+      {
+        "_name": "notification_text_milestone_11",
+        "__text": "Best Friend"
+      },
+      {
+        "_name": "notification_text_milestone_11_desc",
+        "__text": "\"Best friends count on each other, like you've counted on %s to complete the last 50 cleaning missions. Go ahead and brag about your BFF.\""
+      },
+      {
+        "_name": "notification_text_milestone_12",
+        "__text": "Spring Clean"
+      },
+      {
+        "_name": "notification_text_milestone_12_desc",
+        "__text": "\"It's that time of year, spring cleaning! Let %s do the work for you.\""
+      },
+      {
+        "_name": "notification_text_milestone_1_desc",
+        "__text": "%s just completed its inaugural run. This is the start of a beautiful friendship. Not to mention, a clean one!"
+      },
+      {
+        "_name": "notification_text_milestone_2",
+        "__text": "Time Saver (5 hours)"
+      },
+      {
+        "_name": "notification_text_milestone_2_desc",
+        "__text": "\"Your wish for more hours in the day has come true. By letting %s do the work, you've earned 5 hours back. Now go and have fun!\""
+      },
+      {
+        "_name": "notification_text_milestone_3",
+        "__text": "Time Saver (20 hours)"
+      },
+      {
+        "_name": "notification_text_milestone_3_desc",
+        "__text": "\"You've almost got a full day back! It's like a leap year. So go ahead, start a hobby, watch your favourite movie trilogy...\""
+      },
+      {
+        "_name": "notification_text_milestone_4",
+        "__text": "Time Saver (40 hours)"
+      },
+      {
+        "_name": "notification_text_milestone_4_desc",
+        "__text": "\"Friends noticing your clean floors and that relaxed look on your face? Not surprising, as the time you've saved with your %s is similar to a week off!\""
+      },
+      {
+        "_name": "notification_text_milestone_5",
+        "__text": "Dirt Buster"
+      },
+      {
+        "_name": "notification_text_milestone_5_desc",
+        "__text": "%s has now picked up the equivalent of a wheelie bin full of dirt off your floor. Cool? Gross? It could go either way."
+      },
+      {
+        "_name": "notification_text_milestone_6",
+        "__text": "Roomba Mile"
+      },
+      {
+        "_name": "notification_text_milestone_6_desc",
+        "__text": "Go %s! Your robot has now driven one mile while vacuuming. Keep pressing CLEAN!"
+      },
+      {
+        "_name": "notification_text_milestone_7",
+        "__text": "Marathon Medal"
+      },
+      {
+        "_name": "notification_text_milestone_7_desc",
+        "__text": "26.2 miles driven - give that Roomba a medal!! %s is going the distance to clean your home."
+      },
+      {
+        "_name": "notification_text_milestone_8",
+        "__text": "Globetrotter"
+      },
+      {
+        "_name": "notification_text_milestone_8_desc",
+        "__text": "%s has driven the distance of 1/100th of the way around the earth while cleaning. Keep pressing CLEAN!"
+      },
+      {
+        "_name": "notification_text_milestone_9",
+        "__text": "Six Months Sidekick"
+      },
+      {
+        "_name": "notification_text_milestone_9_desc",
+        "__text": "\"Feel the love! It's been six months since the first time you pushed CLEAN. Happy half birthday %s!\""
+      },
+      {
+        "_name": "notification_text_ready",
+        "__text": "%1$s will clean at %2$s"
+      },
+      {
+        "_name": "notification_text_share_1",
+        "__text": "I just unlocked the Maiden Voyage Badge!"
+      },
+      {
+        "_name": "notification_text_share_10",
+        "__text": "\"%s amazes me at every turn. So far, it has picked up the equivalent of a wheelie bin full of dirt off my floors. Don't judge. What's on your floors?\""
+      },
+      {
+        "_name": "notification_text_share_11",
+        "__text": "\"I've just unlocked the Roomba Mile Badge!\""
+      },
+      {
+        "_name": "notification_text_share_12",
+        "__text": "This is one busy robot. %1$s has already driven one mile while vacuuming my floors for me. Keep going, %1$s!"
+      },
+      {
+        "_name": "notification_text_share_13",
+        "__text": "\"I've just unlocked the Marathon Medal Badge!\""
+      },
+      {
+        "_name": "notification_text_share_14",
+        "__text": "%s has driven the full distance of a marathon while cleaning my home. Apparently those trips under the bed and around the chair legs are adding up. Give this robot a medal!"
+      },
+      {
+        "_name": "notification_text_share_15",
+        "__text": "\"I've just unlocked the Globetrotter Badge!\""
+      },
+      {
+        "_name": "notification_text_share_16",
+        "__text": "I knew %s was covering some serious ground, but wow! It has now driven the distance of 1/100th of the way around the earth while cleaning my home."
+      },
+      {
+        "_name": "notification_text_share_17",
+        "__text": "\"I've just unlocked the Six Months Sidekick Badge!\""
+      },
+      {
+        "_name": "notification_text_share_18",
+        "__text": "\"Six months ago today I handed over the vacuuming to %1$s. It's one of the best things I've ever done. Thanks %1$s!\""
+      },
+      {
+        "_name": "notification_text_share_19",
+        "__text": "\"I've just unlocked the Birthday Party Badge!\""
+      },
+      {
+        "_name": "notification_text_share_2",
+        "__text": "\"I don't know who was more productive – %1$s or me? %1$s vacuumed my floors at the push of a button. I could get used to this.\""
+      },
+      {
+        "_name": "notification_text_share_20",
+        "__text": "\"Happy birthday %1$s! It's my robot's special day, but I feel like I got the gift. Thanks %1$s for all the time you've saved me over the past year. Here's to many more!\""
+      },
+      {
+        "_name": "notification_text_share_21",
+        "__text": "\"I've just unlocked the Best Friend Badge!\""
+      },
+      {
+        "_name": "notification_text_share_22",
+        "__text": "Is it possible to be best friends with a robot? Of course, especially one that does so much for me. %1$s has cleaned my floors 50 times so far. Thanks, %1$s!"
+      },
+      {
+        "_name": "notification_text_share_23",
+        "__text": "\"I've just unlocked the Spring Clean Badge!\""
+      },
+      {
+        "_name": "notification_text_share_24",
+        "__text": "\"This year, I'm leaving the job to my vacuum cleaning robot!...Thanks %s, I'll be outside enjoying the sunshine if you need me.\""
+      },
+      {
+        "_name": "notification_text_share_25",
+        "__text": "My Roomba just completed its first mission! Clean floors at the push of a button? I could get used to this! #iRobotRoomba"
+      },
+      {
+        "_name": "notification_text_share_26",
+        "__text": "By letting Roomba vacuum my floors, my wish for more hours in the day has come true. Thanks #iRobotRoomba!"
+      },
+      {
+        "_name": "notification_text_share_27",
+        "__text": "My floors are cleaner and my to-do list shorter. That means more time for fun. I love this robot! #iRobotRoomba"
+      },
+      {
+        "_name": "notification_text_share_28",
+        "__text": "\"My Roomba has cleaned for a total of 40 hours. It's like I'm accruing my own holiday time! Thanks #iRobotRoomba\""
+      },
+      {
+        "_name": "notification_text_share_29",
+        "__text": "\"My Roomba has picked up the equivalent of a wheelie bin full of dirt from my floors. Don't judge. What's on your floors? #iRobotRoomba\""
+      },
+      {
+        "_name": "notification_text_share_3",
+        "__text": "\"I've just unlocked the Time Saver (5 hours) Badge!\""
+      },
+      {
+        "_name": "notification_text_share_30",
+        "__text": "My Roomba has already driven one mile throughout my home while vacuuming my floors for me. Keep going, Roomba! #iRobotRoomba"
+      },
+      {
+        "_name": "notification_text_share_31",
+        "__text": "\"Those trips cleaning under the bed are adding up. Roomba is officially a marathon runner. It's gone 26.2 miles round my house! #iRobotRoomba\""
+      },
+      {
+        "_name": "notification_text_share_32",
+        "__text": "Got the iRobot Globetrotter Badge! Roomba has now driven the distance of 1/100th of the way around the earth cleaning my home. #iRobotRoomba"
+      },
+      {
+        "_name": "notification_text_share_33",
+        "__text": "\"Six months ago today I handed over the vacuuming to my Roomba. It's one of the best things I've ever done. Thanks, Roomba! #iRobotRoomba\""
+      },
+      {
+        "_name": "notification_text_share_34",
+        "__text": "\"Happy birthday, Roomba! Thanks for all the time you've saved me over the past year. Here's to many more! #iRobotRoomba\""
+      },
+      {
+        "_name": "notification_text_share_35",
+        "__text": "Is it possible to be best friends with a robot? Yes, especially one that does so much for me. 50 cleaning missions so far! #iRobotRoomba"
+      },
+      {
+        "_name": "notification_text_share_36",
+        "__text": "\"Spring cleaning? Roomba's got it covered. Thanks, little robot! I'll be outside enjoying the sunshine if you need me. #iRobotRoomba\""
+      },
+      {
+        "_name": "notification_text_share_4",
+        "__text": "\"My wish for more hours in the day has come true. %s vacuumed my floors this week, so I've earned 5 hours back. What should I do with them?\""
+      },
+      {
+        "_name": "notification_text_share_5",
+        "__text": "\"I've just unlocked the Time Saver (20 hours) Badge!\""
+      },
+      {
+        "_name": "notification_text_share_6",
+        "__text": "\"Body Copy: I'm saving so much time by letting %s vacuum my floors for me. My to-do list is getting shorter, leaving more room for fun. What should I do?\""
+      },
+      {
+        "_name": "notification_text_share_7",
+        "__text": "\"I've just unlocked the Time Saver (40 hours) Badge!\""
+      },
+      {
+        "_name": "notification_text_share_8",
+        "__text": "\"You may have noticed my new relaxed attitude. These things happen when you save 40 hours by letting %s do the cleaning. It's like a holiday!\""
+      },
+      {
+        "_name": "notification_text_share_9",
+        "__text": "\"I've just unlocked the Dirt Buster Badge!\""
+      },
+      {
+        "_name": "notification_title",
+        "__text": "%s requires your attention"
+      },
+      {
+        "_name": "notification_title_robot_name",
+        "__text": "%s"
+      },
+      {
+        "_name": "notifications",
+        "__text": "Notifications"
+      },
+      {
+        "_name": "notificationtimeout",
+        "__text": "An error occurred while processing this notification."
+      }
+    ]
   }
-
-
-		]
-	}
 }

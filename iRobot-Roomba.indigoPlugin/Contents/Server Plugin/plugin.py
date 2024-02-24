@@ -16,7 +16,7 @@ import json
 import logging
 #import OpenSSL
 #rom base64 import b64encode
-
+import traceback
 from roomba import Roomba
 import platform
 from roomba import password
@@ -136,7 +136,7 @@ class Plugin(indigo.PluginBase):
 
         ## Load json database of errors
         try:
-            with open('errormsg.json') as json_file:
+            with open('errormsg.json', 'r', encoding='utf-8') as json_file:
                 self.iroombaData = json.load(json_file)
 
             self.logger.debug("Reading iRoomba Strings as JSON Data From File")
@@ -144,15 +144,17 @@ class Plugin(indigo.PluginBase):
           #  for strings in self.iroombaData:
                # self.logger.debug( text(strings) )
 
-            self.newiroombaData = { d['_name'] : d['__text']  for d in self.iroombaData}
+            self.newiroombaData = { d['_name'].encode("utf-8") : d['__text'].encode('utf-8')  for d in self.iroombaData}
             self.iroombaData = None
 
             self.logger.debug("Done reading new json Data file")
         except:
-            self.logger.debug("Exception in Json database")
+            self.logger.debug("Exception in Json database", exc_info=True)
             pass
 
         self.logger.info("{0:=^130}".format(f" End Initializing Plugin Session for Plugin: {plugin_display_name} "))
+        if self.debugOther:
+            self.logger.debug(f"{self.newiroombaData=}")
         #self.logger.debug(json.dumps(self.iroombaData, sort_keys=True, indent=4))
         #self.logger.error(self.iroombaData['resources']['abc_capital_on'])
 
@@ -207,7 +209,7 @@ class Plugin(indigo.PluginBase):
         self.browserOpen(iurl)
 
     def startup(self):
-        self.logger.info(u"Starting Roomba")
+        #self.logger.info(u"Starting Roomba")
         self.triggers = { }
         self.masterState = None
         self.currentstate = ""
@@ -230,7 +232,7 @@ class Plugin(indigo.PluginBase):
             for file_name in file_names:
                 shutil.move(os.path.join(source_dir, file_name), target_dir)
         except:
-            self.logger.debug("Error trying to move files.  Skippping.", exc_info=True)
+            self.logger.debug("Error trying to move files.  Skippping.", exc_info=False)
 
         self.continuous = self.pluginPrefs.get('continuous', False)
 
@@ -784,6 +786,32 @@ class Plugin(indigo.PluginBase):
             return
 
         result = irobotAPI_Maps(self, address=roombaIP,useCloud=useCloud, cloudLogin=cloudLogin, cloudPassword=cloudPassword, blid=blid)
+
+        try:
+            self.sleep(1)
+            roombaIP = str(device.states['IP'])
+            folderLocation = self.pluginprefDirectory  # MAChome+"Documents/Indigo-iRobotRoomba/"
+            filename = str(roombaIP) + "-mapping-data.json"
+            file = folderLocation + filename
+            favourites_file = folderLocation + str(roombaIP) + "-favourites-data.json"
+
+            if self.checkMapFile(device, file) == False:
+                self.logger.debug(u'Mapping Data File Does Not Exist.')
+                self.logger.info("No Cloud Mapping Data found for this device.  Please setup in Device Config if needed.")
+            else:
+                self.logger.debug(u'Mapping Data File Exists - using it')
+                with open(file) as data_file:
+                    self.allMappingData[roombaIP] = json.load(data_file)
+
+            if self.checkMapFile(device, favourites_file) == False:
+                self.logger.debug(u'Favourites Data File Does Not Exist.')
+                self.logger.info("No Cloud Favourites Data found for this device.  Please setup in Device Config if needed.")
+            else:
+                self.logger.debug(u'Favourites Data File Exists - using it')
+                with open(favourites_file) as data_file:
+                    self.allFavouritesData[roombaIP] = json.load(data_file)
+        except:
+            self.logger.exception("Exception Caughht loading files")
 
 
     def getRoombaPassword(self, valuesDict, typeId, deviceId):

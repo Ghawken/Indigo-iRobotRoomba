@@ -61,7 +61,7 @@ Please use the Get Password data to connect to icloud, update password and updat
             visibleBindingValue="true" >
                 <Label>Roomba Cloud Password:</Label>
             </Field>
-           <Field id="getRoombaPasswordCloud" type="button" fontSize="large" visibleBindingId="useCloud"
+           <Field id="getRoombaPasswordCloud" type="button" visibleBindingId="useCloud"
             visibleBindingValue="true">
                 <Title>Get Password</Title>
                 <CallbackMethod>getRoombaPassword</CallbackMethod>

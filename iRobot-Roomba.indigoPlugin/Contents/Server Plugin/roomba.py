@@ -125,7 +125,7 @@ class irobotAPI_Maps(object):
                     f.write(mapdata)
                 with open(self.favourites_file,"w") as f:
                     f.write(favourites_data)
-                self.logger.info("Mapping Data Saved for this Robot.")
+                self.logger.info("Mapping & Favourite Data Saved for this Robot.")
 
 class password(object):
     '''
@@ -715,7 +715,7 @@ class Roomba(object):
                 # but v1.3 changes all this, so have to do the following:
 
                 self.logger.debug("Selecting the best SSL TLS Settings")
-                self.logger.info("Setting TLS")
+                self.logger.debug("Setting TLS")
                 try:
                     # self.client._ssl_context = None
                     context = ssl.SSLContext()
@@ -862,7 +862,7 @@ class Roomba(object):
 
     def on_connect(self, client, userdata, flags, rc):
         try:
-            self.logger.debug("Roomba Connected %s" % self.roombaName)
+            self.logger.info("Roomba Connected : %s" % self.roombaName)
             if rc == 0:
                 self.roomba_connected = True
                 #self.plugin.connected = True
