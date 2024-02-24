@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 <MenuItems>
     <SupportURL></SupportURL>
-	<MenuItem id="checkAllRoombas">
-		<Name>Update All Roomba State Info</Name>
-        <CallbackMethod>checkallStatesMenu</CallbackMethod>
-	</MenuItem>
     <MenuItem id="titleSeparator2" type="separator" />
         <MenuItem id="restartPlugin">
         <Name>Restart Plugin</Name>

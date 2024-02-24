@@ -91,6 +91,7 @@ class irobotAPI_Maps(object):
         self.folderLocation = self.plugin.pluginprefDirectory #self.MAChome+"Documents/Indigo-iRobotRoomba/"
 
         self.file = self.folderLocation + str(address)+"-mapping-data.json"
+        self.favourites_file = self.folderLocation + str(address)+"-favourites-data.json"
         self.address = address
         self.useCloud = useCloud
         self.cloudLogin = cloudLogin
@@ -110,7 +111,9 @@ class irobotAPI_Maps(object):
             if str(robot)==str(blid):
                 self.logger.debug("Robot Found:")
                 mapdata = json.dumps(iRobot.get_maps(robot), indent=2)
-                self.logger.debug("Robot ID {}, MAPS: {}".format(robot, mapdata))
+                favourites_data = json.dumps(iRobot.get_favourites(robot), indent=2)
+                #self.logger.debug("Robot ID {}, MAPS: {}".format(robot, mapdata))
+                #self.logger.debug("Robot ID {}, Favourites: {}".format(robot, favourites_data))
                 if not os.path.isdir(self.folderLocation):
                     try:
                         ret = os.makedirs(self.folderLocation)
@@ -120,6 +123,8 @@ class irobotAPI_Maps(object):
 
                 with open(self.file,"w") as f:
                     f.write(mapdata)
+                with open(self.favourites_file,"w") as f:
+                    f.write(favourites_data)
                 self.logger.info("Mapping Data Saved for this Robot.")
 
 class password(object):
@@ -472,6 +477,7 @@ class Roomba(object):
               "evac": "Emptying bin",
               "chargingerror": "Base Unplugged",
               "hmPostMsn": "End Mission",
+              "refill" : "Refilling Tank",
               "": None}
 
     # From http://homesupport.irobot.com/app/answers/detail/a_id/9024/~/roomba-900-error-messages

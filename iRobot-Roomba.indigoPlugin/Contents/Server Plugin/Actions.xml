@@ -26,6 +26,7 @@
             </ConfigUI>
         <CallbackMethod>lastCommandRoombaAction</CallbackMethod>
     </Action>
+
     <Action id="cleanRoomRoomba" deviceFilter="self.roombaDevice">
         <Name>Clean Specific Room/Areas</Name>
         <ConfigUI>
@@ -37,6 +38,18 @@
             </ConfigUI>
         <CallbackMethod>sendSpecificRoomCommand</CallbackMethod>
     </Action>
+        <Action id="cleanFavouriteRoomba" deviceFilter="self.roombaDevice">
+        <Name>Clean Favourite Room/Areas</Name>
+        <ConfigUI>
+
+         <Field id="actionID" type="menu" rows="14">
+                <Label>Favourites </Label>
+             <List class="self" method="actionReturnFavourites" dynamicReload="true"/>
+         </Field>
+            </ConfigUI>
+        <CallbackMethod>sendSpecificFavouriteCommand</CallbackMethod>
+    </Action>
+
     <Action id="startRoomba" deviceFilter="self.roombaDevice">
         <Name>Start Roomba</Name>
         <CallbackMethod>startRoombaAction</CallbackMethod>

@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <PluginConfig>
     <SupportURL>https://forums.indigodomo.com/viewforum.php?f=265</SupportURL>
-      <Field id="infoLabel0" type="label" fontSize='large' fontColor="black">
+      <Field id="infoLabel0" type="label" fontSize='large' fontColor="blue">
     <Label>iRoomba Robot Line Indigo Plugin</Label>
   </Field>
-  <Field id="space0" type="label" fontColor="black" >
+  <Field id="space0" type="label" fontColor="blue" >
     <Label>Developed by: GlennNZ</Label>
   </Field>
   <Field id="sep7" type="separator"/>
@@ -31,7 +31,6 @@
     </Field>
 
     <Field id="space2226" type="separator"/>
-    <Field id="space22226" type="separator"/>
     <Field id="statusFrequency" type="textfield" defaultValue="1" hidden="true">
         <Label>Update device status frequency (minutes):</Label>
     </Field>
@@ -41,17 +40,9 @@
     <Field id="updateNote" type="label" fontSize="small" fontColor="darkgray" hidden="true">
         <Label>The plugin will not check for updates if the frequency is set to zero.</Label>
     </Field>
-    <Field id="sep2" type="separator" hidden="true"/>
 
-  <Field id="debugTrue" type="checkbox" tooltip="Will save debug info to log.">
-    <Label>Display Roomba Communication and save to log (vebose!)</Label>
-    <Description>Enable/Disable</Description>
-  </Field>
 
-  <Field id="debugOther" type="checkbox" tooltip="Will save debug info to log.">
-    <Label>Display Further Debug Information</Label>
-    <Description>Enable/Disable</Description>
-  </Field>
+
 
     <Field id="continuous" type="checkbox" tooltip="Will keep connection to Roomba open." defaultValue="true" hidden="true">
             <Label>
@@ -61,14 +52,42 @@
             <Description>Enable/Disable</Description>
             </Field>
 
-    <Field id="logLevel" type="menu" defaultValue="20">
-        <Label>Event Logging Level:</Label>
+      <Field id="space023" type="label" fontColor="blue" >
+    <Label>Debug Settings:</Label>
+  </Field>
+    <Field id="sep7asdd2e" type="separator"/>
+    <Field id="debugTrue" type="checkbox" tooltip="Will save debug info to log.">
+    <Label>Display Roomba Communication and save to log (vebose!)</Label>
+    <Description>Enable/Disable</Description>
+  </Field>
+
+  <Field id="debugOther" type="checkbox" tooltip="Will save debug info to log.">
+    <Label>Display Further Debug Information</Label>
+    <Description>Enable/Disable</Description>
+  </Field>
+
+    <Field id="showDebugLevel" type="menu" defaultValue="20" tooltip="Controls the amount of debug information written to the log.">
+        <Label>Indigo Log Debug level:</Label>
+        <Description>Level of Debug information to show in Indigo</Description>
         <List>
+            <Option value="5">Detailed Debugging Messages</Option>
             <Option value="10">Debugging Messages</Option>
             <Option value="20">Informational Messages</Option>
             <Option value="30">Warning Messages</Option>
             <Option value="40">Error Messages</Option>
             <Option value="50">Critical Errors Only</Option>
         </List>
-    </Field>       
+    </Field>
+        <Field id="showDebugFileLevel" type="menu" defaultValue="5" tooltip="Controls the amount of debug information written to the log.">
+        <Label>File Debug level:</Label>
+        <Description>Level of Debug information saved to File</Description>
+        <List>
+            <Option value="5">Detailed Debugging Messages</Option>
+            <Option value="10">Debugging Messages</Option>
+            <Option value="20">Informational Messages</Option>
+            <Option value="30">Warning Messages</Option>
+            <Option value="40">Error Messages</Option>
+            <Option value="50">Critical Errors Only</Option>
+        </List>
+    </Field>
 </PluginConfig>

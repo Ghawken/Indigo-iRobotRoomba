@@ -18,7 +18,7 @@ import logging
 #rom base64 import b64encode
 
 from roomba import Roomba
-
+import platform
 from roomba import password
 from roomba import irobotAPI_Maps
 #import paho.mqtt.client as mqtt
@@ -27,6 +27,7 @@ import datetime
 from builtins import str as text
 import locale
 import shutil
+from os import path
 
 try:
     import indigo
@@ -34,40 +35,100 @@ except:
     pass
 
 kCurDevVersCount = 1        # current version of plugin devices
+################################################################################
+# New Indigo Log Handler - display more useful info when debug logging
+# update to python3 changes
+################################################################################
+class IndigoLogHandler(logging.Handler):
+    def __init__(self, display_name, level=logging.NOTSET):
+        super().__init__(level)
+        self.displayName = display_name
 
+    def emit(self, record):
+        """ not used by this class; must be called independently by indigo """
+        logmessage = ""
+        try:
+            levelno = int(record.levelno)
+            is_error = False
+            is_exception = False
+            if self.level <= levelno:  ## should display this..
+                if record.exc_info !=None:
+                    is_exception = True
+                if levelno == 5:	# 5
+                    logmessage = '({}:{}:{}): {}'.format(path.basename(record.pathname), record.funcName, record.lineno, record.getMessage())
+                elif levelno == logging.DEBUG:	# 10
+                    logmessage = '({}:{}:{}): {}'.format(path.basename(record.pathname), record.funcName, record.lineno, record.getMessage())
+                elif levelno == logging.INFO:		# 20
+                    logmessage = record.getMessage()
+                elif levelno == logging.WARNING:	# 30
+                    logmessage = record.getMessage()
+                elif levelno == logging.ERROR:		# 40
+                    logmessage = '({}: Function: {}  line: {}):    Error :  Message : {}'.format(path.basename(record.pathname), record.funcName, record.lineno, record.getMessage())
+                    is_error = True
+                if is_exception:
+                    logmessage = '({}: Function: {}  line: {}):    Exception :  Message : {}'.format(path.basename(record.pathname), record.funcName, record.lineno, record.getMessage())
+                    indigo.server.log(message=logmessage, type=self.displayName, isError=is_error, level=levelno)
+                    if record.exc_info !=None:
+                        etype,value,tb = record.exc_info
+                        tb_string = "".join(traceback.format_tb(tb))
+                        indigo.server.log(f"Traceback:\n{tb_string}", type=self.displayName, isError=is_error, level=levelno)
+                        indigo.server.log(f"Error in plugin execution:\n\n{traceback.format_exc(30)}", type=self.displayName, isError=is_error, level=levelno)
+                    indigo.server.log(f"\nExc_info: {record.exc_info} \nExc_Text: {record.exc_text} \nStack_info: {record.stack_info}",type=self.displayName, isError=is_error, level=levelno)
+                    return
+                indigo.server.log(message=logmessage, type=self.displayName, isError=is_error, level=levelno)
+        except Exception as ex:
+            indigo.server.log(f"Error in Logging: {ex}",type=self.displayName, isError=is_error, level=levelno)
 ################################################################################
 class Plugin(indigo.PluginBase):
 
     ########################################
     # Main Plugin methods
     ########################################
-    def __init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs):
-        indigo.PluginBase.__init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs)
-        pfmt = logging.Formatter('%(asctime)s.%(msecs)03d\t[%(levelname)8s] %(name)20s.%(funcName)-25s%(msg)s', datefmt='%Y-%m-%d %H:%M:%S')
+    def __init__(self, plugin_id, plugin_display_name, plugin_version, pluginPrefs):
+        indigo.PluginBase.__init__(self, plugin_id, plugin_display_name, plugin_version, pluginPrefs)
+        ################################################################################
+        # Setup Logging
+        ################################################################################
+        try:
+            self.logLevel = int(self.pluginPrefs["showDebugLevel"])
+            self.fileloglevel = int(self.pluginPrefs["showDebugFileLevel"])
+        except:
+            self.logLevel = logging.INFO
+            self.fileloglevel = logging.DEBUG
+
+        self.logger.removeHandler(self.indigo_log_handler)
+
+        self.indigo_log_handler = IndigoLogHandler(plugin_display_name, logging.INFO)
+        ifmt = logging.Formatter("%(message)s")
+        self.indigo_log_handler.setFormatter(ifmt)
+        self.indigo_log_handler.setLevel(self.logLevel)
+        self.logger.addHandler(self.indigo_log_handler)
+
+        pfmt = logging.Formatter('%(asctime)s.%(msecs)03d\t%(levelname)s\t%(name)s.%(funcName)s:\t%(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         self.plugin_file_handler.setFormatter(pfmt)
+        self.plugin_file_handler.setLevel(self.fileloglevel)
 
         MAChome     = os.path.expanduser("~")+"/"
         self.mainfolderLocation = MAChome+"Documents/Indigo-iRobotRoomba/"
 
         #self.mappingfile = self.mainfolderLocation + str(address)+"-mapping-data.json"
-        self.logger.info(u"")
-        self.logger.info(u"{0:=^130}".format(" Initializing New Plugin Session "))
-        self.logger.info(u"{0:<30} {1}".format("Plugin name:", pluginDisplayName))
-        self.logger.info(u"{0:<30} {1}".format("Plugin version:", pluginVersion))
-        self.logger.info(u"{0:<30} {1}".format("Plugin ID:", pluginId))
-        self.logger.info(u"{0:<30} {1}".format("Indigo version:", indigo.server.version))
-        self.logger.info(u"{0:<30} {1}".format("Python version:", sys.version.replace('\n', '')))
-        self.logger.info(u"{0:<30} {1}".format("Python Directory:", sys.prefix.replace('\n', '')))
-        #self.logger.info(u"{0:<30} {1}".format("Major Problem equals: ", MajorProblem))
-        self.logger.info(u"{0:=^130}".format(""))
+        system_version, product_version, longer_name = self.get_macos_version()
+        self.logger.info("{0:=^130}".format(f" Initializing New Plugin Session for Plugin: {plugin_display_name} "))
+        self.logger.info("{0:<30} {1}".format("Plugin name:", plugin_display_name))
+        self.logger.info("{0:<30} {1}".format("Plugin version:", plugin_version))
+        self.logger.info("{0:<30} {1}".format("Plugin ID:", plugin_id))
+        self.logger.info("{0:<30} {1}".format("Indigo version:", indigo.server.version) )
+        self.logger.info("{0:<30} {1}".format("System version:", f"{system_version} {longer_name}" ))
+        self.logger.info("{0:<30} {1}".format("Product version:", product_version))
+        self.logger.info("{0:<30} {1}".format("Silicon version:", str(platform.machine()) ))
+        self.logger.info("{0:<30} {1}".format("Python version:", sys.version.replace('\n', '')))
+        self.logger.info("{0:<30} {1}".format("Python Directory:", sys.prefix.replace('\n', '')))
 
         self.allMappingData = {}
+        self.allFavouritesData = {}
+
         self.pluginprefDirectory = '{}/Preferences/Plugins/com.GlennNZ.indigoplugin.irobot/'.format(indigo.server.getInstallFolderPath())
-        try:
-            self.logLevel = int(self.pluginPrefs[u"logLevel"])
-        except:
-            self.logLevel = logging.INFO
-        self.indigo_log_handler.setLevel(self.logLevel)
+
         self.logger.debug(u"logLevel = " + str(self.logLevel))
         self.debugTrue = self.pluginPrefs.get('debugTrue', '')
         self.debugOther = self.pluginPrefs.get('debugOther', True)
@@ -91,9 +152,54 @@ class Plugin(indigo.PluginBase):
             self.logger.debug("Exception in Json database")
             pass
 
+        self.logger.info("{0:=^130}".format(f" End Initializing Plugin Session for Plugin: {plugin_display_name} "))
         #self.logger.debug(json.dumps(self.iroombaData, sort_keys=True, indent=4))
         #self.logger.error(self.iroombaData['resources']['abc_capital_on'])
 
+    def get_macos_version(self):
+        try:
+            version, _, _ = platform.mac_ver()
+            longer_version = platform.platform()
+            self.logger.info(f"{version}")
+            longer_name = self.get_macos_marketing_name(version)
+            return version, longer_version, longer_name
+        except:
+            self.logger.debug("Exception:",exc_info=True)
+            return "","",""
+
+    def get_macos_marketing_name(self, version: str) -> str:
+        """Return the marketing name for a given macOS version number."""
+        versions = {
+            "10.0": "Cheetah",
+            "10.1": "Puma",
+            "10.2": "Jaguar",
+            "10.3": "Panther",
+            "10.4": "Tiger",
+            "10.5": "Leopard",
+            "10.6": "Snow Leopard",
+            "10.7": "Lion",
+            "10.8": "Mountain Lion",
+            "10.9": "Mavericks",
+            "10.10": "Yosemite",
+            "10.11": "El Capitan",
+            "10.12": "Sierra",
+            "10.13": "High Sierra",
+            "10.14": "Mojave",
+            "10.15": "Catalina",
+            "11": "Big Sur",  # Just use the major version number for macOS 11+
+            "12": "Monterey",
+            "13": "Ventura",
+            "14": "Sonoma",
+        }
+        major_version_parts = version.split(".")
+        # If the version is "11" or later, use only the first number as the key
+        if int(major_version_parts[0]) >= 11:
+            major_version = major_version_parts[0]
+        # For macOS "10.x" versions, use the first two numbers as the key
+        else:
+            major_version = ".".join(major_version_parts[:2])
+        self.logger.debug(f"Major Version== {major_version}")
+        return versions.get(major_version, f"Unknown macOS version for {version}")
 
     def pluginStore(self):
         self.logger.info(u'Opening Plugin Store.')
@@ -195,13 +301,13 @@ class Plugin(indigo.PluginBase):
             "47": "Reboot required",
             "48": "Path blocked",
             "52": "Pad required attention",
+            "53": "Software update required",
             "54": "Blades stuck",
             "55": "Left blades stuck",
             "56":"Right blades stuck",
             "57":"Cutting deck stuck",
             "58":"Navigation problem",
             "59":"Tilt detected",
-            "53": "Software update required",
             "60":"Rolled over",
             "62":"Stopped button pressed",
             "63":"Hardware Error",
@@ -218,7 +324,7 @@ class Plugin(indigo.PluginBase):
             "79":"Right wheel error",
             "85":"Path to charging station blocked",
             "86": "Path to charging station blocked",
-             "88": "Navigation problem",
+            "88": "Navigation problem",
             "89": "Mission runtime too long",
             "101": "Battery isn't connected",
             "102": "Charging error",
@@ -241,6 +347,7 @@ class Plugin(indigo.PluginBase):
             "121": "Clean the Charging contacts",
             "122": "Charging system error",
             "123": "Battery not initialized",
+            "216": "Charging base bag full",
             "224": "Smart Map Problem"
         }
         # self.errorStrings = {
@@ -405,6 +512,7 @@ class Plugin(indigo.PluginBase):
         roombaIP = str(device.states['IP'])
         filename =  str(roombaIP)+"-mapping-data.json"
         file = folderLocation + filename
+        favourites_file = folderLocation + str(roombaIP)+ "-favourites-data.json"
 
         if self.checkMapFile(device, file)== False:
             self.logger.debug(u'Mapping Data File Does Not Exist.')
@@ -413,6 +521,15 @@ class Plugin(indigo.PluginBase):
             self.logger.debug(u'Mapping Data File Exists - using it')
             with open(file) as data_file:
                 self.allMappingData[roombaIP] = json.load(data_file)
+
+        if self.checkMapFile(device, favourites_file)== False:
+            self.logger.debug(u'Favourites Data File Does Not Exist.')
+            self.logger.info("No Cloud Favourites Data found for this device.  Please setup in Device Config if needed.")
+        else:
+            self.logger.debug(u'Favourites Data File Exists - using it')
+            with open(favourites_file) as data_file:
+                self.allFavouritesData[roombaIP] = json.load(data_file)
+
 
         self.logger.debug(text(self.allMappingData))
 
@@ -437,6 +554,30 @@ class Plugin(indigo.PluginBase):
                         for zones in items['active_pmapv_details']['zones']:
                             self.logger.debug(text(zones))
                             myArray.append((zones['id']+str("Z"), zones['name']))
+        else:
+            self.logger.info("No room data available.  Please update or may not be possible with this model.")
+
+        self.logger.debug(text(myArray))
+        return myArray
+    def actionReturnFavourites(self, filter, valuesDict,typeId, targetId):
+        self.logger.debug(u'Generate Favourites from Favourites Data')
+        self.logger.debug(targetId)
+        myArray = []
+
+        device = indigo.devices[targetId]
+        ipaddress = device.states['IP']
+        robotid = str(device.states['blid']).lower()
+        self.logger.debug(f"{ipaddress=}\n{robotid=}")
+
+        if str(ipaddress) in self.allFavouritesData:
+            for items in self.allFavouritesData[str(ipaddress)]:
+                if 'commanddefs' in items:
+                    if 'robot_id' in items['commanddefs'][0]:
+                        self.logger.debug(f"{items['commanddefs'][0]}")
+                        if str(items['commanddefs'][0]['robot_id']).lower() == robotid:
+                            self.logger.debug("Favourite for matching Robot Found")
+                            self.logger.debug(f"{items}")
+                            myArray.append((items['favorite_id'], items['name']))
         else:
             self.logger.info("No room data available.  Please update or may not be possible with this model.")
 
@@ -538,17 +679,22 @@ class Plugin(indigo.PluginBase):
     def closedPrefsConfigUi(self, valuesDict, userCancelled):
         if not userCancelled:
             try:
-                self.logLevel = int(valuesDict[u"logLevel"])
+                self.logLevel = int(valuesDict["showDebugLevel"])
+                self.fileloglevel = int(valuesDict["showDebugFileLevel"])
             except:
+                self.logger.exception("Error here")
                 self.logLevel = logging.INFO
+                self.fileloglevel = logging.DEBUG
+
+            self.plugin_file_handler.setLevel(self.fileloglevel)
             self.indigo_log_handler.setLevel(self.logLevel)
             self.logger.debug(u"logLevel = " + str(self.logLevel))
             self.datetimeFormat = valuesDict.get('datetimeFormat', '%c')
-            self.updateFrequency = float(self.pluginPrefs.get('updateFrequency', "24")) * 60.0 * 60.0
+            #self.updateFrequency = float(self.pluginPrefs.get('updateFrequency', "24")) * 60.0 * 60.0
             self.logger.debug(u"updateFrequency = " + str(self.updateFrequency))
             self.next_update_check = time.time()
-            self.debugTrue = self.pluginPrefs.get('debugTrue', '')
-            self.debugOther = self.pluginPrefs.get('debugOther', True)
+            self.debugTrue =valuesDict.get('debugTrue', '')
+            self.debugOther = valuesDict.get('debugOther', True)
     ########################################
     def closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):
         self.logger.debug(u'closedDeviceConfigUi(self, valuesDict, userCancelled, typeId, devId):')
@@ -1271,6 +1417,111 @@ class Plugin(indigo.PluginBase):
 
         except Exception as ex:
             self.logger.exception("Exception ")
+    def sendSpecificFavouriteCommand(self, pluginAction, roombaDevice):
+        try:
+            self.logger.debug("send Specific Favourite Clean called to run")
+            self.logger.debug("pluginAction "+text(pluginAction))
+            self.logger.debug("roombaDevice IP:" + text(roombaDevice.states['IP']))
+
+            blid = str(roombaDevice.states['blid'])
+            ipaddress = str(roombaDevice.states['IP'])
+            action = {}
+            regions = []
+            actionRooms = []
+            commandtosend = ""
+
+            if blid is None:
+                self.logger.info("Please update iRobot to include Blid data.  Run Get Password via Cloud to update.")
+                return
+            if blid == "":
+                self.logger.info("Please update iRobot to include Blid data.  Run Get Password via Cloud to update.")
+                return
+            if ipaddress is None:
+                self.logger.info("Please update iRobot to include IP Address data.  Run Get Password via Cloud to update.")
+                return
+            if ipaddress == "":
+                self.logger.info("Please update iRobot to include Ip Address data.  Run Get Password via Cloud to update.")
+                return
+
+
+            action['ordered']=1
+           # action['regions']=[]
+
+            actionID = pluginAction.props.get("actionID")
+            self.logger.debug(text(actionID))
+            if len(actionID)<=0:
+                self.logger.info("Please select some options in Action Group Config.  No Favourites selected.")
+                return
+            command_to_run = None
+            if str(ipaddress) in self.allFavouritesData:
+                for items in self.allFavouritesData[str(ipaddress)]:
+                    if str(actionID).lower() == str(items['favorite_id']).lower():
+                        self.logger.debug(f"Found Correct Favourite:\n {items['commanddefs'][0]}")
+                        favourite_id = str(items['favorite_id']).lower()
+                        command_to_run = items["commanddefs"][0]
+
+            self.logger.debug(f"Command to Run: {command_to_run}")
+            if command_to_run == None:
+                self.logger.error("Command found is empty.  Ending")
+
+            if 'pmap_id' in command_to_run:
+                action['pmap_id']= command_to_run['pmap_id']
+            if 'user_pmapv_id' in command_to_run:
+                action['user_pmapv_id']= command_to_run['user_pmapv_id']
+            if 'regions' in command_to_run:
+                action['regions']= command_to_run['regions']
+            else:
+                action['regions'] =[]
+
+            action['favorite_id'] = favourite_id
+
+           # if 'select_all' in command_to_run:
+            #    action['select_all'] = command_to_run['select_all']
+            if 'command' in command_to_run:
+                action['command'] = command_to_run['command']
+            else:
+                action['command'] = "start"
+            if 'params' in command_to_run:
+                action['params'] = command_to_run['params']
+            if 'ordered' in command_to_run:
+                action['ordered'] = command_to_run['ordered']
+
+            #action['robot_id']= blid
+
+            self.logger.debug(json.dumps(action))
+
+            try:
+                iroombaName = str(roombaDevice.states['Name'])
+                iroombaIP = str(roombaDevice.states['IP'])
+                self.logger.debug("Roomba Name:"+text(iroombaName))
+                self.logger.debug("Roomba IP:" + text(iroombaIP))
+                #self.logger.debug("Connected Roomba Name:"+text(self.connectedtoName))
+
+                for myroomba in self.roomba_list:
+                    if str(myroomba.address) == str(iroombaIP):
+                        if myroomba.roomba_connected == False:
+                            self.logger.debug(u"Not connected to iRoomba:"+text(iroombaName)+" & IP:"+text(iroombaIP)+u" -- Should be --- Attempting to reconnect.")
+                            connected = False
+                            connected = self.connectRoomba(roombaDevice)
+                            time.sleep(5)
+                            # Add a connection check - the main library has added a base exception which might be useful to also use.
+                            if connected == False:
+                                self.logger.info(u'Failed Connected to Roomba within 5 seconds, waiting another 5.')
+                                time.sleep(5)
+                                if connected == False:
+                                    self.logger.info(u'Failed Connected to Roomba within 5 seconds.  Ending attempt.')
+                                    return
+                            myroomba.send_command_special(json.dumps(action))
+                        else:
+                            self.logger.debug("Sending Command to myroomba:"+text(myroomba.roombaName)+" and action:"+str(json.dumps(action)))
+                            myroomba.send_command_special(json.dumps(action))
+
+                return
+
+            except Exception as e:
+                self.logger.exception(u'Caught Error within RoombaAction:'+text(e))
+        except:
+            self.logger.exception("Exception Sending Favourite Command")
 
     def sendSpecificRoomCommand(self, pluginAction, roombaDevice):
         self.logger.debug("send Specific Room Clean called to run")

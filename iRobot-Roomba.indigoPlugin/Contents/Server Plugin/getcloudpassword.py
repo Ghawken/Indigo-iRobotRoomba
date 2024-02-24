@@ -89,7 +89,9 @@ class irobotAuth:
     def login(self):
         r = requests.get("https://disc-prod.iot.irobotapi.com/v1/discover/endpoints?country_code=US")
         response = r.json()
+        self.logger.debug(f"{response['deployments']=}")
         deployment = response['deployments'][next(iter(response['deployments']))]
+
         self.httpBase = deployment['httpBase']
         iotBase = deployment['httpBaseAuth']
         iotUrl = urlparse(iotBase)
@@ -98,6 +100,7 @@ class irobotAuth:
 
         self.apikey = response['gigya']['api_key']
         self.gigyaBase = response['gigya']['datacenter_domain']
+        self.vstream = deployment['vStream']
 
         data = {"apiKey": self.apikey,
                 "targetenv": "mobile",
@@ -110,8 +113,6 @@ class irobotAuth:
         r = requests.post("https://accounts.%s/accounts.login" % self.gigyaBase, data=data)
 
         response = r.json()
-
-        self.logger.debug(str(response))
 
         if 'errorMessage' in response:
             if response['errorMessage']=="Invalid LoginID":
@@ -159,7 +160,18 @@ class irobotAuth:
         return self.data['robots']
 
     def get_maps(self, robot):
-        return self.amz.get(self.iotHost, '/dev/v1/%s/pmaps' % robot, query="activeDetails=2").json()
+        self.logger.debug(f"{robot=}\n{self.iotHost=}")
+        ## auth1.prod.iot.irobotapi.com/v1/819**/pmaps?visible=2
+        #  maps_host = 'auth1.prod.iot.irobotapi.com'  ## fix to auth1 - although auth3 also works
+        result =  self.amz.get(self.iotHost, '/v1/%s/pmaps' % robot, query="activeDetails=2").json()
+        self.logger.debug(f"result = \n {result}")
+        return result
+
+    def get_favourites(self, robot):
+        self.logger.debug(f"Getting Favourites")
+        result =  self.amz.get(self.iotHost, '/v1/user/favorites', query="").json()
+        self.logger.debug(f"result = \n {result}")
+        return result
 
     def get_newest_map(self, robot):
         maps = self.get_maps(robot)

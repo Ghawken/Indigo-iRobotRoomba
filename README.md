@@ -17,10 +17,11 @@ iRoomba i7/i7+
 
 iRoomba s9/S9+
 
+iRoomba J7/J7 Combo
+
 ***Installation:***
 
 Indigo 2023.2 API 3.4 Only Version 0.9.35+
-
 Download and Install from Plugin Store as below link:
 
 https://www.indigodomo.com/pluginstore/132/
